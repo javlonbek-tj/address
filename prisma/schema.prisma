@@ -1,0 +1,166 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../lib/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Region {
+  id   String @id @default(cuid())
+  name String
+  code String @unique
+
+  geometry Json
+  center   Json?
+
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  districts District[]
+  users     User[]
+
+  @@index([name])
+  @@map("regions")
+}
+
+model District {
+  id       String @id @default(cuid())
+  regionId String
+  name     String
+  code     String @unique
+
+  geometry Json
+  center   Json?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  region   Region    @relation(fields: [regionId], references: [id], onDelete: Cascade)
+  mahallas Mahalla[]
+  streets  Street[]
+  users    User[]
+
+  @@index([name])
+  @@map("districts")
+}
+
+model Mahalla {
+  id   String @id @default(cuid())
+  name String
+  code String @unique
+
+  geometry Json
+  center   Json?
+
+  uzKadName String
+  geoCode   String
+  oneId     String
+
+  hidden         Boolean @default(false)
+  mergedIntoId   String?
+  mergedIntoName String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  oldName       String?
+  regulation    String?
+  regulationUrl String?
+
+  districtId String
+  district   District @relation(fields: [districtId], references: [id], onDelete: Cascade)
+  streets    Street[]
+
+  @@index([name])
+  @@index([hidden])
+  @@map("mahallas")
+}
+
+model Street {
+  id   String @id @default(cuid())
+  name String
+  code String @unique
+
+  geometry Json
+  center   Json?
+
+  type      String
+  oldNameId String?
+  oldName   String?
+  uzKadCode String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  districtId String
+  district   District @relation(fields: [districtId], references: [id])
+  mahallaId  String
+  mahalla    Mahalla  @relation(fields: [mahallaId], references: [code], onDelete: Cascade)
+
+  @@index([name])
+  @@map("streets")
+}
+
+model User {
+  id          String  @id @default(cuid())
+  fullName    String?
+  jshshir     String? @unique
+  phoneNumber String?
+
+  role   UserRole
+  status UserStatus @default(active)
+
+  // Region-specific
+  regionId String?
+  region   Region?             @relation(fields: [regionId], references: [id], onDelete: Cascade)
+  position RegionUserPosition?
+
+  // District-specific
+  districtId String?
+  district   District? @relation(fields: [districtId], references: [id], onDelete: Cascade)
+
+  // Auth relations
+  auth AuthUser?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([role])
+  @@index([status])
+  @@index([regionId])
+  @@index([districtId])
+  @@map("users")
+}
+
+model AuthUser {
+  id              String @id @default(cuid())
+  userId          String @unique
+  username        String @unique
+  displayUsername String
+  passwordHash    String
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("auth_users")
+}
+
+enum UserRole {
+  superadmin
+  admin
+  region_user
+  district_user
+}
+
+enum RegionUserPosition {
+  boss
+  assistant
+}
+
+enum UserStatus {
+  active
+  inactive
+}
