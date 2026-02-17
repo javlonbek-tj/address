@@ -1,7 +1,7 @@
 import 'server-only';
 
 import { prisma } from '../prisma';
-import { Mahalla } from '@/types';
+import type { Mahalla } from '@/types';
 
 export async function getMahallas(districtId: string): Promise<Mahalla[]> {
   if (!districtId) return [];

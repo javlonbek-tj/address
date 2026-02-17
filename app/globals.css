@@ -1,6 +1,6 @@
 @import 'tailwindcss';
 @import 'tw-animate-css';
-@import "leaflet/dist/leaflet.css";
+@import 'leaflet/dist/leaflet.css';
 
 @custom-variant dark (&:is(.dark *));
 
@@ -72,8 +72,7 @@
   --chart-3: oklch(0.541 0.281 293.009);
   --chart-4: oklch(0.491 0.27 292.581);
   --chart-5: oklch(0.432 0.232 292.759);
-  --sidebar: oklch(1 0 0)
-  --sidebar-foreground: oklch(0.141 0.005 285.823);
+  --sidebar: oklch(1 0 0) --sidebar-foreground: oklch(0.141 0.005 285.823);
   --sidebar-primary: oklch(0.541 0.281 293.009);
   --sidebar-primary-foreground: oklch(0.969 0.016 293.756);
   --sidebar-accent: oklch(0.967 0.001 286.375);
@@ -123,4 +122,36 @@
   body {
     @apply bg-background text-foreground;
   }
+}
+
+.leaflet-tooltip.map-label {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  color: #1d4ed8 !important; /* blue-700 */
+  font-weight: 600 !important;
+  font-size: 11px !important;
+  text-shadow:
+    -1px -1px 0 #fff,
+    1px -1px 0 #fff,
+    -1px 1px 0 #fff,
+    1px 1px 0 #fff,
+    0 0 5px rgba(255, 255, 255, 0.8);
+  pointer-events: none !important;
+  white-space: nowrap;
+}
+
+.leaflet-tooltip.street-label {
+  display: none !important;
+}
+
+.zoom-high .leaflet-tooltip.street-label {
+  display: block !important;
+}
+
+.leaflet-tooltip-top.map-label:before,
+.leaflet-tooltip-bottom.map-label:before,
+.leaflet-tooltip-left.map-label:before,
+.leaflet-tooltip-right.map-label:before {
+  display: none !important;
 }

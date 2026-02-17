@@ -1,21 +1,18 @@
 'use client';
 
-import { Region } from '@/lib/generated/prisma/client';
+import type { Region } from '@/lib/generated/prisma/client';
 import dynamic from 'next/dynamic';
+import { Spinner } from '../shared';
 
-interface MapWrapperProps {
+interface Props {
   regions: Region[];
 }
 
 const UzbekistanMap = dynamic(() => import('./UzbekistanMap'), {
   ssr: false,
-  loading: () => (
-    <div className='h-full w-full flex items-center justify-center bg-slate-100'>
-      <p>Xarita yuklanmoqda...</p>
-    </div>
-  ),
+  loading: () => <Spinner />,
 });
 
-export function MapWrapper({ regions }: MapWrapperProps) {
+export function MapWrapper({ regions }: Props) {
   return <UzbekistanMap regions={regions} />;
 }

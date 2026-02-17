@@ -1,13 +1,11 @@
-'use client';
-
 import { useState } from 'react';
-import { useDistricts } from './useDistricts';
-import { useMahallas } from './useMahallas';
+import { useDistricts, useMahallas, useStreets } from './';
 
 export function useMapFilters() {
   const [selectedRegion, setSelectedRegion] = useState('');
   const [selectedDistrict, setSelectedDistrict] = useState('');
   const [selectedMahalla, setSelectedMahalla] = useState('');
+  const [selectedStreet, setSelectedStreet] = useState('');
 
   // 1. Fetch Districts (Only if a region is selected)
   const { districts, isLoadingDistricts } = useDistricts(selectedRegion);
@@ -15,15 +13,25 @@ export function useMapFilters() {
   // 2. Fetch Mahallas (Only if a district is selected)
   const { mahallas, isLoadingMahallas } = useMahallas(selectedDistrict);
 
-  const handleSetSelectedRegion = (region: string) => {
-    setSelectedRegion(region);
+  // 3. Fetch Streets (Only if a district is selected)
+  const { streets, isLoadingStreets } = useStreets(selectedDistrict);
+
+  const handleSetSelectedRegion = (regionId: string) => {
+    setSelectedRegion(regionId);
     setSelectedDistrict('');
     setSelectedMahalla('');
+    setSelectedStreet('');
   };
 
-  const handleSetSelectedDistrict = (district: string) => {
-    setSelectedDistrict(district);
+  const handleSetSelectedDistrict = (districtId: string) => {
+    setSelectedDistrict(districtId);
     setSelectedMahalla('');
+    setSelectedStreet('');
+  };
+
+  const handleSetSelectedMahalla = (mahallaId: string) => {
+    setSelectedMahalla(mahallaId);
+    setSelectedStreet('');
   };
 
   return {
@@ -32,9 +40,12 @@ export function useMapFilters() {
     selectedDistrict,
     setSelectedDistrict: handleSetSelectedDistrict,
     selectedMahalla,
-    setSelectedMahalla,
+    setSelectedMahalla: handleSetSelectedMahalla,
+    selectedStreet,
+    setSelectedStreet,
     districts,
     mahallas,
-    isLoading: isLoadingDistricts || isLoadingMahallas,
+    streets,
+    isLoading: isLoadingDistricts || isLoadingMahallas || isLoadingStreets,
   };
 }

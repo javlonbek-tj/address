@@ -33,7 +33,7 @@ export function HeaderActions() {
               }
             />
           </TooltipTrigger>
-          <TooltipContent className='bg-gray-900 dark:bg-white text-white dark:text-gray-900 border-none shadow-xl text-[10px] py-1 px-2 **:data-[slot=tooltip-arrow]:hidden'>
+          <TooltipContent className='bg-gray-900 z-1000 dark:bg-white text-white dark:text-gray-900 border-none shadow-xl text-[10px] py-1 px-2 **:data-[slot=tooltip-arrow]:hidden'>
             Mavzuni o&apos;zgartirish
           </TooltipContent>
         </Tooltip>
@@ -48,7 +48,7 @@ export function HeaderActions() {
               icon={<User className='h-[1.2rem] w-[1.2rem]' />}
             />
           </TooltipTrigger>
-          <TooltipContent className='bg-gray-900 dark:bg-white text-white dark:text-gray-900 border-none shadow-xl text-[10px] py-1 px-2 **:data-[slot=tooltip-arrow]:hidden'>
+          <TooltipContent className='bg-gray-900 z-1000 dark:bg-white text-white dark:text-gray-900 border-none shadow-xl text-[10px] py-1 px-2 **:data-[slot=tooltip-arrow]:hidden'>
             Profil
           </TooltipContent>
         </Tooltip>

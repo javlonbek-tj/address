@@ -1,11 +1,11 @@
 import { axiosInstance } from './instance';
 import { ApiRoutes } from './apiRoutes';
-import { District } from '@/types';
+import type { Street } from '@/types';
 
-export const fetchDistricts = async (regionId: string) => {
+export const fetchStreets = async (districtId: string) => {
   const { data } = await axiosInstance.get<{
     success: boolean;
-    data: District[];
-  }>(`${ApiRoutes.DISTRICTS}?regionId=${regionId}`);
+    data: Street[];
+  }>(`${ApiRoutes.STREETS}?districtId=${districtId}`);
   return data?.data || [];
 };

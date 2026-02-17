@@ -1,17 +1,23 @@
 import { NextRequest } from 'next/server';
-import { getMahallas } from '@/server/data/mahallas';
+import {
+  getGlobalStatistics,
+  getRegionStatistics,
+  getDistrictStatistics,
+} from '@/server';
 
 export async function GET(request: NextRequest) {
   try {
+    const regionId = request.nextUrl.searchParams.get('regionId');
     const districtId = request.nextUrl.searchParams.get('districtId');
-    if (!districtId) {
-      return Response.json(
-        { success: false, error: 'District ID required' },
-        { status: 400 },
-      );
+    let data;
+    if (districtId) {
+      data = await getDistrictStatistics(districtId);
+    } else if (regionId) {
+      data = await getRegionStatistics(regionId);
+    } else {
+      data = await getGlobalStatistics();
     }
 
-    const data = await getMahallas(districtId);
     return Response.json({ success: true, data });
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Unknown error';

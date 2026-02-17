@@ -1,6 +1,6 @@
+import type { Mahalla } from '@/types';
 import { fetchMahallas } from '@/services';
 import { useQuery } from '@tanstack/react-query';
-import { Mahalla } from '@/types';
 
 export function useMahallas(districtId: string) {
   const { data: mahallas = [], isLoading: isLoadingMahallas } = useQuery<
@@ -9,7 +9,6 @@ export function useMahallas(districtId: string) {
     queryKey: ['mahallas', districtId],
     queryFn: () => fetchMahallas(districtId),
     enabled: !!districtId,
-    staleTime: Infinity,
   });
 
   return { mahallas, isLoadingMahallas };

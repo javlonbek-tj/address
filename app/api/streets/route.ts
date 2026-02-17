@@ -1,5 +1,5 @@
 import { NextRequest } from 'next/server';
-import { getMahallas } from '@/server/data/mahallas';
+import { getStreets } from '@/server/data/streets';
 
 export async function GET(request: NextRequest) {
   try {
@@ -11,7 +11,7 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    const data = await getMahallas(districtId);
+    const data = await getStreets(districtId);
     return Response.json({ success: true, data });
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Unknown error';

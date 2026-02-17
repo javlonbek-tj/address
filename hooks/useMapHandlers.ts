@@ -4,10 +4,10 @@ import { useEffect, useRef, useCallback } from 'react';
 import { Feature } from 'geojson';
 import { Layer, LatLngBounds, Path } from 'leaflet';
 import L from 'leaflet';
-import { Region } from '@/lib/generated/prisma/client';
+import type { Region } from '@/lib/generated/prisma/client';
 import { MAP_LEVEL_STYLES } from '@/lib/constants/map';
 
-interface UseMapHandlersProps {
+interface Props {
   regions: Region[];
   selectedRegion: string;
   selectedDistrict: string;
@@ -15,6 +15,8 @@ interface UseMapHandlersProps {
   setSelectedRegion: (id: string) => void;
   setSelectedDistrict: (id: string) => void;
   setSelectedMahalla: (id: string) => void;
+  selectedStreet: string;
+  setSelectedStreet: (id: string) => void;
   setMapBounds: (bounds: LatLngBounds | null) => void;
 }
 
@@ -26,18 +28,22 @@ export function useMapHandlers({
   setSelectedRegion,
   setSelectedDistrict,
   setSelectedMahalla,
+  selectedStreet,
+  setSelectedStreet,
   setMapBounds,
-}: UseMapHandlersProps) {
+}: Props) {
   // Refs for event handlers to avoid stale closures
   const selectedRegionRef = useRef(selectedRegion);
   const selectedDistrictRef = useRef(selectedDistrict);
   const selectedMahallaRef = useRef(selectedMahalla);
+  const selectedStreetRef = useRef(selectedStreet);
 
   useEffect(() => {
     selectedRegionRef.current = selectedRegion;
     selectedDistrictRef.current = selectedDistrict;
     selectedMahallaRef.current = selectedMahalla;
-  }, [selectedRegion, selectedDistrict, selectedMahalla]);
+    selectedStreetRef.current = selectedStreet;
+  }, [selectedRegion, selectedDistrict, selectedMahalla, selectedStreet]);
 
   const handleRegionClick = useCallback(
     (region: Region, bounds: LatLngBounds) => {
@@ -49,6 +55,13 @@ export function useMapHandlers({
 
   const onEachRegion = useCallback(
     (feature: Feature, layer: Layer) => {
+      const props = feature.properties as { name: string; id: string };
+      layer.bindTooltip(props.name, {
+        permanent: false,
+        direction: 'center',
+        className: 'map-label',
+      });
+
       layer.on({
         click: (e: {
           target: { getBounds: () => LatLngBounds };
@@ -63,6 +76,8 @@ export function useMapHandlers({
           }
         },
         mouseover: (e: { target: Layer }) => {
+          // Block hover if children are selected
+          if (selectedDistrictRef.current || selectedMahallaRef.current) return;
           const l = e.target as Path;
           if (typeof l.setStyle === 'function') {
             l.setStyle(MAP_LEVEL_STYLES.highlight.adminBoundary);
@@ -72,13 +87,15 @@ export function useMapHandlers({
           const l = e.target as Path;
           const featureId = (feature.properties as { id: string }).id;
           const isSelected = featureId === selectedRegionRef.current;
-          const hasSelection = !!selectedRegionRef.current;
 
           if (typeof l.setStyle === 'function') {
             l.setStyle({
               ...MAP_LEVEL_STYLES.adminBoundary,
-              opacity: !hasSelection || isSelected ? 1 : 0.3,
               weight: isSelected ? 3 : 2,
+              opacity:
+                selectedDistrictRef.current || selectedMahallaRef.current
+                  ? 0.3
+                  : 1,
             });
           }
         },
@@ -90,6 +107,11 @@ export function useMapHandlers({
   const onEachDistrict = useCallback(
     (feature: Feature, layer: Layer) => {
       const props = feature.properties as { name: string; id: string };
+      layer.bindTooltip(props.name, {
+        permanent: true,
+        direction: 'center',
+        className: 'map-label',
+      });
 
       layer.on({
         click: (e: {
@@ -111,11 +133,10 @@ export function useMapHandlers({
           const l = e.target as Path;
           const isSelected = props.id === selectedDistrictRef.current;
           if (typeof l.setStyle === 'function') {
-            l.setStyle(
-              isSelected
-                ? MAP_LEVEL_STYLES.highlight.adminBoundary
-                : MAP_LEVEL_STYLES.adminBoundary,
-            );
+            l.setStyle({
+              ...MAP_LEVEL_STYLES.adminBoundary,
+              weight: isSelected ? 3 : 2,
+            });
           }
         },
       });
@@ -127,10 +148,9 @@ export function useMapHandlers({
     (feature: Feature, layer: Layer) => {
       const props = feature.properties as { name: string; id: string };
       layer.bindTooltip(props.name, {
-        permanent: false,
+        permanent: true,
         direction: 'center',
-        className:
-          'bg-white px-2 py-1 rounded shadow-sm border border-slate-200 text-xs font-medium',
+        className: 'map-label',
       });
 
       layer.on({
@@ -140,30 +160,58 @@ export function useMapHandlers({
         }) => {
           L.DomEvent.stopPropagation(e.originalEvent);
           setSelectedMahalla(props.id);
-          const bounds = e.target.getBounds();
-          setMapBounds(bounds);
         },
         mouseover: (e: { target: Layer }) => {
           const l = e.target as Path;
           if (typeof l.setStyle === 'function') {
-            l.setStyle(MAP_LEVEL_STYLES.highlight.mahalla);
+            l.setStyle(MAP_LEVEL_STYLES.highlight.adminBoundary);
           }
         },
         mouseout: (e: { target: Layer }) => {
           const l = e.target as Path;
           const isSelected = props.id === selectedMahallaRef.current;
           if (typeof l.setStyle === 'function') {
-            l.setStyle(
-              isSelected
-                ? MAP_LEVEL_STYLES.highlight.mahalla
-                : MAP_LEVEL_STYLES.mahalla,
-            );
+            l.setStyle({
+              ...MAP_LEVEL_STYLES.adminBoundary,
+              weight: isSelected ? 3 : 2.5,
+            });
           }
         },
       });
     },
-    [setSelectedMahalla, setMapBounds],
+    [setSelectedMahalla],
   );
 
-  return { onEachRegion, onEachDistrict, onEachMahalla };
+  const onEachStreet = useCallback(
+    (feature: Feature, layer: Layer) => {
+      const props = feature.properties as { name: string; id: string };
+      layer.bindTooltip(props.name, {
+        permanent: true,
+        direction: 'center',
+        className: 'map-label street-label',
+      });
+
+      layer.on({
+        click: (e: { originalEvent: MouseEvent }) => {
+          L.DomEvent.stopPropagation(e.originalEvent);
+          setSelectedStreet(props.id);
+        },
+        mouseover: (e: { target: Layer }) => {
+          const l = e.target as Path;
+          if (typeof l.setStyle === 'function') {
+            l.setStyle(MAP_LEVEL_STYLES.highlight.street);
+          }
+        },
+        mouseout: (e: { target: Layer }) => {
+          const l = e.target as Path;
+          if (typeof l.setStyle === 'function') {
+            l.setStyle(MAP_LEVEL_STYLES.street);
+          }
+        },
+      });
+    },
+    [setSelectedStreet],
+  );
+
+  return { onEachRegion, onEachDistrict, onEachMahalla, onEachStreet };
 }

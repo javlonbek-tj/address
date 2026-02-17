@@ -1,7 +1,7 @@
 'use client';
 
 import { X } from 'lucide-react';
-import { Mahalla } from '@/types';
+import type { Mahalla } from '@/types';
 
 interface MahallaPopupProps {
   mahalla: Mahalla;
@@ -36,7 +36,7 @@ export function MahallaPopup({ mahalla, onClose }: MahallaPopupProps) {
           <InfoRow label='Geonames kodi' value={mahalla.geoCode || '-'} />
           <InfoRow
             label="Mavjud ko'chalar soni"
-            value={mahalla._count?.toString() || '0'}
+            value={mahalla._count?.streets.toString() || '0'}
           />
           <InfoRow label='Kengash qarori' value={mahalla.regulation || '-'} />
           <InfoRow label='Tarixiy nomi' value={mahalla.oldName || '-'} />
