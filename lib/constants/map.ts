@@ -18,6 +18,8 @@ export const baseMaps = {
   },
 } as const;
 
+export type BaseMapKey = keyof typeof baseMaps;
+
 const BASE_BLUE_STYLE = {
   fillColor: '#3b82f6',
   weight: 2,
@@ -37,9 +39,11 @@ export const MAP_LEVEL_STYLES = {
   adminBoundary: BASE_BLUE_STYLE,
   mahalla: BASE_BLUE_STYLE,
   street: {
-    color: '#334155',
-    weight: 2,
-    opacity: 0.8,
+    color: '#f59e0b',
+    weight: 4,
+    opacity: 0.9,
+    lineCap: 'round' as CanvasLineCap,
+    lineJoin: 'round' as CanvasLineJoin,
   },
   property: {
     fillColor: '#6366f1',
@@ -52,9 +56,11 @@ export const MAP_LEVEL_STYLES = {
     adminBoundary: BLUE_HIGHLIGHT_STYLE,
     mahalla: BLUE_HIGHLIGHT_STYLE,
     street: {
-      color: '#2563eb',
-      weight: 4,
+      color: '#1d4ed8',
+      weight: 6,
       opacity: 1,
+      lineCap: 'round' as CanvasLineCap,
+      lineJoin: 'round' as CanvasLineJoin,
     },
   },
   satellite: {
@@ -72,6 +78,13 @@ export const MAP_LEVEL_STYLES = {
       color: '#3b82f6',
       fillOpacity: 0,
     },
+    street: {
+      color: '#f59e0b',
+      weight: 4,
+      opacity: 0.95,
+      lineCap: 'round' as CanvasLineCap,
+      lineJoin: 'round' as CanvasLineJoin,
+    },
     highlight: {
       mahalla: {
         fillColor: '#ffffff',
@@ -84,6 +97,13 @@ export const MAP_LEVEL_STYLES = {
         fillOpacity: 0,
         weight: 6,
         color: '#60a5fa',
+      },
+      street: {
+        color: '#1d4ed8',
+        weight: 6,
+        opacity: 1,
+        lineCap: 'round' as CanvasLineCap,
+        lineJoin: 'round' as CanvasLineJoin,
       },
     },
   },

@@ -158,7 +158,7 @@ export function useMapHandlers({
           target: { getBounds: () => LatLngBounds };
           originalEvent: MouseEvent;
         }) => {
-          L.DomEvent.stopPropagation(e.originalEvent);
+          L.DomEvent.stop(e.originalEvent);
           setSelectedMahalla(props.id);
         },
         mouseover: (e: { target: Layer }) => {
@@ -170,10 +170,10 @@ export function useMapHandlers({
         mouseout: (e: { target: Layer }) => {
           const l = e.target as Path;
           const isSelected = props.id === selectedMahallaRef.current;
-          if (typeof l.setStyle === 'function') {
+          if (typeof l.setStyle === 'function' && !isSelected) {
             l.setStyle({
               ...MAP_LEVEL_STYLES.adminBoundary,
-              weight: isSelected ? 3 : 2.5,
+              weight: 2,
             });
           }
         },
@@ -185,6 +185,7 @@ export function useMapHandlers({
   const onEachStreet = useCallback(
     (feature: Feature, layer: Layer) => {
       const props = feature.properties as { name: string; id: string };
+
       layer.bindTooltip(props.name, {
         permanent: true,
         direction: 'center',
@@ -193,7 +194,7 @@ export function useMapHandlers({
 
       layer.on({
         click: (e: { originalEvent: MouseEvent }) => {
-          L.DomEvent.stopPropagation(e.originalEvent);
+          L.DomEvent.stop(e.originalEvent);
           setSelectedStreet(props.id);
         },
         mouseover: (e: { target: Layer }) => {
@@ -204,7 +205,8 @@ export function useMapHandlers({
         },
         mouseout: (e: { target: Layer }) => {
           const l = e.target as Path;
-          if (typeof l.setStyle === 'function') {
+          const isSelected = props.id === selectedStreetRef.current;
+          if (typeof l.setStyle === 'function' && !isSelected) {
             l.setStyle(MAP_LEVEL_STYLES.street);
           }
         },

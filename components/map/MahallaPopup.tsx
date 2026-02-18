@@ -2,13 +2,17 @@
 
 import { X } from 'lucide-react';
 import type { Mahalla } from '@/types';
+import { useState } from 'react';
 
-interface MahallaPopupProps {
+interface Props {
   mahalla: Mahalla;
-  onClose: () => void;
 }
 
-export function MahallaPopup({ mahalla, onClose }: MahallaPopupProps) {
+export function MahallaPopup({ mahalla }: Props) {
+  const [visible, setVisible] = useState(true);
+
+  if (!visible) return null;
+
   return (
     <div className='absolute bottom-6 right-6 z-2000 w-80 bg-white dark:bg-slate-900 rounded-xl shadow-2xl border border-slate-200 dark:border-slate-800 overflow-hidden animate-in slide-in-from-bottom-4 duration-300'>
       {/* Header */}
@@ -17,13 +21,12 @@ export function MahallaPopup({ mahalla, onClose }: MahallaPopupProps) {
           Mahalla ma&apos;lumotlari
         </h3>
         <button
-          onClick={onClose}
+          onClick={() => setVisible(false)}
           className='text-white/70 hover:text-white transition-colors'
         >
           <X size={20} />
         </button>
       </div>
-
       {/* Content */}
       <div className='p-4 space-y-4'>
         <div className='space-y-3'>

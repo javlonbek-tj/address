@@ -6,3 +6,4 @@ export { useStreets } from './useStreets';
 export * from './useStats';
 export { useMapHandlers } from './useMapHandlers';
 export { useMapFeatures } from './useMapFeatures';
+export { useMapHighlighting } from './useMapHighlighting';

@@ -14,7 +14,7 @@ export function MapZoomManager() {
     const zoom = map.getZoom();
     const container = map.getContainer();
 
-    if (zoom >= 14) {
+    if (zoom >= 16) {
       container.classList.add('zoom-high');
     } else {
       container.classList.remove('zoom-high');

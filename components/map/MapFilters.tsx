@@ -30,6 +30,7 @@ export function MapFilters({
     streets,
     selectedStreet,
     setSelectedStreet,
+    isLoading,
   } = filterState;
 
   const flyToItem = (
@@ -82,7 +83,11 @@ export function MapFilters({
 
   return (
     <div className='absolute top-3 left-1/2 -translate-x-1/2 z-9999 w-fit max-w-[95%]'>
-      <div className='flex items-center gap-3 p-2 bg-background/95 backdrop-blur-md border rounded-xl shadow-lg'>
+      <div
+        className={`flex items-center gap-3 p-2 bg-background/95 backdrop-blur-md border rounded-xl shadow-lg transition-opacity duration-200 ${
+          isLoading ? 'opacity-70 pointer-events-none' : 'opacity-100'
+        }`}
+      >
         <FilterSelect
           value={selectedRegion}
           onValueChange={handleRegionChange}

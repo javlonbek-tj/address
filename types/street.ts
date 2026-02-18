@@ -11,4 +11,10 @@ export type Street = StreetType & {
     name: string;
     code: string;
   };
+  metadata?: {
+    length: number;
+    bearing: number;
+    startPoint: { lat: number; lng: number };
+    endPoint: { lat: number; lng: number };
+  };
 };

@@ -4,3 +4,6 @@ export { MapWrapper } from './MapWrapper';
 export { MapZoomManager } from './MapZoomManager';
 export { MapFilters } from './MapFilters';
 export { MapStatistics } from './MapStatistics';
+export { MapLayersControl } from './MapLayersControl';
+export { MapControls } from './MapControls';
+export { StreetPopup } from './StreetPopup';

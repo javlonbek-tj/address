@@ -9,9 +9,12 @@ interface MapEventsProps {
 export function MapEvents({ onMapClick }: MapEventsProps) {
   useMapEvents({
     click: (e) => {
-      // If we clicked the map background (not a feature), reset selection
-      const container = e.target.getContainer();
-      if (e.originalEvent.target === container) {
+      // If we clicked the map background (not a feature or its containers), reset selection
+      const target = e.originalEvent.target as HTMLElement;
+      if (
+        target === e.target.getContainer() ||
+        target.classList.contains('leaflet-container')
+      ) {
         onMapClick();
       }
     },

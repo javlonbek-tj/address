@@ -8,12 +8,18 @@ import { MapPanes } from './MapPanes';
 interface Props {
   children?: React.ReactNode;
   className?: string;
+  baseMap?: BaseMapKey;
 }
+
+import { BaseMapKey } from '@/lib/constants/map';
 
 export const MapContainer = ({
   children,
   className = 'h-full w-full',
+  baseMap = 'osm',
 }: Props) => {
+  const selectedBase = baseMaps[baseMap];
+
   return (
     <RLMapContainer
       center={[41.377, 64.585]} // Default center: Uzbekistan
@@ -22,8 +28,8 @@ export const MapContainer = ({
       zoomControl={true}
     >
       <TileLayer
-        url={baseMaps.osm.url}
-        attribution={baseMaps.osm.attribution}
+        url={selectedBase.url}
+        attribution={selectedBase.attribution}
       />
       <MapPanes />
       {children}

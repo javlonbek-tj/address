@@ -2,6 +2,7 @@
 
 import { useMemo } from 'react';
 import { Geometry } from 'geojson';
+import * as turf from '@turf/turf';
 import type { Region } from '@/lib/generated/prisma/client';
 import type { District, Mahalla, Street } from '@/types';
 
@@ -13,6 +14,7 @@ interface UseMapFeaturesProps {
   selectedRegion: string;
   selectedDistrict: string;
   selectedMahalla: string;
+  selectedStreet: string;
 }
 
 export function useMapFeatures({
@@ -23,10 +25,53 @@ export function useMapFeatures({
   selectedRegion,
   selectedDistrict,
   selectedMahalla,
+  selectedStreet,
 }: UseMapFeaturesProps) {
   const currentMahalla = useMemo(() => {
     return mahallas.find((mahalla) => mahalla.id === selectedMahalla);
   }, [mahallas, selectedMahalla]);
+
+  const currentStreet = useMemo(() => {
+    const street = streets.find((s) => s.id === selectedStreet);
+    if (!street || !street.geometry) return street;
+
+    try {
+      const geo = street.geometry as unknown as Geometry;
+      if (geo.type !== 'LineString' && geo.type !== 'MultiLineString')
+        return street;
+
+      const line =
+        geo.type === 'LineString'
+          ? turf.lineString(geo.coordinates)
+          : turf.lineString(geo.coordinates[0]);
+
+      const length = turf.length(line, { units: 'meters' });
+      const coords = turf.getCoords(line);
+      const start = coords[0];
+      const end = coords[coords.length - 1];
+
+      // Calculate bearing of the last segment for direction arrow
+      let bearing = 0;
+      if (coords.length >= 2) {
+        const p1 = turf.point(coords[coords.length - 2]);
+        const p2 = turf.point(coords[coords.length - 1]);
+        bearing = turf.bearing(p1, p2);
+      }
+
+      return {
+        ...street,
+        metadata: {
+          length,
+          bearing,
+          startPoint: { lat: start[1], lng: start[0] },
+          endPoint: { lat: end[1], lng: end[0] },
+        },
+      };
+    } catch (error) {
+      console.error('Error calculating street metadata:', error);
+      return street;
+    }
+  }, [streets, selectedStreet]);
 
   const regionFeatures = useMemo(() => {
     const items = selectedRegion
@@ -68,6 +113,7 @@ export function useMapFeatures({
 
   return {
     currentMahalla,
+    currentStreet,
     regionFeatures,
     districtFeatures,
     mahallaFeatures,
