@@ -2,7 +2,7 @@ import { Loader2 } from 'lucide-react';
 
 export function Spinner() {
   return (
-    <div className='flex items-center justify-center h-screen'>
+    <div className='flex items-center justify-center h-[calc(100vh-4rem)] bg-slate-50 dark:bg-slate-950'>
       <div className='h-7 w-7 animate-spin rounded-full border-[3px] border-secondary border-t-primary' />
     </div>
   );

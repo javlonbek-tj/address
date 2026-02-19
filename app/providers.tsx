@@ -1,6 +1,7 @@
 'use client';
 
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { useState } from 'react';
 import { Toaster } from 'react-hot-toast';
 import { TooltipProvider } from '@/components/ui/tooltip';
@@ -27,6 +28,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
           }}
         />
       </TooltipProvider>
+      <ReactQueryDevtools initialIsOpen={false} />
     </QueryClientProvider>
   );
 }

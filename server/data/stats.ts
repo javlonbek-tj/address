@@ -47,3 +47,78 @@ export async function getDistrictStatistics(districtId: string) {
     return { mahallas: 0, streets: 0 };
   }
 }
+
+export async function getDashboardAnalytics() {
+  try {
+    const [
+      totalRegions,
+      totalDistricts,
+      totalMahallas,
+      totalStreets,
+      streetsByType,
+      hiddenMahallas,
+    ] = await Promise.all([
+      prisma.region.count(),
+      prisma.district.count(),
+      prisma.mahalla.count(),
+      prisma.street.count(),
+      prisma.street.groupBy({
+        by: ['type'],
+        _count: {
+          id: true,
+        },
+      }),
+      prisma.mahalla.count({
+        where: {
+          hidden: true,
+        },
+      }),
+    ]);
+
+    const regionsWithCounts = await prisma.region.findMany({
+      select: {
+        name: true,
+        districts: {
+          select: {
+            _count: {
+              select: { mahallas: true },
+            },
+          },
+        },
+      },
+      orderBy: { name: 'asc' },
+    });
+
+    const regionStats = regionsWithCounts.map((region) => ({
+      name: region.name,
+      mahallas: region.districts.reduce(
+        (acc, district) => acc + district._count.mahallas,
+        0,
+      ),
+    }));
+
+    return {
+      counts: {
+        regions: totalRegions,
+        districts: totalDistricts,
+        mahallas: totalMahallas,
+        streets: totalStreets,
+        properties: 148882,
+      },
+      charts: {
+        regions: regionStats,
+        streetTypes: streetsByType.map((s) => ({
+          name: s.type || 'Aniqlanmagan',
+          value: s._count.id,
+        })),
+        dataHealth: {
+          hiddenMahallas,
+          totalMahallas,
+        },
+      },
+    };
+  } catch (error) {
+    console.error('Failed to fetch dashboard analytics:', error);
+    return null;
+  }
+}

@@ -1,6 +1,6 @@
 'use client';
 
-import { Map, LayoutDashboard, MapPin, BarChart3, Users } from 'lucide-react';
+import { Map } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import {
@@ -13,34 +13,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from '@/components/ui/sidebar';
-
-const menuItems = [
-  {
-    title: 'Ochiq xarita',
-    icon: Map,
-    href: '/',
-  },
-  {
-    title: 'Dashboard',
-    icon: LayoutDashboard,
-    href: '/dashboard',
-  },
-  {
-    title: 'Manzil tuzilmasi',
-    icon: MapPin,
-    href: '/address-data',
-  },
-  {
-    title: 'Tahlil',
-    icon: BarChart3,
-    href: '/analytics',
-  },
-  {
-    title: 'Xodimlar',
-    icon: Users,
-    href: '/employees',
-  },
-];
+import { menuItems } from '@/lib';
 
 export function AppSidebar() {
   const pathname = usePathname();
