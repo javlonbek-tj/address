@@ -33,7 +33,7 @@ export function FormActions({
     <div className={`flex justify-end gap-2 pt-4 ${className}`}>
       <Button
         type='button'
-        variant='secondary'
+        variant='outline'
         onClick={onCancel}
         disabled={disabled}
         className={`cursor-pointer min-w-25 transition-colors ${

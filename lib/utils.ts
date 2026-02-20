@@ -1,7 +1,7 @@
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 import { Map as MapIcon, Navigation, Home, Waypoints } from 'lucide-react';
-import { Statistics } from '@/types';
+import type { Statistics } from '@/types';
 import { StatItem } from '@/components/map/MapStatistics';
 
 export function cn(...inputs: ClassValue[]) {

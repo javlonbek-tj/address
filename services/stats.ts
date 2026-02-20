@@ -1,6 +1,6 @@
 import { axiosInstance } from './instance';
 import { ApiRoutes } from './apiRoutes';
-import { Statistics } from '@/types';
+import type { Statistics } from '@/types';
 
 export const fetchStatistics = async (
   regionId?: string,

@@ -1,6 +1,6 @@
 import { fetchDistricts } from '@/services';
 import { useQuery } from '@tanstack/react-query';
-import { District } from '@/types';
+import type { District } from '@/lib/generated/prisma/client';
 
 export function useDistricts(regionId: string) {
   const { data: districts = [], isLoading: isLoadingDistricts } = useQuery<

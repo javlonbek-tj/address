@@ -10,10 +10,10 @@ import {
   Tag,
   Navigation,
 } from 'lucide-react';
-import { Street } from '@/types';
+import type { StreetWithMetadata } from '@/types';
 
 interface Props {
-  street: Street;
+  street: StreetWithMetadata;
   onClose: () => void;
 }
 

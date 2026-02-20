@@ -1,11 +1,11 @@
 'use client';
 
 import { X } from 'lucide-react';
-import type { Mahalla } from '@/types';
+import type { MahallaWithRelations } from '@/types';
 import { useState } from 'react';
 
 interface Props {
-  mahalla: Mahalla;
+  mahalla: MahallaWithRelations;
 }
 
 export function MahallaPopup({ mahalla }: Props) {
@@ -33,10 +33,10 @@ export function MahallaPopup({ mahalla }: Props) {
           <InfoRow label='Mahalla nomi' value={mahalla.name} />
           <InfoRow
             label='Manzili'
-            value={`${mahalla.district?.region?.name || ''}, ${mahalla.district?.name || ''}`}
+            value={`${mahalla.district.region.name}, ${mahalla.district.name}`}
           />
-          <InfoRow label='UzKad kodi' value={mahalla.code} />
-          <InfoRow label='Geonames kodi' value={mahalla.geoCode || '-'} />
+          <InfoRow label='UzKad kodi' value={mahalla.code.toString()} />
+          <InfoRow label='Geonames kodi' value={mahalla.geoCode.toString()} />
           <InfoRow
             label="Mavjud ko'chalar soni"
             value={mahalla._count?.streets.toString() || '0'}

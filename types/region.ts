@@ -1,4 +1,4 @@
-export type District = {
+export type Region = {
   id: string;
   name: string;
   code: number;

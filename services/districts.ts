@@ -1,6 +1,6 @@
 import { axiosInstance } from './instance';
 import { ApiRoutes } from './apiRoutes';
-import { District } from '@/types';
+import type { District } from '@/lib/generated/prisma/client';
 
 export const fetchDistricts = async (regionId: string) => {
   const { data } = await axiosInstance.get<{

@@ -2,8 +2,8 @@ import { Loader2 } from 'lucide-react';
 
 export function Spinner() {
   return (
-    <div className='flex items-center justify-center h-[calc(100vh-4rem)] bg-slate-50 dark:bg-slate-950'>
-      <div className='h-7 w-7 animate-spin rounded-full border-[3px] border-secondary border-t-primary' />
+    <div className='absolute inset-0 flex items-center justify-center bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm z-10'>
+      <div className='animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600'></div>
     </div>
   );
 }

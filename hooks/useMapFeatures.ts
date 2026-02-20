@@ -3,14 +3,18 @@
 import { useMemo } from 'react';
 import { Geometry } from 'geojson';
 import * as turf from '@turf/turf';
-import type { Region } from '@/lib/generated/prisma/client';
-import type { District, Mahalla, Street } from '@/types';
+import type {
+  Region as RegionModel,
+  District as DistrictModel,
+  Mahalla as MahallaModel,
+  Street as StreetModel,
+} from '@/lib/generated/prisma/client';
 
-interface UseMapFeaturesProps {
-  regions: Region[];
-  districts: District[];
-  mahallas: Mahalla[];
-  streets: Street[];
+interface Props {
+  regions: RegionModel[];
+  districts: DistrictModel[];
+  mahallas: MahallaModel[];
+  streets: StreetModel[];
   selectedRegion: string;
   selectedDistrict: string;
   selectedMahalla: string;
@@ -26,7 +30,7 @@ export function useMapFeatures({
   selectedDistrict,
   selectedMahalla,
   selectedStreet,
-}: UseMapFeaturesProps) {
+}: Props) {
   const currentMahalla = useMemo(() => {
     return mahallas.find((mahalla) => mahalla.id === selectedMahalla);
   }, [mahallas, selectedMahalla]);

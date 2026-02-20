@@ -1,13 +1,12 @@
-import { TabType } from '@/types';
-import { AddButton, TabButton } from './';
+import type { TabType } from '@/types';
+import { TabButton } from './';
 
 interface Props {
   activeTab: TabType;
   onTabChange: (tab: TabType) => void;
-  onAddClick: () => void;
 }
 
-export function Tabs({ activeTab, onTabChange, onAddClick }: Props) {
+export function Tabs({ activeTab, onTabChange }: Props) {
   return (
     <div className='border-b border-gray-200 dark:border-gray-700 px-6'>
       <nav className='flex items-center space-x-8'>
@@ -35,7 +34,6 @@ export function Tabs({ activeTab, onTabChange, onAddClick }: Props) {
         >
           Ko&apos;chalar
         </TabButton>
-        <AddButton activeTab={activeTab} onClick={onAddClick} />
       </nav>
     </div>
   );

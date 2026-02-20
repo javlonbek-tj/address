@@ -1,5 +1,5 @@
 import { NextRequest } from 'next/server';
-import { getDistricts } from '@/server';
+import { getDistrictsByRegionId } from '@/server';
 
 export async function GET(request: NextRequest) {
   try {
@@ -11,7 +11,7 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    const data = await getDistricts(regionId);
+    const data = await getDistrictsByRegionId(regionId);
     return Response.json({ success: true, data });
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Unknown error';
