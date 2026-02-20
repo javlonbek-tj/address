@@ -7,7 +7,7 @@ import {
   FieldGroup,
   FieldLabel,
 } from '@/components/ui/field';
-import type { Region } from '@/lib/generated/prisma/client';
+import type { Region } from '@/types';
 import {
   Dialog,
   DialogContent,
@@ -56,27 +56,27 @@ export function RegionFormDialog({ open, onClose, region }: Props) {
   };
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className='sm:max-w-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white max-h-[90vh] overflow-y-auto overflow-x-hidden'>
+      <DialogContent className="bg-white dark:bg-gray-800 sm:max-w-lg max-h-[90vh] overflow-x-hidden overflow-y-auto text-gray-900 dark:text-white">
         <DialogHeader>
           <DialogTitle>Hududni tahrirlash</DialogTitle>
         </DialogHeader>
-        <DialogDescription className='sr-only'>
+        <DialogDescription className="sr-only">
           Hududni tahrirlash
         </DialogDescription>
         <form onSubmit={form.handleSubmit(onSubmit)}>
           <FieldGroup>
             <Controller
               control={form.control}
-              name='name'
+              name="name"
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor='name'>Hudud nomi</FieldLabel>
+                  <FieldLabel htmlFor="name">Hudud nomi</FieldLabel>
                   <Input
-                    id='name'
+                    id="name"
                     {...field}
-                    className='dark:bg-gray-700 dark:text-white'
-                    placeholder='Hudud nomi'
-                    autoComplete='off'
+                    className="dark:bg-gray-700 dark:text-white"
+                    placeholder="Hudud nomi"
+                    autoComplete="off"
                     aria-invalid={fieldState.invalid}
                   />
                   {fieldState.invalid && (
@@ -87,16 +87,16 @@ export function RegionFormDialog({ open, onClose, region }: Props) {
             />
             <Controller
               control={form.control}
-              name='code'
+              name="code"
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor='code'>Soato kodi</FieldLabel>
+                  <FieldLabel htmlFor="code">Soato kodi</FieldLabel>
                   <DecimalInput
-                    id='code'
+                    id="code"
                     {...field}
-                    className='dark:bg-gray-700 dark:text-white'
-                    placeholder='Soato kodi'
-                    autoComplete='off'
+                    className="dark:bg-gray-700 dark:text-white"
+                    placeholder="Soato kodi"
+                    autoComplete="off"
                     aria-invalid={fieldState.invalid}
                     maxDecimals={0}
                   />

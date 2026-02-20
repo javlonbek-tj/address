@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useDistricts, useMahallas, useStreets } from './';
-import { BaseMapKey } from '@/lib/constants/map';
+import type { BaseMapKey } from '@/lib/constants/map';
 
 export function useMapFilters() {
   const [selectedRegion, setSelectedRegion] = useState('');

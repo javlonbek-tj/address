@@ -3,6 +3,7 @@
 import { usePathname } from 'next/navigation';
 import { HeaderActions } from './HeaderActions';
 import { menuItems } from '@/lib';
+import { SidebarTrigger } from '../ui/sidebar';
 
 export function Header() {
   const pathname = usePathname();
@@ -14,7 +15,10 @@ export function Header() {
         'flex h-16 shrink-0 items-center justify-between gap-2 border-b px-6 transition-all duration-300'
       }
     >
-      <h1 className='text-lg font-semibold'>{title}</h1>
+      <div className="flex items-center gap-2">
+        <SidebarTrigger />
+        <h1 className="font-semibold text-lg">{title}</h1>
+      </div>
       <HeaderActions />
     </header>
   );

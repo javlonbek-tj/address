@@ -2,11 +2,11 @@ import 'server-only';
 
 import { prisma } from '../prisma';
 import type { Mahalla } from '@/types';
-import type { Mahalla as MahallaModel } from '@/lib/generated/prisma/client';
+import type { MahallaWithRelations } from '@/types';
 
 export async function getMahallasByDistrictId(
   districtId: string,
-): Promise<MahallaModel[]> {
+): Promise<MahallaWithRelations[]> {
   if (!districtId) return [];
   try {
     const mahallas = await prisma.mahalla.findMany({

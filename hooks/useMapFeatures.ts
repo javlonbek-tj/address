@@ -6,15 +6,14 @@ import * as turf from '@turf/turf';
 import type {
   Region as RegionModel,
   District as DistrictModel,
-  Mahalla as MahallaModel,
-  Street as StreetModel,
 } from '@/lib/generated/prisma/client';
+import { MahallaWithRelations, StreetWithMetadata } from '@/types';
 
 interface Props {
   regions: RegionModel[];
   districts: DistrictModel[];
-  mahallas: MahallaModel[];
-  streets: StreetModel[];
+  mahallas: MahallaWithRelations[];
+  streets: StreetWithMetadata[];
   selectedRegion: string;
   selectedDistrict: string;
   selectedMahalla: string;

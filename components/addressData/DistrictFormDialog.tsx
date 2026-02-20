@@ -65,29 +65,29 @@ export function DistrictFormDialog({
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className='sm:max-w-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white max-h-[90vh] overflow-y-auto overflow-x-hidden'>
+      <DialogContent className="bg-white dark:bg-gray-800 sm:max-w-lg max-h-[90vh] overflow-x-hidden overflow-y-auto text-gray-900 dark:text-white">
         <DialogHeader>
           <DialogTitle>
             {district ? 'Tumanni tahrirlash' : 'Tuman qoʻshish'}
           </DialogTitle>
         </DialogHeader>
-        <DialogDescription className='sr-only'>
+        <DialogDescription className="sr-only">
           {district ? 'Tumanni tahrirlash' : 'Tuman qoʻshish'}
         </DialogDescription>
         <form onSubmit={form.handleSubmit(onSubmit)}>
           <FieldGroup>
             <Controller
               control={form.control}
-              name='regionId'
+              name="regionId"
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor='regionId'>Hudud</FieldLabel>
+                  <FieldLabel htmlFor="regionId">Hudud</FieldLabel>
                   <select
-                    id='regionId'
+                    id="regionId"
                     {...field}
-                    className='flex h-10 w-full rounded-md border border-gray-200 bg-white px-3 py-2 text-sm ring-offset-white file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-gray-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-950 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-800 dark:bg-gray-700 dark:ring-offset-gray-950 dark:placeholder:text-gray-400 dark:focus-visible:ring-gray-300'
+                    className="flex bg-white dark:bg-gray-700 file:bg-transparent disabled:opacity-50 px-3 py-2 border border-gray-200 dark:border-gray-800 file:border-0 rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-950 dark:focus-visible:ring-gray-300 ring-offset-white focus-visible:ring-offset-2 dark:ring-offset-gray-950 w-full h-10 file:font-medium dark:placeholder:text-gray-400 placeholder:text-gray-500 text-sm file:text-sm disabled:cursor-not-allowed"
                   >
-                    <option value='' disabled>
+                    <option value="" disabled>
                       Hududni tanlang
                     </option>
                     {regions.map((region) => (
@@ -105,16 +105,16 @@ export function DistrictFormDialog({
 
             <Controller
               control={form.control}
-              name='name'
+              name="name"
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor='name'>Tuman nomi</FieldLabel>
+                  <FieldLabel htmlFor="name">Tuman nomi</FieldLabel>
                   <Input
-                    id='name'
+                    id="name"
                     {...field}
-                    className='dark:bg-gray-700 dark:text-white'
-                    placeholder='Tuman nomi'
-                    autoComplete='off'
+                    className="dark:bg-gray-700 dark:text-white"
+                    placeholder="Tuman nomi"
+                    autoComplete="off"
                     aria-invalid={fieldState.invalid}
                   />
                   {fieldState.invalid && (
@@ -126,16 +126,16 @@ export function DistrictFormDialog({
 
             <Controller
               control={form.control}
-              name='code'
+              name="code"
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor='code'>Soato kodi</FieldLabel>
+                  <FieldLabel htmlFor="code">Soato kodi</FieldLabel>
                   <DecimalInput
-                    id='code'
+                    id="code"
                     {...field}
-                    className='dark:bg-gray-700 dark:text-white'
-                    placeholder='Soato kodi'
-                    autoComplete='off'
+                    className="dark:bg-gray-700 dark:text-white"
+                    placeholder="Soato kodi"
+                    autoComplete="off"
                     aria-invalid={fieldState.invalid}
                     maxDecimals={0}
                   />

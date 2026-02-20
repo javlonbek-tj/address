@@ -1,16 +1,11 @@
 import 'server-only';
 
 import { prisma } from '../prisma';
-import type { Region } from '@/types';
+import type { Region as RegionModel } from '@/lib/generated/prisma/client';
 
-export async function getRegions(): Promise<Region[]> {
+export async function getRegions(): Promise<RegionModel[]> {
   try {
     const regions = await prisma.region.findMany({
-      select: {
-        id: true,
-        name: true,
-        code: true,
-      },
       orderBy: { name: 'asc' },
     });
 

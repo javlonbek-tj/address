@@ -1,6 +1,4 @@
-export * from './AddressDataTable';
-export * from './Tabs';
-export * from './TabButton';
+export * from './RegionTable';
 export * from './RegionFormDialog';
 export * from './DistrictFormDialog';
 export * from './MahallaFormDialog';

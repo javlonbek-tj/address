@@ -4,11 +4,11 @@ export type MahallaWithRelations = MahallaType & {
   district: {
     id: string;
     name: string;
-    code: string;
+    code: number;
     region: {
       id: string;
       name: string;
-      code: string;
+      code: number;
     };
   };
   _count: {

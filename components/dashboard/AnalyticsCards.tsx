@@ -17,7 +17,7 @@ export interface AnalyticsCardsProps {
 export function AnalyticsCards({ counts }: AnalyticsCardsProps) {
   const cards = CARDS_DATA({ counts });
   return (
-    <div className='grid gap-4 md:grid-cols-2 lg:grid-cols-5'>
+    <div className="gap-4 grid md:grid-cols-2 lg:grid-cols-5">
       {cards.map((card, index) => (
         <motion.div
           key={card.title}
@@ -26,9 +26,9 @@ export function AnalyticsCards({ counts }: AnalyticsCardsProps) {
           transition={{ duration: 0.4, delay: index * 0.1 }}
           whileHover={{ y: -5 }}
         >
-          <Card className='hover:shadow-lg cursor-pointer transition-all duration-400 border-slate-200 dark:border-slate-500 hover:border-blue-500/30 dark:hover:border-slate-100 h-full bg-white/50 dark:bg-slate-900/50 backdrop-blur-sm'>
-            <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
-              <CardTitle className='text-sm font-medium text-slate-500 dark:text-slate-400'>
+          <Card className="bg-white/50 dark:bg-slate-900/50 hover:shadow-lg backdrop-blur-sm border-slate-200 hover:border-blue-500/30 dark:border-slate-500 dark:hover:border-slate-100 h-full transition-all duration-400 cursor-pointer">
+            <CardHeader className="flex flex-row justify-between items-center space-y-0 pb-2">
+              <CardTitle className="font-medium text-slate-500 dark:text-slate-400 text-sm">
                 {card.title}
               </CardTitle>
               <div className={`p-2 rounded-lg ${card.bg}`}>
@@ -36,7 +36,9 @@ export function AnalyticsCards({ counts }: AnalyticsCardsProps) {
               </div>
             </CardHeader>
             <CardContent>
-              <div className='text-2xl font-bold text-slate-900 dark:text-slate-50'>
+              <div
+                className="font-bold text-slate-900 dark:text-slate-50 text-2xl"
+              >
                 {card.value.toLocaleString()}
               </div>
             </CardContent>

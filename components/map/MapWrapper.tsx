@@ -1,11 +1,11 @@
 'use client';
 
-import type { Region } from '@/lib/generated/prisma/client';
+import type { Region as RegionModel } from '@/lib/generated/prisma/client';
 import dynamic from 'next/dynamic';
 import { Spinner } from '../shared';
 
 interface Props {
-  regions: Region[];
+  regions: RegionModel[];
 }
 
 const UzbekistanMap = dynamic(() => import('./UzbekistanMap'), {

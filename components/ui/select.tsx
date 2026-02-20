@@ -36,16 +36,16 @@ function SelectTrigger({
     <SelectPrimitive.Trigger
       data-slot='select-trigger'
       data-size={size}
-      suppressHydrationWarning
+      
       className={cn(
-        "border-input data-[placeholder]:text-muted-foreground [&_svg:not([class*='text-'])]:text-muted-foreground focus-visible:border-primary aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive dark:bg-input/30 dark:hover:bg-input/50 flex w-fit items-center justify-between gap-2 rounded-md border bg-transparent px-3 py-2 text-sm whitespace-nowrap shadow-xs transition-[color,box-shadow] outline-none disabled:cursor-not-allowed disabled:opacity-50 data-[size=default]:h-9 data-[size=sm]:h-8 *:data-[slot=select-value]:line-clamp-1 *:data-[slot=select-value]:flex *:data-[slot=select-value]:items-center *:data-[slot=select-value]:gap-2 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
+        "border-input data-placeholder:text-muted-foreground [&_svg:not([class*='text-'])]:text-muted-foreground focus-visible:border-primary aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive dark:bg-input/30 dark:hover:bg-input/50 flex w-fit items-center justify-between gap-2 rounded-md border bg-transparent px-3 py-2 text-sm whitespace-nowrap shadow-xs transition-[color,box-shadow] outline-none disabled:cursor-not-allowed disabled:opacity-50 data-[size=default]:h-9 data-[size=sm]:h-8 *:data-[slot=select-value]:line-clamp-1 *:data-[slot=select-value]:flex *:data-[slot=select-value]:items-center *:data-[slot=select-value]:gap-2 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
         className,
       )}
       {...props}
     >
       {children}
       <SelectPrimitive.Icon asChild>
-        <ChevronDownIcon className='size-4 opacity-50' />
+        <ChevronDownIcon className='opacity-50 size-4' />
       </SelectPrimitive.Icon>
     </SelectPrimitive.Trigger>
   );
@@ -97,7 +97,7 @@ function SelectLabel({
   return (
     <SelectPrimitive.Label
       data-slot='select-label'
-      className={cn('text-muted-foreground px-2 py-1.5 text-xs', className)}
+      className={cn('px-2 py-1.5 text-muted-foreground text-xs', className)}
       {...props}
     />
   );
@@ -119,7 +119,7 @@ function SelectItem({
     >
       <span
         data-slot='select-item-indicator'
-        className='absolute right-2 flex size-3.5 items-center justify-center'
+        className='right-2 absolute flex justify-center items-center size-3.5'
       >
         <SelectPrimitive.ItemIndicator>
           <CheckIcon className='size-4' />
@@ -137,7 +137,7 @@ function SelectSeparator({
   return (
     <SelectPrimitive.Separator
       data-slot='select-separator'
-      className={cn('bg-border pointer-events-none -mx-1 my-1 h-px', className)}
+      className={cn('-mx-1 my-1 bg-border h-px pointer-events-none', className)}
       {...props}
     />
   );
@@ -151,7 +151,7 @@ function SelectScrollUpButton({
     <SelectPrimitive.ScrollUpButton
       data-slot='select-scroll-up-button'
       className={cn(
-        'flex cursor-default items-center justify-center py-1',
+        'flex justify-center items-center py-1 cursor-default',
         className,
       )}
       {...props}
@@ -169,7 +169,7 @@ function SelectScrollDownButton({
     <SelectPrimitive.ScrollDownButton
       data-slot='select-scroll-down-button'
       className={cn(
-        'flex cursor-default items-center justify-center py-1',
+        'flex justify-center items-center py-1 cursor-default',
         className,
       )}
       {...props}
