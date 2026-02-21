@@ -1,6 +1,6 @@
 'use client';
 
-import { Controller, useForm } from 'react-hook-form';
+import { Controller } from 'react-hook-form';
 import {
   Field,
   FieldError,
@@ -14,12 +14,11 @@ import {
   DialogDescription,
   DialogHeader,
   DialogTitle,
-} from '../ui/dialog';
-import { Input } from '../ui/input';
-import { DecimalInput, FormActions } from '../shared';
-import { useEffect, useState } from 'react';
-import { updateRegion } from '@/app/actions';
-import toast from 'react-hot-toast';
+} from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { DecimalInput, FormActions } from '@/components/shared';
+
+import { useRegionForm } from '@/hooks';
 
 interface Props {
   open: boolean;
@@ -28,55 +27,34 @@ interface Props {
 }
 
 export function RegionFormDialog({ open, onClose, region }: Props) {
-  const [submitting, setIsSubmitting] = useState(false);
-  const form = useForm<Region>({
-    defaultValues: region,
+  const { form, submitting, onSubmit } = useRegionForm({
+    region,
+    open,
+    onClose,
   });
-  useEffect(() => {
-    if (open) {
-      form.reset(region);
-    }
-  }, [region, form, open]);
-
-  const onSubmit = async (data: Region) => {
-    if (!region?.id) return;
-    setIsSubmitting(true);
-    const result = await updateRegion(region.id, data);
-
-    if (!result.success) {
-      console.log(result);
-      toast.error(result.message || 'Hududni tahrirlashda xatolik yuz berdi');
-      setIsSubmitting(false);
-      return;
-    }
-
-    toast.success('Hudud muvaffaqiyatli tahrirlandi');
-    onClose();
-    setIsSubmitting(false);
-  };
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="bg-white dark:bg-gray-800 sm:max-w-lg max-h-[90vh] overflow-x-hidden overflow-y-auto text-gray-900 dark:text-white">
+      <DialogContent className='bg-white dark:bg-gray-800 sm:max-w-lg max-h-[90vh] overflow-x-hidden overflow-y-auto text-gray-900 dark:text-white'>
         <DialogHeader>
           <DialogTitle>Hududni tahrirlash</DialogTitle>
         </DialogHeader>
-        <DialogDescription className="sr-only">
+        <DialogDescription className='sr-only'>
           Hududni tahrirlash
         </DialogDescription>
         <form onSubmit={form.handleSubmit(onSubmit)}>
           <FieldGroup>
             <Controller
               control={form.control}
-              name="name"
+              name='name'
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor="name">Hudud nomi</FieldLabel>
+                  <FieldLabel htmlFor='name'>Hudud nomi</FieldLabel>
                   <Input
-                    id="name"
+                    id='name'
                     {...field}
-                    className="dark:bg-gray-700 dark:text-white"
-                    placeholder="Hudud nomi"
-                    autoComplete="off"
+                    className='dark:bg-gray-700 dark:text-white'
+                    placeholder='Hudud nomi'
+                    autoComplete='off'
                     aria-invalid={fieldState.invalid}
                   />
                   {fieldState.invalid && (
@@ -87,16 +65,16 @@ export function RegionFormDialog({ open, onClose, region }: Props) {
             />
             <Controller
               control={form.control}
-              name="code"
+              name='code'
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor="code">Soato kodi</FieldLabel>
+                  <FieldLabel htmlFor='code'>Soato kodi</FieldLabel>
                   <DecimalInput
-                    id="code"
+                    id='code'
                     {...field}
-                    className="dark:bg-gray-700 dark:text-white"
-                    placeholder="Soato kodi"
-                    autoComplete="off"
+                    className='dark:bg-gray-700 dark:text-white'
+                    placeholder='Soato kodi'
+                    autoComplete='off'
                     aria-invalid={fieldState.invalid}
                     maxDecimals={0}
                   />

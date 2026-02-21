@@ -4,10 +4,10 @@ import { prisma } from '../prisma';
 export async function getGlobalStatistics() {
   try {
     const [regions, districts, mahallas, streets] = await Promise.all([
-      prisma.region.count(),
-      prisma.district.count(),
-      prisma.mahalla.count(),
-      prisma.street.count(),
+      prisma.region.count({ where: { isActive: true } }),
+      prisma.district.count({ where: { isActive: true } }),
+      prisma.mahalla.count({ where: { isActive: true } }),
+      prisma.street.count({ where: { isActive: true } }),
     ]);
 
     return { regions, districts, mahallas, streets };
@@ -21,9 +21,13 @@ export async function getRegionStatistics(regionId: string) {
   if (!regionId) return null;
   try {
     const [districts, mahallas, streets] = await Promise.all([
-      prisma.district.count({ where: { regionId } }),
-      prisma.mahalla.count({ where: { district: { regionId } } }),
-      prisma.street.count({ where: { district: { regionId } } }),
+      prisma.district.count({ where: { regionId, isActive: true } }),
+      prisma.mahalla.count({
+        where: { district: { regionId, isActive: true } },
+      }),
+      prisma.street.count({
+        where: { district: { regionId, isActive: true } },
+      }),
     ]);
 
     return { districts, mahallas, streets };
@@ -37,8 +41,8 @@ export async function getDistrictStatistics(districtId: string) {
   if (!districtId) return null;
   try {
     const [mahallas, streets] = await Promise.all([
-      prisma.mahalla.count({ where: { districtId } }),
-      prisma.street.count({ where: { districtId } }),
+      prisma.mahalla.count({ where: { districtId, isActive: true } }),
+      prisma.street.count({ where: { districtId, isActive: true } }),
     ]);
 
     return { mahallas, streets };
@@ -58,10 +62,10 @@ export async function getDashboardAnalytics() {
       streetsByType,
       hiddenMahallas,
     ] = await Promise.all([
-      prisma.region.count(),
-      prisma.district.count(),
-      prisma.mahalla.count(),
-      prisma.street.count(),
+      prisma.region.count({ where: { isActive: true } }),
+      prisma.district.count({ where: { isActive: true } }),
+      prisma.mahalla.count({ where: { isActive: true } }),
+      prisma.street.count({ where: { isActive: true } }),
       prisma.street.groupBy({
         by: ['type'],
         _count: {
@@ -76,6 +80,7 @@ export async function getDashboardAnalytics() {
     ]);
 
     const regionsWithCounts = await prisma.region.findMany({
+      where: { isActive: true },
       select: {
         name: true,
         districts: {

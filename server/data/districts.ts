@@ -10,7 +10,7 @@ export async function getDistrictsByRegionId(
   if (!regionId) return [];
   try {
     const districts = await prisma.district.findMany({
-      where: { regionId },
+      where: { regionId, isActive: true },
       orderBy: { name: 'asc' },
     });
 
@@ -20,13 +20,16 @@ export async function getDistrictsByRegionId(
     return [];
   }
 }
-export async function getDistricts(): Promise<District[]> {
+
+export async function getDistrictTableData() {
   try {
     const districts = await prisma.district.findMany({
+      where: { isActive: true },
       select: {
         id: true,
         name: true,
         code: true,
+        regionId: true,
       },
       orderBy: { name: 'asc' },
     });

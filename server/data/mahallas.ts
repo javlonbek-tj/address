@@ -10,7 +10,7 @@ export async function getMahallasByDistrictId(
   if (!districtId) return [];
   try {
     const mahallas = await prisma.mahalla.findMany({
-      where: { districtId },
+      where: { districtId, isActive: true },
       include: {
         district: {
           select: {
@@ -42,6 +42,7 @@ export async function getMahallasByDistrictId(
 export const getMahallas = async (): Promise<Mahalla[]> => {
   try {
     const mahallas = await prisma.mahalla.findMany({
+      where: { isActive: true },
       select: {
         id: true,
         name: true,

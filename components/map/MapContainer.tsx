@@ -4,6 +4,7 @@ import { MapContainer as RLMapContainer, TileLayer } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css'; // Ensure CSS is available to this component
 import { baseMaps } from '@/lib';
 import { MapPanes } from './MapPanes';
+import { MapResizeHandler } from './MapResizeHandler';
 
 interface Props {
   children?: React.ReactNode;
@@ -32,6 +33,7 @@ export const MapContainer = ({
         attribution={selectedBase.attribution}
       />
       <MapPanes />
+      <MapResizeHandler />
       {children}
     </RLMapContainer>
   );

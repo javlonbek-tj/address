@@ -12,7 +12,7 @@ export default function RootLayout({
       <SidebarProvider defaultOpen>
         <>
           <AppSidebar />
-          <div className='flex flex-col flex-1 border-l'>
+          <div className='flex flex-col flex-1 border-l min-w-0'>
             <Header />
             <SidebarInset className='bg-blue-50 dark:bg-gray-900'>
               {children}

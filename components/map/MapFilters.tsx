@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { useMapFilters } from '@/hooks/useMapFilters';
+import { useMapFilters } from '@/hooks';
 import type { Region } from '@/lib/generated/prisma/client';
 import { FilterSelect } from './FilterSelect';
 import { LatLngBounds } from 'leaflet';

@@ -12,6 +12,7 @@ export async function getStreetsByDistrictId(
   const streets = await prisma.street.findMany({
     where: {
       districtId,
+      isActive: true,
     },
     include: {
       district: {
@@ -40,6 +41,7 @@ export async function getStreetsByDistrictId(
 export const getStreets = async (): Promise<Street[]> => {
   try {
     const streets = await prisma.street.findMany({
+      where: { isActive: true },
       select: {
         id: true,
         name: true,

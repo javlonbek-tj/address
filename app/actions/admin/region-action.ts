@@ -4,7 +4,7 @@ import type { RegionSchemaType } from '@/lib';
 import type { ActionResult } from '@/types';
 import { regionSchema } from '@/lib';
 import { prisma } from '@/server';
-import type { Region } from '@/lib/generated/prisma/client';
+import type { Region } from '@/types';
 
 export async function updateRegion(
   id: string,
@@ -13,7 +13,6 @@ export async function updateRegion(
   const validationResult = regionSchema.safeParse(data);
 
   if (!validationResult.success) {
-    console.log(validationResult.error);
     return {
       success: false,
       error: 'VALIDATION_ERROR',
@@ -32,6 +31,7 @@ export async function updateRegion(
         ],
         NOT: { id },
       },
+      select: { id: true },
     });
 
     if (existingRegion) {
@@ -47,6 +47,7 @@ export async function updateRegion(
         name,
         code: codeNumber,
       },
+      select: { id: true, name: true, code: true },
     });
 
     return {
@@ -55,6 +56,28 @@ export async function updateRegion(
     };
   } catch (error) {
     console.error('[UPDATE_REGION_ERROR]', error);
+    return {
+      success: false,
+      error: 'INTERNAL_SERVER_ERROR',
+    };
+  }
+}
+
+export async function deleteRegion(id: string): Promise<ActionResult<null>> {
+  try {
+    await prisma.region.update({
+      where: { id },
+      data: {
+        isActive: false,
+      },
+    });
+
+    return {
+      success: true,
+      data: null,
+    };
+  } catch (error) {
+    console.error('[DELETE_REGION_ERROR]', error);
     return {
       success: false,
       error: 'INTERNAL_SERVER_ERROR',

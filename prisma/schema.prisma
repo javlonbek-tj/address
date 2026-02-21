@@ -14,6 +14,7 @@ model Region {
 
   geometry Json
   center   Json?
+  isActive Boolean @default(true)
 
   createdAt DateTime   @default(now())
   updatedAt DateTime   @updatedAt
@@ -32,6 +33,7 @@ model District {
 
   geometry Json
   center   Json?
+  isActive Boolean @default(true)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -52,6 +54,7 @@ model Mahalla {
 
   geometry Json
   center   Json?
+  isActive Boolean @default(true)
 
   uzKadName String
   geoCode   Int
@@ -84,6 +87,7 @@ model Street {
 
   geometry Json
   center   Json?
+  isActive Boolean @default(true)
 
   type      String
   oldNameId String?
@@ -110,6 +114,7 @@ model User {
 
   role   UserRole
   status UserStatus @default(active)
+  isActive Boolean @default(true)
 
   // Region-specific
   regionId String?

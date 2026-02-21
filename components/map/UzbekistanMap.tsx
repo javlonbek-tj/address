@@ -8,11 +8,12 @@ import type { Region } from '@/lib/generated/prisma/client';
 import { MapContainer } from './MapContainer';
 import { MAP_LEVEL_STYLES } from '@/lib/constants/map';
 import { formatMapStatistics } from '@/lib/utils';
-import { useMapFilters } from '@/hooks';
-import { useMapHandlers } from '@/hooks/useMapHandlers';
-import { useMapFeatures } from '@/hooks/useMapFeatures';
-import { useStats } from '@/hooks';
-import { useMapHighlighting } from '@/hooks/useMapHighlighting';
+import {
+  useMapFilters,
+  useMapFeatures,
+  useStats,
+  useMapHighlighting,
+} from '@/hooks';
 import { MapAutoCenter } from './MapAutoCenter';
 import { MapEvents } from './MapEvents';
 import {
@@ -25,6 +26,7 @@ import {
   StreetPopup,
 } from './';
 import { MapSpinner } from '../shared';
+import { useMapHandlers } from '@/hooks/useMapHandlers';
 
 interface UzbekistanMapProps {
   regions: Region[];
@@ -108,7 +110,7 @@ export default function UzbekistanMap({ regions }: UzbekistanMapProps) {
   };
 
   return (
-    <div className="relative w-full h-full">
+    <div className='relative w-full h-full'>
       <MapFilters
         regions={regions}
         filterState={filterState}
@@ -148,7 +150,7 @@ export default function UzbekistanMap({ regions }: UzbekistanMapProps) {
                 features: regionFeatures,
               } as FeatureCollection
             }
-            pane="regionsPane"
+            pane='regionsPane'
             interactive={true}
             style={() => {
               return {
@@ -170,7 +172,7 @@ export default function UzbekistanMap({ regions }: UzbekistanMapProps) {
                 features: districtFeatures,
               } as FeatureCollection
             }
-            pane="districtsPane"
+            pane='districtsPane'
             style={MAP_LEVEL_STYLES.adminBoundary}
             onEachFeature={onEachDistrict}
           />
@@ -186,7 +188,7 @@ export default function UzbekistanMap({ regions }: UzbekistanMapProps) {
                 features: mahallaFeatures,
               } as FeatureCollection
             }
-            pane="mahallasPane"
+            pane='mahallasPane'
             style={(feature?: Feature) => {
               const props = feature?.properties as { id: string } | undefined;
               const isSelected = props?.id === selectedMahalla;
@@ -210,7 +212,7 @@ export default function UzbekistanMap({ regions }: UzbekistanMapProps) {
                 features: streetFeatures,
               } as FeatureCollection
             }
-            pane="streetsPane"
+            pane='streetsPane'
             style={(feature?: Feature) => {
               const props = feature?.properties as { id: string } | undefined;
               const isSelected = props?.id === selectedStreet;

@@ -7,3 +7,4 @@ export { MapStatistics } from './MapStatistics';
 export { MapLayersControl } from './MapLayersControl';
 export { MapControls } from './MapControls';
 export { StreetPopup } from './StreetPopup';
+export { MapResizeHandler } from './MapResizeHandler';

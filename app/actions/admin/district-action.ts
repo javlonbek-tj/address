@@ -4,7 +4,7 @@ import type { DistrictSchemaType } from '@/lib';
 import type { ActionResult } from '@/types';
 import { districtSchema } from '@/lib';
 import { prisma } from '@/server';
-import type { District } from '@/lib/generated/prisma/client';
+import type { District } from '@/types';
 
 export async function updateDistrict(
   id: string,
@@ -31,6 +31,7 @@ export async function updateDistrict(
         ],
         NOT: { id },
       },
+      select: { id: true },
     });
 
     if (existingDistrict) {
@@ -47,6 +48,7 @@ export async function updateDistrict(
         code: codeNumber,
         regionId,
       },
+      select: { id: true, name: true, code: true },
     });
 
     return {
@@ -55,6 +57,28 @@ export async function updateDistrict(
     };
   } catch (error) {
     console.error('[UPDATE_DISTRICT_ERROR]', error);
+    return {
+      success: false,
+      error: 'INTERNAL_SERVER_ERROR',
+    };
+  }
+}
+
+export async function deleteDistrict(id: string): Promise<ActionResult<null>> {
+  try {
+    await prisma.district.update({
+      where: { id },
+      data: {
+        isActive: false,
+      },
+    });
+
+    return {
+      success: true,
+      data: null,
+    };
+  } catch (error) {
+    console.error('[DELETE_DISTRICT_ERROR]', error);
     return {
       success: false,
       error: 'INTERNAL_SERVER_ERROR',

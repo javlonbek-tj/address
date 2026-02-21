@@ -1,16 +1,16 @@
 'use client';
 
-import { AlertCircle, Loader2 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
+import { Loader2 } from 'lucide-react';
 
 interface Props {
   open: boolean;
@@ -34,44 +34,31 @@ export function DeleteDialog({
   isDeleting = false,
 }: Props) {
   return (
-    <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>{title}</DialogTitle>
-          <DialogDescription>{description}</DialogDescription>
-        </DialogHeader>
-
-        {showAlert && (
-          <Alert variant='destructive' className='my-4'>
-            <AlertCircle className='w-4 h-4' />
-            <AlertTitle>Muhim!</AlertTitle>
-            <AlertDescription>{alertDescription}</AlertDescription>
-          </Alert>
-        )}
-
-        <DialogFooter>
-          <Button
-            variant='secondary'
-            onClick={onClose}
-            className='cursor-pointer min-w-25'
-          >
-            Отмена
-          </Button>
-
-          <Button
-            variant='destructive'
+    <AlertDialog open={open} onOpenChange={onClose}>
+      <AlertDialogContent className='bg-white text-gray-900 dark:bg-gray-800 dark:text-white'>
+        <AlertDialogHeader>
+          <AlertDialogTitle>{title}</AlertDialogTitle>
+          <AlertDialogDescription className='dark:text-gray-400'>
+            {description}
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel disabled={isDeleting} className='cursor-pointer'>
+            Bekor qilish
+          </AlertDialogCancel>
+          <AlertDialogAction
             onClick={onConfirm}
-            className='cursor-pointer min-w-25'
             disabled={isDeleting}
+            className='bg-red-600 hover:bg-red-700 cursor-pointer'
           >
             {isDeleting ? (
               <Loader2 className='w-4 h-4 animate-spin' />
             ) : (
               'O‘chirish'
             )}
-          </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
   );
 }

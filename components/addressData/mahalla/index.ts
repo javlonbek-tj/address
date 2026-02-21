@@ -1,0 +1,1 @@
+export { MahallaFormDialog } from './MahallaFormDialog';
