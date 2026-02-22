@@ -1,6 +1,5 @@
 export { MahallaPopup } from './MahallaPopup';
 export { MapContainer } from './MapContainer';
-export { MapWrapper } from './MapWrapper';
 export { MapZoomManager } from './MapZoomManager';
 export { MapFilters } from './MapFilters';
 export { MapStatistics } from './MapStatistics';

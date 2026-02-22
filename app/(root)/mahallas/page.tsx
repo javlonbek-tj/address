@@ -1,10 +1,14 @@
-import { DistrictTable } from '@/components/addressData';
+import { MahallaTable } from '@/components/addressData';
 import { ErrorMessage } from '@/components/shared';
-import { getDistrictTableData, getRegionTableData } from '@/server';
+import {
+  getMahallaTableData,
+  getRegionTableData,
+  getDistrictsByRegionId,
+} from '@/server';
 
 export const dynamic = 'force-dynamic';
 
-export default async function DistrictsPage({
+export default async function MahallasPage({
   searchParams,
 }: {
   searchParams: Promise<{
@@ -12,6 +16,7 @@ export default async function DistrictsPage({
     search?: string;
     limit?: string;
     regionId?: string;
+    districtId?: string;
   }>;
 }) {
   const {
@@ -19,16 +24,19 @@ export default async function DistrictsPage({
     search = '',
     limit = '10',
     regionId = 'all',
+    districtId = 'all',
   } = await searchParams;
 
-  const [result, regions] = await Promise.all([
-    getDistrictTableData({
+  const [result, regions, districts] = await Promise.all([
+    getMahallaTableData({
       page: Number(page),
       limit: Number(limit),
       search,
       regionId,
+      districtId,
     }),
     getRegionTableData(),
+    regionId !== 'all' ? getDistrictsByRegionId(regionId) : Promise.resolve([]),
   ]);
 
   if (!result || !result.data) {
@@ -38,15 +46,17 @@ export default async function DistrictsPage({
   const totalPages = Math.ceil(result.total / result.limit);
 
   return (
-    <DistrictTable
-      districts={result.data}
-      regions={Array.isArray(regions) ? regions : regions.data}
+    <MahallaTable
+      mahallas={result.data}
+      regions={Array.isArray(regions) ? regions : (regions as any).data}
+      initialDistricts={districts as any}
       totalCount={result.total}
       currentPage={result.page}
       pageSize={result.limit}
       totalPages={totalPages}
       search={search}
       regionId={regionId}
+      districtId={districtId}
     />
   );
 }

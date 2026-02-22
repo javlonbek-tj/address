@@ -4,3 +4,10 @@ export type District = {
   code: number;
   regionId: string;
 };
+
+export type DistrictTableData = {
+  data: District[];
+  total: number;
+  page: number;
+  limit: number;
+};

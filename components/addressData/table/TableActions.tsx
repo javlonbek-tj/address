@@ -19,20 +19,18 @@ interface Props {
 export function TableActions({ id, onEdit, onDelete }: Props) {
   return (
     <TooltipProvider delayDuration={200}>
-      <div className='flex justify-end items-center gap-1'>
+      <div className="flex justify-end items-center gap-1">
         <Tooltip>
           <TooltipTrigger asChild>
-            <Link href={`/address-data/${id}`}>
-              <Button
-                variant='ghost'
-                size='icon-sm'
-                className='hover:bg-blue-50 dark:hover:bg-blue-900/40 rounded-lg w-8 h-8 text-blue-600 dark:text-blue-400 active:scale-95 transition-all cursor-pointer'
-              >
-                <Eye className='w-4 h-4' />
-              </Button>
-            </Link>
+            <Button
+              variant="ghost"
+              size="icon-xs"
+              className="hover:bg-blue-50 dark:hover:bg-blue-900/40 text-blue-600 dark:text-blue-400 active:scale-95 transition-all cursor-pointer"
+            >
+              <Eye />
+            </Button>
           </TooltipTrigger>
-          <TooltipContent className='**:data-[slot=tooltip-arrow]:hidden bg-gray-900 dark:bg-white shadow-xl px-2 py-1 border-none text-[10px] text-white dark:text-gray-900'>
+          <TooltipContent className="**:data-[slot=tooltip-arrow]:hidden bg-gray-900 dark:bg-white shadow-xl px-2 py-1 border-none text-[10px] text-white dark:text-gray-900">
             Ko&apos;rish
           </TooltipContent>
         </Tooltip>
@@ -40,15 +38,15 @@ export function TableActions({ id, onEdit, onDelete }: Props) {
         <Tooltip>
           <TooltipTrigger asChild>
             <Button
-              variant='ghost'
-              size='icon-sm'
+              variant="ghost"
+              size="icon-xs"
               onClick={onEdit}
-              className='hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg w-8 h-8 text-gray-600 dark:text-gray-300 active:scale-95 transition-all cursor-pointer'
+              className="hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-300 active:scale-95 transition-all cursor-pointer"
             >
-              <Pencil className='w-4 h-4' />
+              <Pencil />
             </Button>
           </TooltipTrigger>
-          <TooltipContent className='**:data-[slot=tooltip-arrow]:hidden bg-gray-900 dark:bg-white shadow-xl px-2 py-1 border-none text-[10px] text-white dark:text-gray-900'>
+          <TooltipContent className="**:data-[slot=tooltip-arrow]:hidden bg-gray-900 dark:bg-white shadow-xl px-2 py-1 border-none text-[10px] text-white dark:text-gray-900">
             Tahrirlash
           </TooltipContent>
         </Tooltip>
@@ -56,15 +54,15 @@ export function TableActions({ id, onEdit, onDelete }: Props) {
         <Tooltip>
           <TooltipTrigger asChild>
             <Button
-              variant='ghost'
-              size='icon-sm'
+              variant="ghost"
+              size="icon-xs"
               onClick={onDelete}
-              className='hover:bg-red-50 dark:hover:bg-red-900/40 rounded-lg w-8 h-8 text-red-600 dark:text-red-400 active:scale-95 transition-all cursor-pointer'
+              className="hover:bg-red-50 dark:hover:bg-red-900/40 text-red-600 dark:text-red-400 active:scale-95 transition-all cursor-pointer"
             >
-              <Trash2 className='w-4 h-4' />
+              <Trash2 />
             </Button>
           </TooltipTrigger>
-          <TooltipContent className='**:data-[slot=tooltip-arrow]:hidden bg-gray-900 dark:bg-white shadow-xl px-2 py-1 border-none text-[10px] text-white dark:text-gray-900'>
+          <TooltipContent className="**:data-[slot=tooltip-arrow]:hidden bg-gray-900 dark:bg-white shadow-xl px-2 py-1 border-none text-[10px] text-white dark:text-gray-900">
             O&apos;chirish
           </TooltipContent>
         </Tooltip>

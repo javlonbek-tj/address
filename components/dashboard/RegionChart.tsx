@@ -17,10 +17,10 @@ export function RegionChart({ data }: RegionChartProps) {
   }));
 
   return (
-    <div className='col-span-full lg:col-span-3'>
+    <div className="col-span-full lg:col-span-2 xl:col-span-3">
       <AnalyticsCharts
         title="Mahalla ma'lumot"
-        type='bar'
+        type="bar"
         data={chartData}
         colors={REGION_CHART_COLORS}
       />

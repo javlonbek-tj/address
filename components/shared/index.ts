@@ -1,7 +1,9 @@
 export * from './button';
 export * from './Spinner';
-export * from './ErrorMessage';
-export * from './CopyableCode';
-export * from './DecimalInput';
+export { ErrorMessage } from './ErrorMessage';
+export { CopyableCode } from './CopyableCode';
+export { DecimalInput } from './DecimalInput';
 export * from './form';
 export * from './modal';
+export { Pagination } from './Pagination';
+export { PaginationWrapper } from './PaginationWrapper';

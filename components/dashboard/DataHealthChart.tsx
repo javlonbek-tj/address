@@ -16,10 +16,10 @@ export function DataHealthChart({ hidden, total }: DataHealthChartProps) {
   ];
 
   return (
-    <div className='col-span-full lg:col-span-2'>
+    <div className="col-span-full lg:col-span-1 xl:col-span-2">
       <AnalyticsCharts
         title="Ma'lumot holati"
-        type='pie'
+        type="pie"
         data={data}
         colors={DATA_HEALTH_CHART_COLORS}
       />

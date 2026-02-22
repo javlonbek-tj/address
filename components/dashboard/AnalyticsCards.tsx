@@ -36,9 +36,7 @@ export function AnalyticsCards({ counts }: AnalyticsCardsProps) {
               </div>
             </CardHeader>
             <CardContent>
-              <div
-                className="font-bold text-slate-900 dark:text-slate-50 text-2xl"
-              >
+              <div className="font-bold text-slate-900 dark:text-slate-50 text-base md:text-lg">
                 {card.value.toLocaleString()}
               </div>
             </CardContent>

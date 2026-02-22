@@ -16,10 +16,10 @@ export function StreetTypeChart({ data }: StreetTypeChartProps) {
     .sort((a, b) => b.value - a.value);
 
   return (
-    <div className='col-span-full lg:col-span-2'>
+    <div className="col-span-full lg:col-span-1 xl:col-span-2">
       <AnalyticsCharts
         title="Ko'cha turlari"
-        type='pie'
+        type="pie"
         data={filteredData}
         colors={STREET_TYPE_CHART_COLORS}
       />

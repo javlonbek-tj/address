@@ -16,21 +16,21 @@ interface Props {
 
 export function MapControls({ currentBaseMap, onBaseMapChange }: Props) {
   return (
-    <div className='absolute right-4 top-1/2 -translate-y-1/2 flex flex-col gap-3 z-1000'>
+    <div className="top-1/2 right-3 z-1000 absolute flex flex-col gap-3 -translate-y-1/2">
       <Tooltip>
         <TooltipTrigger asChild>
           <button
             onClick={() => onBaseMapChange('osm')}
-            className={`w-12 h-12 cursor-pointer rounded-full flex items-center justify-center shadow-lg border-2 ${
+            className={`w-10 h-10 xl:w-12 xl:h-12 cursor-pointer rounded-full flex items-center justify-center shadow-lg border-2 ${
               currentBaseMap === 'osm'
                 ? 'bg-primary text-primary-foreground border-primary/40'
                 : 'bg-background/90 backdrop-blur-md text-muted-foreground border-transparent hover:bg-background'
             }`}
           >
-            <Map className='size-5' />
+            <Map className="size-5" />
           </button>
         </TooltipTrigger>
-        <TooltipContent side='left' className='font-medium'>
+        <TooltipContent side="left" className="font-medium">
           Oddiy xarita
         </TooltipContent>
       </Tooltip>
@@ -39,16 +39,16 @@ export function MapControls({ currentBaseMap, onBaseMapChange }: Props) {
         <TooltipTrigger asChild>
           <button
             onClick={() => onBaseMapChange('satellite')}
-            className={`w-12 h-12 cursor-pointer rounded-full flex items-center justify-center shadow-lg border-2 ${
+            className={`w-10 h-10 xl:w-12 xl:h-12 cursor-pointer rounded-full flex items-center justify-center shadow-lg border-2 ${
               currentBaseMap === 'satellite'
                 ? 'bg-primary text-primary-foreground border-primary/40'
                 : 'bg-background/90 backdrop-blur-md text-muted-foreground border-transparent hover:bg-background'
             }`}
           >
-            <Satellite className='size-5' />
+            <Satellite className="size-5" />
           </button>
         </TooltipTrigger>
-        <TooltipContent side='left' className='font-medium'>
+        <TooltipContent side="left" className="font-medium">
           Sputnik xaritasi
         </TooltipContent>
       </Tooltip>

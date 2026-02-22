@@ -20,7 +20,7 @@ export function MapStatistics({ stats, title = 'Statistika' }: Props) {
   if (stats.length === 0) return null;
 
   return (
-    <div className="top-3 right-3 z-1000 absolute bg-background/95 shadow-xl backdrop-blur-md border rounded-xl w-64 overflow-hidden">
+    <div className="hidden lg:block top-3 right-3 z-1000 absolute bg-background/95 shadow-xl backdrop-blur-md border rounded-xl w-64 overflow-hidden">
       <div className="flex justify-between items-center bg-muted/30 px-4 py-3 border-b">
         <h3 className="font-semibold text-foreground/80 text-sm">{title}</h3>
       </div>
@@ -44,10 +44,7 @@ export function MapStatistics({ stats, title = 'Statistika' }: Props) {
                 {stat.label}
               </span>
             </div>
-            <span
-              className="font-bold tabular-nums text-foreground text-sm"
-              
-            >
+            <span className="font-bold tabular-nums text-foreground text-xs">
               {stat.value.toLocaleString()}
             </span>
           </div>

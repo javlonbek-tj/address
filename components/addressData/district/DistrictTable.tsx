@@ -1,9 +1,8 @@
 'use client';
 
-import { useMemo, useState } from 'react';
 import { DistrictFormDialog } from './';
 import type { District, Region } from '@/types';
-import { useTableActions, useSearch, useDelete } from '@/hooks';
+import { useTableActions, useDelete, useTableFilters } from '@/hooks';
 import { Input } from '@/components/ui/input';
 import {
   Select,
@@ -19,9 +18,27 @@ import { deleteDistrict } from '@/app/actions';
 interface Props {
   districts: District[];
   regions: Region[];
+  totalCount: number;
+  currentPage: number;
+  pageSize: number;
+  totalPages: number;
+  search: string;
+  regionId: string;
 }
 
-export function DistrictTable({ districts, regions }: Props) {
+export function DistrictTable({
+  districts,
+  regions,
+  totalCount,
+  currentPage,
+  pageSize,
+  totalPages,
+  search,
+  regionId,
+}: Props) {
+  const { handleSearch, handleFilterChange, isLoading, setIsPending } =
+    useTableFilters();
+
   const {
     isFormOpen,
     handleCloseForm,
@@ -31,17 +48,6 @@ export function DistrictTable({ districts, regions }: Props) {
     setDeleteId,
     handleCloseDelete,
   } = useTableActions();
-  const [selectedRegionId, setSelectedRegionId] = useState<string>('all');
-  const {
-    search,
-    setSearch,
-    filteredData: searchedData,
-  } = useSearch(districts);
-
-  const filteredData = useMemo(() => {
-    if (selectedRegionId === 'all') return searchedData;
-    return searchedData.filter((d) => d.regionId === selectedRegionId);
-  }, [searchedData, selectedRegionId]);
 
   const { isDeleting, handleDelete } = useDelete(deleteDistrict, {
     onSuccess: handleCloseDelete,
@@ -50,23 +56,38 @@ export function DistrictTable({ districts, regions }: Props) {
   });
 
   return (
-    <div className='px-8 py-10 overflow-hidden'>
-      <div className='bg-white dark:bg-gray-800 shadow-sm rounded-lg'>
-        <div className='flex flex-wrap items-center gap-3 border-b p-4'>
+    <div className="px-8 py-10">
+      <div className="bg-white dark:bg-gray-800 shadow-sm rounded-lg">
+        <div className="flex flex-wrap items-center gap-3 p-4 border-b">
           <Input
-            placeholder='Qidiruv...'
-            className='w-64 shadow-sm'
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Qidiruv..."
+            className="shadow-sm w-52 h-8"
+            defaultValue={search}
+            onChange={(e) => handleSearch(e.target.value)}
           />
-          <Select value={selectedRegionId} onValueChange={setSelectedRegionId}>
-            <SelectTrigger className='w-64 shadow-sm dark:bg-gray-700 dark:text-white'>
-              <SelectValue placeholder="Hudud bo'yicha filter" />
+          <Select
+            value={regionId}
+            onValueChange={(value) => handleFilterChange('regionId', value)}
+          >
+            <SelectTrigger
+              className="dark:bg-gray-700 shadow-sm w-52 dark:text-white"
+              size="sm"
+            >
+              <SelectValue
+                placeholder="Hudud bo'yicha filter"
+                className="text-xs 3xl:text-sm"
+              />
             </SelectTrigger>
-            <SelectContent className='dark:bg-gray-700 dark:text-white'>
-              <SelectItem value='all'>Barcha hududlar</SelectItem>
+            <SelectContent className="dark:bg-gray-700 dark:text-white">
+              <SelectItem value="all" className="text-xs 3xl:text-sm">
+                Barcha hududlar
+              </SelectItem>
               {regions.map((region) => (
-                <SelectItem key={region.id} value={region.id}>
+                <SelectItem
+                  key={region.id}
+                  value={region.id}
+                  className="text-xs 3xl:text-sm"
+                >
                   {region.name}
                 </SelectItem>
               ))}
@@ -74,9 +95,17 @@ export function DistrictTable({ districts, regions }: Props) {
           </Select>
         </div>
         <DataTable
-          data={filteredData}
+          data={districts}
           onEdit={handleEdit}
           onDelete={setDeleteId}
+          isLoading={isLoading}
+          pagination={{
+            currentPage,
+            totalPages,
+            totalItems: totalCount,
+            itemsPerPage: pageSize,
+            setIsPending,
+          }}
         />
       </div>
       <DistrictFormDialog

@@ -11,3 +11,4 @@ export { useRegionForm } from './useRegionForm';
 export { useDistrictForm } from './useDistrictForm';
 export { useSearch } from './useSearch';
 export { useDelete } from './useDelete';
+export { useTableFilters } from './useTableFilters';

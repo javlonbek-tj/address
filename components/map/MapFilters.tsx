@@ -82,23 +82,23 @@ export function MapFilters({
   };
 
   return (
-    <div className='absolute top-3 left-1/2 -translate-x-1/2 z-9999 w-fit max-w-[95%]'>
+    <div className="top-3 left-1/3 z-9999 absolute ml-8 w-fit max-w-[95%] -translate-x-1/2">
       <div
-        className={`flex items-center gap-3 p-2 bg-background/95 backdrop-blur-md border rounded-xl shadow-lg transition-opacity duration-200 ${
+        className={`grid grid-cols-2 xl:grid-cols-4 gap-2 p-1 md:p-1.5 bg-background/95 backdrop-blur-md border rounded-lg shadow-lg transition-opacity duration-200 ${
           isLoading ? 'opacity-70 pointer-events-none' : 'opacity-100'
         }`}
       >
         <FilterSelect
           value={selectedRegion}
           onValueChange={handleRegionChange}
-          placeholder='Viloyat'
+          placeholder="Viloyat"
           options={regions}
           onClear={(e) => clearFilter('region', e)}
         />
         <FilterSelect
           value={selectedDistrict}
           onValueChange={handleDistrictChange}
-          placeholder='Tuman/Shahar'
+          placeholder="Tuman/Shahar"
           disabled={!selectedRegion}
           options={districts}
           onClear={(e) => clearFilter('district', e)}
@@ -106,7 +106,7 @@ export function MapFilters({
         <FilterSelect
           value={selectedMahalla}
           onValueChange={handleMahallaChange}
-          placeholder='Mahalla'
+          placeholder="Mahalla"
           disabled={!selectedDistrict}
           options={mahallas}
           onClear={(e) => clearFilter('mahalla', e)}

@@ -24,14 +24,10 @@ interface Props {
 
 export function DashboardOverview({ data }: Props) {
   return (
-    <div className='flex-1 space-y-6 p-6'>
-      <h2 className='text-3xl font-bold tracking-tight text-slate-900 dark:text-slate-50'>
-        Umumiy ko&apos;rinish
-      </h2>
-
+    <div className="flex-1 space-y-6 p-6">
       <AnalyticsCards counts={data.counts} />
 
-      <div className='grid gap-4 md:grid-cols-2 lg:grid-cols-7'>
+      <div className="gap-4 grid lg:grid-cols-2 xl:grid-cols-7">
         <RegionChart data={data.charts.regions} />
         <StreetTypeChart data={data.charts.streetTypes} />
         <DataHealthChart

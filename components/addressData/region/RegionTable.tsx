@@ -2,17 +2,30 @@
 
 import { RegionFormDialog } from './';
 import type { Region } from '@/types';
-import { useTableActions, useSearch, useDelete } from '@/hooks';
+import { useTableActions, useDelete, useTableFilters } from '@/hooks';
 import { Input } from '@/components/ui/input';
 import { DataTable } from '../table';
 import { DeleteDialog } from '@/components/shared';
 import { deleteRegion } from '@/app/actions';
 
 interface Props {
+  // ... existing props
   regions: Region[];
+  totalCount: number;
+  currentPage: number;
+  pageSize: number;
+  search: string;
+  totalPages: number;
 }
 
-export function RegionTable({ regions }: Props) {
+export function RegionTable({
+  regions,
+  totalCount,
+  currentPage,
+  pageSize,
+  search,
+  totalPages,
+}: Props) {
   const {
     isFormOpen,
     handleCloseForm,
@@ -22,7 +35,6 @@ export function RegionTable({ regions }: Props) {
     setDeleteId,
     handleCloseDelete,
   } = useTableActions();
-  const { search, setSearch, filteredData } = useSearch(regions);
 
   const { isDeleting, handleDelete } = useDelete(deleteRegion, {
     onSuccess: handleCloseDelete,
@@ -30,29 +42,39 @@ export function RegionTable({ regions }: Props) {
     errorMessage: "Hududni o'chirishda xatolik yuz berdi",
   });
 
+  const { handleSearch, isLoading, setIsPending } = useTableFilters();
+
   return (
-    <div className='px-8 py-10 overflow-hidden'>
-      <div className='bg-white dark:bg-gray-800 shadow-sm rounded-lg'>
-        <div className='flex flex-wrap items-center gap-3 border-b p-4'>
+    <div className="p-8">
+      <div className="bg-white dark:bg-gray-800 shadow-sm rounded-lg transition-opacity duration-200">
+        <div className="relative flex flex-wrap items-center gap-3 p-4 border-b">
           <Input
-            placeholder='Qidiruv...'
-            className='w-64 shadow-sm'
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Qidiruv..."
+            className="shadow-sm w-52 h-8"
+            defaultValue={search}
+            onChange={(e) => handleSearch(e.target.value)}
           />
         </div>
         <DataTable
-          data={filteredData}
+          data={regions}
           onEdit={handleEdit}
           onDelete={setDeleteId}
+          isLoading={isLoading}
+          pagination={{
+            currentPage,
+            totalPages,
+            totalItems: totalCount,
+            itemsPerPage: pageSize,
+            setIsPending,
+          }}
         />
       </div>
+
       <RegionFormDialog
         open={isFormOpen}
         onClose={handleCloseForm}
         region={editingItem as Region}
       />
-
       <DeleteDialog
         open={!!deleteId}
         onClose={handleCloseDelete}

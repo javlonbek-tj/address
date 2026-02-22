@@ -3,3 +3,10 @@ export type Region = {
   name: string;
   code: number;
 };
+
+export type RegionTableData = {
+  data: Region[];
+  total: number;
+  page: number;
+  limit: number;
+};
