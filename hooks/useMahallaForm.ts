@@ -34,11 +34,11 @@ export function useMahallaForm({
     regionId: mahalla?.district?.region?.id || '',
     districtId: mahalla?.district?.id || '',
     hidden: mahalla?.hidden || false,
-    mergedIntoId: mahalla?.mergedIntoId || '',
-    mergedIntoName: mahalla?.mergedIntoName || '',
     oldName: mahalla?.oldName || '',
     regulation: mahalla?.regulation || '',
     regulationUrl: mahalla?.regulationUrl || '',
+    isOptimized: mahalla?.hidden || false,
+    mergingMahallas: [],
   });
 
   const form = useForm<MahallaSchemaType>({
@@ -51,13 +51,28 @@ export function useMahallaForm({
     }
   }, [mahalla, form, open]);
 
+  const fetchMahallaByCode = async (code: string) => {
+    if (!code || code.length < 3) return null;
+    try {
+      const response = await fetch(`/api/mahallas?search=${code}`);
+      const result = await response.json();
+      if (result.success && result.data?.data?.[0]) {
+        return result.data.data[0];
+      }
+    } catch (error) {
+      console.error('Failed to fetch mahalla:', error);
+    }
+    return null;
+  };
+
   const onSubmit = async (data: MahallaSchemaType) => {
-    if (!mahalla?.id) return;
     setIsSubmitting(true);
-    const result = await updateMahalla(mahalla.id, data);
+    const result = mahalla?.id
+      ? await updateMahalla(mahalla.id, data)
+      : await updateMahalla('', data); // Need to handle create if needed, but the current action is updateMahalla.
 
     if (!result.success) {
-      toast.error(result.message || 'Mahallani tahrirlashda xatolik yuz berdi');
+      toast.error(result.message || 'Mahallani saqlashda xatolik yuz berdi');
       setIsSubmitting(false);
       return;
     }
@@ -74,5 +89,6 @@ export function useMahallaForm({
     form,
     isSubmitting,
     onSubmit,
+    fetchMahallaByCode,
   };
 }

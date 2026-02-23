@@ -26,18 +26,18 @@ export async function updateMahalla(
     uzKadName,
     geoCode,
     oneId,
-    hidden,
-    mergedIntoId,
-    mergedIntoName,
     oldName,
     regulation,
     regulationUrl,
+    isOptimized,
+    mergingMahallas,
+    hidden,
   } = validationResult.data;
 
   try {
     const existingMahalla = await prisma.mahalla.findFirst({
       where: {
-        NOT: { id },
+        NOT: { id: id || undefined },
         OR: [
           { code },
           {
@@ -59,51 +59,55 @@ export async function updateMahalla(
       };
     }
 
-    const updatedMahalla = await prisma.mahalla.update({
-      where: { id },
-      data: {
-        name,
-        code,
-        districtId,
-        uzKadName,
-        geoCode,
-        oneId,
-        hidden,
-        mergedIntoId,
-        mergedIntoName,
-        oldName,
-        regulation,
-        regulationUrl,
-      },
-      select: {
-        id: true,
-        name: true,
-        code: true,
-        uzKadName: true,
-        geoCode: true,
-        oneId: true,
-        hidden: true,
-        mergedIntoId: true,
-        mergedIntoName: true,
-        regulationUrl: true,
-        regulation: true,
-        oldName: true,
-        district: {
-          select: {
-            id: true,
-            name: true,
-            region: {
-              select: {
-                id: true,
-                name: true,
-              },
+    const updatedMahalla = await prisma.$transaction(async (tx) => {
+      const mahalla = id
+        ? await tx.mahalla.update({
+            where: { id },
+            data: {
+              name,
+              code,
+              districtId,
+              uzKadName,
+              geoCode,
+              oneId,
+              hidden: isOptimized ? hidden : false,
+              oldName,
+              regulation,
+              regulationUrl,
             },
+          })
+        : await tx.mahalla.create({
+            data: {
+              name,
+              code,
+              districtId,
+              uzKadName,
+              geoCode,
+              oneId,
+              hidden: isOptimized ? hidden : false,
+              oldName,
+              regulation,
+              regulationUrl,
+              geometry: {}, // Provide default geometry if adding
+            },
+          });
+
+      if (isOptimized && mergingMahallas && mergingMahallas.length > 0) {
+        await tx.mahalla.updateMany({
+          where: {
+            id: { in: mergingMahallas.map((m: any) => m.id) },
           },
-        },
-      },
+          data: {
+            mergedIntoId: mahalla.id,
+            mergedIntoName: mahalla.name,
+          },
+        });
+      }
+
+      return mahalla;
     });
 
-    return { success: true, data: updatedMahalla };
+    return { success: true, data: updatedMahalla as unknown as Mahalla };
   } catch (error) {
     console.error('Failed to update mahalla:', error);
     return { success: false, error: 'INTERNAL_SERVER_ERROR' };

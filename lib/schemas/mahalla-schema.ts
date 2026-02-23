@@ -51,28 +51,22 @@ export const mahallaSchema = z
       .string()
       .trim()
       .min(1, 'Majburiy maydon')
-      .refine((val) => !val || /\.pdf$/i.test(val), 'PDF fayl yuklang')
       .nullable()
       .optional(),
+
+    isOptimized: z.boolean().default(false),
+    mergingMahallas: z
+      .array(
+        z.object({
+          id: z.string().trim().min(1, 'Majburiy maydon'),
+          name: z.string().trim(),
+        }),
+      )
+      .optional()
+      .default([]),
   })
   .superRefine((data, ctx) => {
-    if (!data.hidden) return;
-
-    if (!data.mergedIntoId) {
-      ctx.addIssue({
-        code: 'custom',
-        message: 'Majburiy maydon',
-        path: ['mergedIntoId'],
-      });
-    }
-
-    if (!data.mergedIntoName) {
-      ctx.addIssue({
-        code: 'custom',
-        message: 'Majburiy maydon',
-        path: ['mergedIntoName'],
-      });
-    }
+    if (!data.isOptimized) return;
 
     if (!data.regulationUrl) {
       ctx.addIssue({

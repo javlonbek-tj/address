@@ -27,7 +27,7 @@ const buttonVariants = cva(
         lg: 'h-10 rounded-md px-6 has-[>svg]:px-4',
         icon: 'size-9',
         'icon-xs':
-          "size-6  [&_svg:not([class*='size-'])]:size-3 2xl:size-8 2xl:[&_svg:not([class*='size-'])]:size-4",
+          "size-6  [&_svg:not([class*='size-'])]:size-3 2xl:size-[1.75rem] 3xl:size-8 2xl:[&_svg:not([class*='size-'])]:size-[0.875rem] 3xl:[&_svg:not([class*='size-'])]:size-4",
         'icon-sm': 'size-8',
         'icon-lg': 'size-10',
       },
@@ -53,7 +53,7 @@ function Button({
 
   return (
     <Comp
-      data-slot='button'
+      data-slot="button"
       data-variant={variant}
       data-size={size}
       className={cn(buttonVariants({ variant, size, className }))}
