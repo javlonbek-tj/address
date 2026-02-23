@@ -49,12 +49,10 @@ export function DistrictFormDialog({
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent className='bg-white dark:bg-gray-800 sm:max-w-lg max-h-[90vh] overflow-x-hidden overflow-y-auto text-gray-900 dark:text-white'>
         <DialogHeader>
-          <DialogTitle>
-            {district ? 'Tumanni tahrirlash' : 'Tuman qoʻshish'}
-          </DialogTitle>
+          <DialogTitle>Tumanni tahrirlash</DialogTitle>
         </DialogHeader>
         <DialogDescription className='sr-only'>
-          {district ? 'Tumanni tahrirlash' : 'Tuman qoʻshish'}
+          Tumanni tahrirlash
         </DialogDescription>
         <form onSubmit={form.handleSubmit(onSubmit)}>
           <FieldGroup>

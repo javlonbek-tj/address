@@ -10,7 +10,7 @@ datasource db {
 model Region {
   id   String @id @default(cuid())
   name String
-  code Int    @unique
+  code String @unique
 
   geometry Json
   center   Json?
@@ -29,7 +29,7 @@ model District {
   id       String @id @default(cuid())
   regionId String
   name     String
-  code     Int    @unique
+  code     String @unique
 
   geometry Json
   center   Json?
@@ -50,14 +50,14 @@ model District {
 model Mahalla {
   id   String @id @default(cuid())
   name String
-  code Int    @unique
+  code String @unique
 
   geometry Json
   center   Json?
   isActive Boolean @default(true)
 
   uzKadName String
-  geoCode   Int
+  geoCode   String
   oneId     String
 
   hidden         Boolean @default(false)
@@ -99,7 +99,7 @@ model Street {
 
   districtId String
   district   District @relation(fields: [districtId], references: [id])
-  mahallaId  Int
+  mahallaId  String
   mahalla    Mahalla  @relation(fields: [mahallaId], references: [code], onDelete: Cascade)
 
   @@index([name])

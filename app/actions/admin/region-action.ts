@@ -20,15 +20,11 @@ export async function updateRegion(
   }
 
   const { name, code } = validationResult.data;
-  const codeNumber = Number(code);
 
   try {
     const existingRegion = await prisma.region.findFirst({
       where: {
-        OR: [
-          { name: { equals: name, mode: 'insensitive' } },
-          { code: codeNumber },
-        ],
+        OR: [{ name: { equals: name, mode: 'insensitive' } }, { code }],
         NOT: { id },
       },
       select: { id: true },
@@ -45,7 +41,7 @@ export async function updateRegion(
       where: { id },
       data: {
         name,
-        code: codeNumber,
+        code,
       },
       select: { id: true, name: true, code: true },
     });

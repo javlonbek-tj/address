@@ -74,3 +74,23 @@ export async function getRegionTableData(
     };
   }
 }
+export async function getRegionsList(): Promise<Region[]> {
+  try {
+    const regions = await prisma.region.findMany({
+      where: {
+        isActive: true,
+      },
+      select: {
+        id: true,
+        name: true,
+        code: true,
+      },
+      orderBy: { name: 'asc' },
+    });
+
+    return regions;
+  } catch (error) {
+    console.error('Failed to fetch regions list:', error);
+    return [];
+  }
+}

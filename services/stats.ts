@@ -13,7 +13,7 @@ export const fetchStatistics = async (
   const { data } = await axiosInstance.get<{
     success: boolean;
     data: Statistics;
-  }>(`${ApiRoutes.STATS}?${params.toString()}`);
+  }>(`${ApiRoutes.MAP_STATS}?${params.toString()}`);
 
   return data?.data || null;
 };

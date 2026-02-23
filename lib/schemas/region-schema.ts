@@ -10,9 +10,11 @@ export const regionSchema = z.object({
     .transform((val) => val.charAt(0).toUpperCase() + val.slice(1)),
 
   code: z
-    .number()
+    .string()
+    .trim()
+    .regex(/^\d+$/, 'Faqat raqam kiriting')
     .min(1, 'Majburiy maydon')
-    .max(1000000000, 'Hudud kodi 1,000,000,000 belgidan oshmasligi kerak'),
+    .max(12, 'Maksimal 12 ta raqam'),
 });
 
 export type RegionSchemaType = z.infer<typeof regionSchema>;

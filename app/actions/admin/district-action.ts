@@ -20,15 +20,11 @@ export async function updateDistrict(
   }
 
   const { name, code, regionId } = validationResult.data;
-  const codeNumber = Number(code);
 
   try {
     const existingDistrict = await prisma.district.findFirst({
       where: {
-        OR: [
-          { name: { equals: name, mode: 'insensitive' } },
-          { code: codeNumber },
-        ],
+        OR: [{ name: { equals: name, mode: 'insensitive' } }, { code }],
         NOT: { id },
       },
       select: { id: true },
@@ -45,10 +41,10 @@ export async function updateDistrict(
       where: { id },
       data: {
         name,
-        code: codeNumber,
+        code,
         regionId,
       },
-      select: { id: true, name: true, code: true },
+      select: { id: true, name: true, code: true, regionId: true },
     });
 
     return {

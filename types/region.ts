@@ -1,7 +1,7 @@
 export type Region = {
   id: string;
   name: string;
-  code: number;
+  code: string;
 };
 
 export type RegionTableData = {

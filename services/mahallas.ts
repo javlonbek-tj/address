@@ -1,11 +1,35 @@
 import { axiosInstance } from './instance';
 import { ApiRoutes } from './apiRoutes';
-import type { MahallaWithRelations } from '@/types';
+import type { MahallaTableData, MahallaWithRelations } from '@/types';
 
 export const fetchMahallas = async (districtId: string) => {
   const { data } = await axiosInstance.get<{
     success: boolean;
     data: MahallaWithRelations[];
-  }>(`${ApiRoutes.MAHALLAS}?districtId=${districtId}`);
+  }>(`${ApiRoutes.MAP_MAHALLAS}?districtId=${districtId}`);
   return data?.data || [];
+};
+
+export const fetchMahallaTableData = async (
+  page: number,
+  limit: number,
+  search: string,
+  regionId: string,
+  districtId: string,
+  isOptimized: string,
+) => {
+  const { data } = await axiosInstance.get<{
+    success: boolean;
+    data: MahallaTableData;
+  }>(
+    `${ApiRoutes.MAHALLAS}?page=${page}&limit=${limit}&search=${search}&regionId=${regionId}&districtId=${districtId}&isOptimized=${isOptimized}`,
+  );
+  return (
+    data?.data || {
+      data: [],
+      total: 0,
+      page: 1,
+      limit: 10,
+    }
+  );
 };

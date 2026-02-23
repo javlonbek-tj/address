@@ -1,3 +1,5 @@
+'use client';
+
 import { useState } from 'react';
 import { useDistricts, useMahallas, useStreets } from './';
 import type { BaseMapKey } from '@/lib/constants/map';

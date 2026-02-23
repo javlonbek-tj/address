@@ -1,17 +1,25 @@
 import { NextRequest } from 'next/server';
-import { getMahallasByDistrictId } from '@/server/data/mahallas';
+import { getMahallaTableData } from '@/server';
 
 export async function GET(request: NextRequest) {
   try {
-    const districtId = request.nextUrl.searchParams.get('districtId');
-    if (!districtId) {
-      return Response.json(
-        { success: false, error: 'District ID required' },
-        { status: 400 },
-      );
-    }
+    const page = Number(request.nextUrl.searchParams.get('page')) || 1;
+    const limit = Number(request.nextUrl.searchParams.get('limit')) || 10;
+    const search = request.nextUrl.searchParams.get('search') || '';
+    const regionId = request.nextUrl.searchParams.get('regionId') || '';
 
-    const data = await getMahallasByDistrictId(districtId);
+    const districtId = request.nextUrl.searchParams.get('districtId') || '';
+    const isOptimized =
+      request.nextUrl.searchParams.get('isOptimized') || 'all';
+
+    const data = await getMahallaTableData({
+      page,
+      limit,
+      search,
+      regionId,
+      districtId,
+      isOptimized,
+    });
     return Response.json({ success: true, data });
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Unknown error';

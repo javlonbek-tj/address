@@ -1,7 +1,11 @@
 export { useIsMobile } from './use-mobile';
 export { useMapFilters } from './useMapFilters';
-export { useDistricts } from './useDistricts';
-export { useMahallas } from './useMahallas';
+export {
+  useDistricts,
+  useDistrictTableData,
+  useDistrictsList,
+} from './useDistricts';
+export { useMahallas, useMahallasTableData } from './useMahallas';
 export { useStreets } from './useStreets';
 export * from './useStats';
 export { useTableActions } from './useTableActions';
@@ -12,3 +16,6 @@ export { useDistrictForm } from './useDistrictForm';
 export { useSearch } from './useSearch';
 export { useDelete } from './useDelete';
 export { useTableFilters } from './useTableFilters';
+export { useRegions, useRegionTableData, useRegionsList } from './useRegions';
+export { useImageUpload } from './useImageUpload';
+export { useMahallaForm } from './useMahallaForm';

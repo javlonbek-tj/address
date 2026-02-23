@@ -1,52 +1,11 @@
 import { DistrictTable } from '@/components/addressData';
-import { ErrorMessage } from '@/components/shared';
-import { getDistrictTableData, getRegionTableData } from '@/server';
+import { Spinner } from '@/components/shared';
+import { Suspense } from 'react';
 
-export const dynamic = 'force-dynamic';
-
-export default async function DistrictsPage({
-  searchParams,
-}: {
-  searchParams: Promise<{
-    page?: string;
-    search?: string;
-    limit?: string;
-    regionId?: string;
-  }>;
-}) {
-  const {
-    page = '1',
-    search = '',
-    limit = '10',
-    regionId = 'all',
-  } = await searchParams;
-
-  const [result, regions] = await Promise.all([
-    getDistrictTableData({
-      page: Number(page),
-      limit: Number(limit),
-      search,
-      regionId,
-    }),
-    getRegionTableData(),
-  ]);
-
-  if (!result || !result.data) {
-    return <ErrorMessage className="min-h-[calc(100vh-4rem)]" />;
-  }
-
-  const totalPages = Math.ceil(result.total / result.limit);
-
+export default async function DistrictsPage() {
   return (
-    <DistrictTable
-      districts={result.data}
-      regions={Array.isArray(regions) ? regions : regions.data}
-      totalCount={result.total}
-      currentPage={result.page}
-      pageSize={result.limit}
-      totalPages={totalPages}
-      search={search}
-      regionId={regionId}
-    />
+    <Suspense fallback={<Spinner />}>
+      <DistrictTable />
+    </Suspense>
   );
 }

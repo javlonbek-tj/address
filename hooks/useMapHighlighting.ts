@@ -1,3 +1,5 @@
+'use client';
+
 import { useRef, useEffect } from 'react';
 import { GeoJSON as LeafletGeoJSON } from 'leaflet';
 import { MAP_LEVEL_STYLES } from '@/lib/constants/map';

@@ -46,6 +46,7 @@ export async function getMahallaTableData(
     search?: string;
     regionId?: string;
     districtId?: string;
+    isOptimized?: string;
   } = {},
 ): Promise<{
   data: Mahalla[];
@@ -59,6 +60,7 @@ export async function getMahallaTableData(
     search = '',
     regionId = 'all',
     districtId = 'all',
+    isOptimized = 'all',
   } = params;
   const skip = (page - 1) * limit;
 
@@ -71,6 +73,12 @@ export async function getMahallaTableData(
       where.districtId = districtId;
     } else if (regionId !== 'all') {
       where.district = { regionId };
+    }
+
+    if (isOptimized === 'true') {
+      where.mergedIntoId = { not: null };
+    } else if (isOptimized === 'false') {
+      where.mergedIntoId = null;
     }
 
     if (search) {
@@ -101,6 +109,7 @@ export async function getMahallaTableData(
           geoCode: true,
           oneId: true,
           hidden: true,
+          mergedIntoId: true,
           mergedIntoName: true,
           oldName: true,
           regulation: true,

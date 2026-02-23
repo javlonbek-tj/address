@@ -57,3 +57,13 @@ export const formatMapStatistics = (
 
   return items;
 };
+
+export const validateFile = (file: File): string | null => {
+  if (!['application/pdf'].includes(file.type)) {
+    return "Fayl formati noto'g'ri. Faqat PDF fayllariga ruxsat berilgan";
+  }
+  if (file.size > 10 * 1024 * 1024) {
+    return 'Fayl hajmi 10MB dan oshmasligi kerak';
+  }
+  return null;
+};

@@ -83,3 +83,27 @@ export async function getDistrictTableData(
     };
   }
 }
+export async function getDistrictsList(regionId?: string): Promise<District[]> {
+  try {
+    const where = {
+      isActive: true,
+      ...(regionId && regionId !== 'all' && { regionId }),
+    };
+
+    const districts = await prisma.district.findMany({
+      where,
+      select: {
+        id: true,
+        name: true,
+        code: true,
+        regionId: true,
+      },
+      orderBy: { name: 'asc' },
+    });
+
+    return districts;
+  } catch (error) {
+    console.error('Failed to fetch districts list:', error);
+    return [];
+  }
+}

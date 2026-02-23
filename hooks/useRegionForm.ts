@@ -5,6 +5,8 @@ import { useForm } from 'react-hook-form';
 import type { Region } from '@/types';
 import { updateRegion } from '@/app/actions';
 import toast from 'react-hot-toast';
+import { useQueryClient } from '@tanstack/react-query';
+import { RegionSchemaType } from '@/lib';
 
 interface Props {
   region: Region;
@@ -13,19 +15,25 @@ interface Props {
 }
 
 export function useRegionForm({ region, open, onClose }: Props) {
+  const queryClient = useQueryClient();
   const [submitting, setIsSubmitting] = useState(false);
 
-  const form = useForm<Region>({
-    defaultValues: region,
+  const getFormattedValues = (region: Region): RegionSchemaType => ({
+    name: region?.name || '',
+    code: region?.code || '',
+  });
+
+  const form = useForm<RegionSchemaType>({
+    defaultValues: getFormattedValues(region),
   });
 
   useEffect(() => {
     if (open) {
-      form.reset(region);
+      form.reset(getFormattedValues(region));
     }
   }, [region, form, open]);
 
-  const onSubmit = async (data: Region) => {
+  const onSubmit = async (data: RegionSchemaType) => {
     if (!region?.id) return;
     setIsSubmitting(true);
     const result = await updateRegion(region.id, data);
@@ -37,6 +45,8 @@ export function useRegionForm({ region, open, onClose }: Props) {
     }
 
     toast.success('Hudud muvaffaqiyatli tahrirlandi');
+    queryClient.invalidateQueries({ queryKey: ['regions'] });
+    queryClient.invalidateQueries({ queryKey: ['regions-table-data'] });
     onClose();
     setIsSubmitting(false);
   };

@@ -6,6 +6,6 @@ export const fetchStreets = async (districtId: string) => {
   const { data } = await axiosInstance.get<{
     success: boolean;
     data: StreetWithMetadata[];
-  }>(`${ApiRoutes.STREETS}?districtId=${districtId}`);
+  }>(`${ApiRoutes.MAP_STREETS}?districtId=${districtId}`);
   return data?.data || [];
 };

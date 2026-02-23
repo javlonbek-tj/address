@@ -1,7 +1,7 @@
 export type District = {
   id: string;
   name: string;
-  code: number;
+  code: string;
   regionId: string;
 };
 

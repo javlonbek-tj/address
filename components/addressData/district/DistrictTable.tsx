@@ -2,7 +2,13 @@
 
 import { DistrictFormDialog } from './';
 import type { District, Region } from '@/types';
-import { useTableActions, useDelete, useTableFilters } from '@/hooks';
+import {
+  useTableActions,
+  useDelete,
+  useTableFilters,
+  useDistrictTableData,
+  useRegionsList,
+} from '@/hooks';
 import { Input } from '@/components/ui/input';
 import {
   Select,
@@ -14,30 +20,27 @@ import {
 import { DataTable } from '../table';
 import { DeleteDialog } from '@/components/shared';
 import { deleteDistrict } from '@/app/actions';
+import { useSearchParams } from 'next/navigation';
 
-interface Props {
-  districts: District[];
-  regions: Region[];
-  totalCount: number;
-  currentPage: number;
-  pageSize: number;
-  totalPages: number;
-  search: string;
-  regionId: string;
-}
+export function DistrictTable() {
+  const searchParams = useSearchParams();
 
-export function DistrictTable({
-  districts,
-  regions,
-  totalCount,
-  currentPage,
-  pageSize,
-  totalPages,
-  search,
-  regionId,
-}: Props) {
-  const { handleSearch, handleFilterChange, isLoading, setIsPending } =
-    useTableFilters();
+  const page = Number(searchParams.get('page')) || 1;
+  const limit = Number(searchParams.get('limit')) || 10;
+  const search = searchParams.get('search') || '';
+  const regionId = searchParams.get('regionId') || 'all';
+
+  const { data: districtTableData, isLoadingDistrictTableData } =
+    useDistrictTableData(page, limit, search, regionId);
+
+  const { regions, isLoadingRegions } = useRegionsList();
+
+  const {
+    handleSearch,
+    handleFilterChange,
+    isLoading: isFilterLoading,
+    setIsPending,
+  } = useTableFilters();
 
   const {
     isFormOpen,
@@ -55,13 +58,19 @@ export function DistrictTable({
     errorMessage: "Tumanni o'chirishda xatolik yuz berdi",
   });
 
+  const districts = districtTableData?.data || [];
+  const totalCount = districtTableData?.total || 0;
+  const totalPages = Math.ceil(totalCount / limit);
+  const isLoading =
+    isLoadingDistrictTableData || isFilterLoading || isLoadingRegions;
+
   return (
-    <div className="px-8 py-10">
-      <div className="bg-white dark:bg-gray-800 shadow-sm rounded-lg">
-        <div className="flex flex-wrap items-center gap-3 p-4 border-b">
+    <div className='px-8 py-10'>
+      <div className='bg-white dark:bg-gray-800 shadow-sm rounded-lg'>
+        <div className='flex flex-wrap items-center gap-3 p-4 border-b'>
           <Input
-            placeholder="Qidiruv..."
-            className="shadow-sm w-52 h-8"
+            placeholder='Qidiruv...'
+            className='shadow-sm w-52 h-8 2xl:h-9 2xl:w-64'
             defaultValue={search}
             onChange={(e) => handleSearch(e.target.value)}
           />
@@ -70,23 +79,23 @@ export function DistrictTable({
             onValueChange={(value) => handleFilterChange('regionId', value)}
           >
             <SelectTrigger
-              className="dark:bg-gray-700 shadow-sm w-52 dark:text-white"
-              size="sm"
+              className='dark:bg-gray-700 shadow-sm w-52 dark:text-white'
+              size='sm'
             >
               <SelectValue
                 placeholder="Hudud bo'yicha filter"
-                className="text-xs 3xl:text-sm"
+                className='text-xs 2xl:text-sm'
               />
             </SelectTrigger>
-            <SelectContent className="dark:bg-gray-700 dark:text-white">
-              <SelectItem value="all" className="text-xs 3xl:text-sm">
+            <SelectContent className='dark:bg-gray-700 dark:text-white'>
+              <SelectItem value='all' className='text-xs 2xl:text-sm'>
                 Barcha hududlar
               </SelectItem>
-              {regions.map((region) => (
+              {regions.map((region: Region) => (
                 <SelectItem
                   key={region.id}
                   value={region.id}
-                  className="text-xs 3xl:text-sm"
+                  className='text-xs 2xl:text-sm'
                 >
                   {region.name}
                 </SelectItem>
@@ -100,10 +109,10 @@ export function DistrictTable({
           onDelete={setDeleteId}
           isLoading={isLoading}
           pagination={{
-            currentPage,
+            currentPage: page,
             totalPages,
             totalItems: totalCount,
-            itemsPerPage: pageSize,
+            itemsPerPage: limit,
             setIsPending,
           }}
         />

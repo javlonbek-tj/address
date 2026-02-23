@@ -12,13 +12,23 @@ export function useTableFilters() {
   const [isTransitioning, startTransition] = useTransition();
 
   const handleFilterChange = useCallback(
-    (key: string, value: string) => {
+    (keyOrFilters: string | Record<string, string>, value?: string) => {
       const params = new URLSearchParams(searchParams.toString());
 
-      if (value && value !== 'all') {
-        params.set(key, value);
+      if (typeof keyOrFilters === 'string') {
+        if (value && value !== 'all') {
+          params.set(keyOrFilters, value);
+        } else {
+          params.delete(keyOrFilters);
+        }
       } else {
-        params.delete(key);
+        Object.entries(keyOrFilters).forEach(([key, val]) => {
+          if (val && val !== 'all') {
+            params.set(key, val);
+          } else {
+            params.delete(key);
+          }
+        });
       }
 
       params.set('page', '1');
