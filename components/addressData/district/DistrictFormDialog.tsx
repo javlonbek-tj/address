@@ -24,7 +24,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Input } from '@/components/ui/input';
-import { DecimalInput, FormActions } from '@/components/shared';
+import { FormActions } from '@/components/shared';
 
 interface Props {
   open: boolean;
@@ -108,14 +108,17 @@ export function DistrictFormDialog({
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid}>
                   <FieldLabel htmlFor='code'>Soato kodi</FieldLabel>
-                  <DecimalInput
+                  <Input
                     id='code'
                     {...field}
+                    onChange={(e) => {
+                      const value = e.target.value.replace(/\D/g, '');
+                      field.onChange(value);
+                    }}
                     className='dark:bg-gray-700 dark:text-white'
                     placeholder='Soato kodi'
                     autoComplete='off'
                     aria-invalid={fieldState.invalid}
-                    maxDecimals={0}
                   />
                   {fieldState.invalid && (
                     <FieldError errors={[fieldState.error]} />

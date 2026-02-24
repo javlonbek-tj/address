@@ -34,7 +34,7 @@ export function useDistrictTableData(
   return { data, isLoadingDistrictTableData };
 }
 
-export function useDistrictsList(regionId?: string) {
+export function useDistrictsList(regionId: string) {
   const { data: districts = [], isPending: isLoadingDistricts } = useQuery<
     District[]
   >({

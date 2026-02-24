@@ -12,9 +12,9 @@ export const districtSchema = z.object({
   code: z
     .string()
     .trim()
-    .regex(/^\d+$/, 'Faqat raqam kiriting')
     .min(1, 'Majburiy maydon')
-    .max(12, 'Maksimal 12 ta raqam'),
+    .max(12, 'Maksimal 12 ta raqam')
+    .regex(/^\d+$/, 'Faqat raqam kiriting'),
 
   regionId: z.string().min(1, 'Majburiy maydon'),
 });

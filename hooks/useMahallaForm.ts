@@ -4,7 +4,9 @@ import { useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import type { MahallaSchemaType } from '@/lib';
-import { updateMahalla } from '@/app/actions';
+import { mahallaSchema } from '@/lib';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { getFiles, updateMahalla } from '@/app/actions';
 import toast from 'react-hot-toast';
 import type { Mahalla } from '@/types';
 import { useEffect } from 'react';
@@ -24,6 +26,9 @@ export function useMahallaForm({
 }: Props) {
   const queryClient = useQueryClient();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [existingFiles, setExistingFiles] = useState<
+    Array<{ name: string; url: string }>
+  >([]);
 
   const getFormattedValues = (mahalla: Mahalla): MahallaSchemaType => ({
     name: mahalla?.name || '',
@@ -33,43 +38,38 @@ export function useMahallaForm({
     oneId: mahalla?.oneId || '',
     regionId: mahalla?.district?.region?.id || '',
     districtId: mahalla?.district?.id || '',
-    hidden: mahalla?.hidden || false,
-    oldName: mahalla?.oldName || '',
-    regulation: mahalla?.regulation || '',
-    regulationUrl: mahalla?.regulationUrl || '',
-    isOptimized: mahalla?.hidden || false,
+    hidden: !!mahalla?.hidden,
+    oldName: mahalla?.oldName || null,
+    regulation: mahalla?.regulation || null,
+    regulationUrl: mahalla?.regulationUrl || null,
+    isOptimized: !!mahalla?.hidden || !!mahalla?.mergedIntoId,
     mergingMahallas: [],
   });
 
   const form = useForm<MahallaSchemaType>({
+    resolver: zodResolver(mahallaSchema),
     defaultValues: getFormattedValues(mahalla),
   });
 
   useEffect(() => {
     if (open) {
       form.reset(getFormattedValues(mahalla));
+
+      const getExistingFiles = async () => {
+        const files = await getFiles(
+          `optimization/${mahalla?.district?.region?.name}`,
+        );
+        setExistingFiles(files);
+      };
+      if (mahalla?.district?.region?.id) {
+        getExistingFiles();
+      }
     }
   }, [mahalla, form, open]);
 
-  const fetchMahallaByCode = async (code: string) => {
-    if (!code || code.length < 3) return null;
-    try {
-      const response = await fetch(`/api/mahallas?search=${code}`);
-      const result = await response.json();
-      if (result.success && result.data?.data?.[0]) {
-        return result.data.data[0];
-      }
-    } catch (error) {
-      console.error('Failed to fetch mahalla:', error);
-    }
-    return null;
-  };
-
   const onSubmit = async (data: MahallaSchemaType) => {
     setIsSubmitting(true);
-    const result = mahalla?.id
-      ? await updateMahalla(mahalla.id, data)
-      : await updateMahalla('', data); // Need to handle create if needed, but the current action is updateMahalla.
+    const result = await updateMahalla(mahalla.id, data);
 
     if (!result.success) {
       toast.error(result.message || 'Mahallani saqlashda xatolik yuz berdi');
@@ -89,6 +89,6 @@ export function useMahallaForm({
     form,
     isSubmitting,
     onSubmit,
-    fetchMahallaByCode,
+    existingFiles,
   };
 }

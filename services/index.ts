@@ -1,4 +1,8 @@
-export { fetchMahallas, fetchMahallaTableData } from './mahallas';
+export {
+  fetchMahallas,
+  fetchMahallaTableData,
+  fetchMahallaByCode,
+} from './mahallas';
 export {
   fetchDistricts,
   fetchDistrictTableData,

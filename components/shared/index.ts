@@ -7,3 +7,4 @@ export * from './form';
 export * from './modal';
 export { Pagination } from './Pagination';
 export { PaginationWrapper } from './PaginationWrapper';
+export { FileUploadInput } from './FileUploadInput';

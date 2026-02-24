@@ -89,11 +89,8 @@ export async function getMahallaTableData(
       });
       searchTerms.push({ oneId: { contains: search, mode: 'insensitive' } });
 
-      const numSearch = Number(search);
-      if (!isNaN(numSearch)) {
-        searchTerms.push({ code: numSearch });
-        searchTerms.push({ geoCode: numSearch });
-      }
+      searchTerms.push({ code: { contains: search, mode: 'insensitive' } });
+      searchTerms.push({ geoCode: { contains: search, mode: 'insensitive' } });
 
       where.OR = searchTerms;
     }
@@ -150,3 +147,19 @@ export async function getMahallaTableData(
     };
   }
 }
+
+export const getMahallaByCode = async (code: string) => {
+  try {
+    const mahalla = await prisma.mahalla.findUnique({
+      where: { code },
+      select: {
+        id: true,
+        uzKadName: true,
+      },
+    });
+    return mahalla;
+  } catch (error) {
+    console.error('Failed to fetch mahalla:', error);
+    return null;
+  }
+};

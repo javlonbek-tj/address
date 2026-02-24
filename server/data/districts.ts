@@ -43,10 +43,20 @@ export async function getDistrictTableData(
       ...(regionId !== 'all' ? { regionId } : {}),
       ...(search
         ? {
-            name: {
-              contains: search,
-              mode: 'insensitive' as const,
-            },
+            OR: [
+              {
+                name: {
+                  contains: search,
+                  mode: 'insensitive' as const,
+                },
+              },
+              {
+                code: {
+                  contains: search,
+                  mode: 'insensitive' as const,
+                },
+              },
+            ],
           }
         : {}),
     };
@@ -83,11 +93,11 @@ export async function getDistrictTableData(
     };
   }
 }
-export async function getDistrictsList(regionId?: string): Promise<District[]> {
+export async function getDistrictsList(regionId: string): Promise<District[]> {
   try {
     const where = {
       isActive: true,
-      ...(regionId && regionId !== 'all' && { regionId }),
+      ...(regionId !== 'all' && { regionId }),
     };
 
     const districts = await prisma.district.findMany({

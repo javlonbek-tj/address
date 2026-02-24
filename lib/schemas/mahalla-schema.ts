@@ -42,7 +42,7 @@ export const mahallaSchema = z
     regionId: z.string().trim().min(1, 'Majburiy maydon'),
     districtId: z.string().trim().min(1, 'Majburiy maydon'),
 
-    hidden: z.boolean().default(false),
+    hidden: z.boolean(),
     mergedIntoId: z.string().trim().nullable().optional(),
     mergedIntoName: z.string().trim().nullable().optional(),
     oldName: z.string().trim().nullable().optional(),
@@ -54,16 +54,13 @@ export const mahallaSchema = z
       .nullable()
       .optional(),
 
-    isOptimized: z.boolean().default(false),
-    mergingMahallas: z
-      .array(
-        z.object({
-          id: z.string().trim().min(1, 'Majburiy maydon'),
-          name: z.string().trim(),
-        }),
-      )
-      .optional()
-      .default([]),
+    isOptimized: z.boolean(),
+    mergingMahallas: z.array(
+      z.object({
+        id: z.string().trim().min(1, 'Majburiy maydon'),
+        name: z.string().trim(),
+      }),
+    ),
   })
   .superRefine((data, ctx) => {
     if (!data.isOptimized) return;
@@ -73,6 +70,14 @@ export const mahallaSchema = z
         code: 'custom',
         message: 'Majburiy maydon',
         path: ['regulationUrl'],
+      });
+    }
+
+    if (!data.mergingMahallas.length) {
+      ctx.addIssue({
+        code: 'custom',
+        message: 'Majburiy maydon',
+        path: ['mergingMahallas'],
       });
     }
   });

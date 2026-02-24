@@ -16,7 +16,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
-import { DecimalInput, FormActions } from '@/components/shared';
+import { FormActions } from '@/components/shared';
 
 import { useRegionForm } from '@/hooks';
 
@@ -69,14 +69,18 @@ export function RegionFormDialog({ open, onClose, region }: Props) {
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid}>
                   <FieldLabel htmlFor='code'>Soato kodi</FieldLabel>
-                  <DecimalInput
+                  <Input
                     id='code'
                     {...field}
+                    onChange={(e) => {
+                      const value = e.target.value.replace(/\D/g, '');
+                      field.onChange(value);
+                    }}
                     className='dark:bg-gray-700 dark:text-white'
                     placeholder='Soato kodi'
                     autoComplete='off'
                     aria-invalid={fieldState.invalid}
-                    maxDecimals={0}
+                    inputMode='numeric'
                   />
                   {fieldState.invalid && (
                     <FieldError errors={[fieldState.error]} />

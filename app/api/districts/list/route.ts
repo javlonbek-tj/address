@@ -3,7 +3,7 @@ import { getDistrictsList } from '@/server';
 
 export async function GET(request: NextRequest) {
   try {
-    const regionId = request.nextUrl.searchParams.get('regionId') || undefined;
+    const regionId = request.nextUrl.searchParams.get('regionId') || 'all';
     const data = await getDistrictsList(regionId);
     return Response.json({ success: true, data });
   } catch (error) {

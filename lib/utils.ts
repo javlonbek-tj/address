@@ -3,6 +3,7 @@ import { twMerge } from 'tailwind-merge';
 import { Map as MapIcon, Navigation, Home, Waypoints } from 'lucide-react';
 import type { Statistics } from '@/types';
 import { StatItem } from '@/components/map/MapStatistics';
+import { MAX_UPLOAD_SIZE } from './constants';
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -58,12 +59,15 @@ export const formatMapStatistics = (
   return items;
 };
 
-export const validateFile = (file: File): string | null => {
-  if (!['application/pdf'].includes(file.type)) {
-    return "Fayl formati noto'g'ri. Faqat PDF fayllariga ruxsat berilgan";
+export const validateFile = (
+  file: File,
+  acceptFileTypes: string[],
+): string | null => {
+  if (!acceptFileTypes.includes(file.type)) {
+    return `Faqat ${acceptFileTypes.join(', ')} fayllariga ruxsat berilgan`;
   }
-  if (file.size > 10 * 1024 * 1024) {
-    return 'Fayl hajmi 10MB dan oshmasligi kerak';
+  if (file.size > MAX_UPLOAD_SIZE) {
+    return `Fayl hajmi ${MAX_UPLOAD_SIZE / 1024 / 1024}MB dan oshmasligi kerak`;
   }
   return null;
 };

@@ -88,7 +88,7 @@ export async function updateMahalla(
               oldName,
               regulation,
               regulationUrl,
-              geometry: {}, // Provide default geometry if adding
+              geometry: {},
             },
           });
 

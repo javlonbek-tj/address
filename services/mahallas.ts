@@ -33,3 +33,11 @@ export const fetchMahallaTableData = async (
     }
   );
 };
+
+export const fetchMahallaByCode = async (code: string) => {
+  const { data } = await axiosInstance.get<{
+    success: boolean;
+    data: { uzKadName: string; id: string };
+  }>(`${ApiRoutes.MAHALLAS}/${code}`);
+  return data?.data || null;
+};

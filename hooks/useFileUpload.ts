@@ -1,13 +1,15 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { deleteImageFile, uploadFileAction } from '@/app/actions';
+import { removeFile, uploadFileAction } from '@/app/actions';
 
-export function useImageUpload(
+export function useFileUpload(
   initialImageUrl: string | null,
-  open: boolean,
-  imageFolder: string,
   originalImageUrl: string | null,
+  imageFolder: string,
+  acceptedFileTypes: string[],
+  preserveName: boolean,
+  open?: boolean,
 ) {
   const [previewUrl, setPreviewUrl] = useState('');
   const [uploadedImageUrl, setUploadedImageUrl] = useState('');
@@ -23,7 +25,7 @@ export function useImageUpload(
 
   const removeImage = async () => {
     if (uploadedImageUrl && uploadedImageUrl !== originalImageUrl) {
-      await deleteImageFile(uploadedImageUrl);
+      await removeFile(uploadedImageUrl);
       setUploadedImageUrl('');
     }
     setPreviewUrl('');
@@ -31,7 +33,12 @@ export function useImageUpload(
 
   const uploadFile = async (file: File) => {
     setIsUploading(true);
-    const result = await uploadFileAction(file, imageFolder);
+    const result = await uploadFileAction(
+      file,
+      imageFolder,
+      preserveName,
+      acceptedFileTypes,
+    );
     if (result.success) {
       setUploadedImageUrl(result.data?.imageUrl || '');
       setPreviewUrl(result.data?.imageUrl || '');
@@ -47,7 +54,7 @@ export function useImageUpload(
       uploadedImageUrl !== originalImageUrl
     ) {
       try {
-        await deleteImageFile(uploadedImageUrl);
+        await removeFile(uploadedImageUrl);
       } catch (error) {
         console.error('Failed to delete orphaned image:', error);
       }

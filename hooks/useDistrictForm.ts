@@ -3,6 +3,8 @@
 import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import type { DistrictSchemaType } from '@/lib';
+import { districtSchema } from '@/lib';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { updateDistrict } from '@/app/actions';
 import toast from 'react-hot-toast';
 import type { District } from '@/types';
@@ -25,6 +27,7 @@ export function useDistrictForm({ district, open, onClose }: Props) {
   });
 
   const form = useForm<DistrictSchemaType>({
+    resolver: zodResolver(districtSchema),
     defaultValues: getFormattedValues(district),
   });
 

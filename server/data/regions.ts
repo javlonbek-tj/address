@@ -35,10 +35,20 @@ export async function getRegionTableData(
       isActive: true,
       ...(search
         ? {
-            name: {
-              contains: search,
-              mode: 'insensitive' as const,
-            },
+            OR: [
+              {
+                name: {
+                  contains: search,
+                  mode: 'insensitive' as const,
+                },
+              },
+              {
+                code: {
+                  contains: search,
+                  mode: 'insensitive' as const,
+                },
+              },
+            ],
           }
         : {}),
     };
