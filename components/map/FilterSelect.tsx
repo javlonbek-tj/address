@@ -29,34 +29,34 @@ export function FilterSelect({
   onClear,
 }: FilterSelectProps) {
   return (
-    <div className="group relative shrink-0">
+    <div className='group relative shrink-0'>
       <Select value={value} onValueChange={onValueChange} disabled={disabled}>
         <SelectTrigger
           className={cn(
             'w-36 sm:w-44 md:w-44 lg:w-40 2xl:w-44 text-xs 3xl:text-sm',
             value && '[&_svg]:hidden',
           )}
-          size="sm"
+          size='sm'
         >
           <SelectValue
             placeholder={placeholder}
-            className="text-xs 3xl:text-sm"
+            className='text-xs 3xl:text-sm'
           />
         </SelectTrigger>
         {value && (
           <button
             onClick={onClear}
-            className="top-1/2 right-2 z-10 absolute hover:bg-slate-100 p-1 rounded-md text-slate-400 transition-colors -translate-y-1/2 duration-200"
+            className='top-1/2 right-2 z-10 absolute hover:bg-slate-100 p-1 rounded-md text-slate-400 transition-colors -translate-y-1/2 duration-200'
           >
             <X size={14} />
           </button>
         )}
-        <SelectContent position="popper" sideOffset={4} className="z-10001">
+        <SelectContent position='popper' sideOffset={4}>
           {options.map((opt) => (
             <SelectItem
               key={opt.id}
               value={opt.id}
-              className="text-xs 3xl:text-sm"
+              className='text-xs 3xl:text-sm'
             >
               {opt.name}
             </SelectItem>

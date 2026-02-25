@@ -31,7 +31,7 @@ export async function updateMahalla(
     regulationUrl,
     isOptimized,
     mergingMahallas,
-    hidden,
+    mergedInto,
   } = validationResult.data;
 
   try {
@@ -59,55 +59,85 @@ export async function updateMahalla(
       };
     }
 
-    const updatedMahalla = await prisma.$transaction(async (tx) => {
-      const mahalla = id
-        ? await tx.mahalla.update({
-            where: { id },
-            data: {
-              name,
-              code,
-              districtId,
-              uzKadName,
-              geoCode,
-              oneId,
-              hidden: isOptimized ? hidden : false,
-              oldName,
-              regulation,
-              regulationUrl,
-            },
-          })
-        : await tx.mahalla.create({
-            data: {
-              name,
-              code,
-              districtId,
-              uzKadName,
-              geoCode,
-              oneId,
-              hidden: isOptimized ? hidden : false,
-              oldName,
-              regulation,
-              regulationUrl,
-              geometry: {},
-            },
-          });
+    const targetCodes = (mergedInto || []).map(
+      (mahalla) => mahalla.mahallaCode,
+    );
+    const targets = await prisma.mahalla.findMany({
+      where: { code: { in: targetCodes } },
+      select: { id: true },
+    });
 
-      if (isOptimized && mergingMahallas && mergingMahallas.length > 0) {
-        await tx.mahalla.updateMany({
-          where: {
-            id: { in: mergingMahallas.map((m: any) => m.id) },
+    const sourceCodes = (mergingMahallas || []).map(
+      (mahalla) => mahalla.mahallaCode,
+    );
+    const sources = await prisma.mahalla.findMany({
+      where: { code: { in: sourceCodes } },
+      select: { id: true },
+    });
+
+    const updatedMahalla = await prisma.$transaction(async (tx) => {
+      const mahalla = await tx.mahalla.update({
+        where: { id },
+        data: {
+          name,
+          code,
+          districtId,
+          uzKadName,
+          geoCode,
+          oneId,
+          oldName,
+          regulation,
+          regulationUrl,
+          isOptimized,
+          mergedInto: {
+            set: targets.map((mahalla) => ({ id: mahalla.id })),
           },
-          data: {
-            mergedIntoId: mahalla.id,
-            mergedIntoName: mahalla.name,
+          mergedMahallas: {
+            set: sources.map((mahalla) => ({ id: mahalla.id })),
           },
-        });
-      }
+        },
+        select: {
+          id: true,
+          name: true,
+          code: true,
+          uzKadName: true,
+          geoCode: true,
+          oneId: true,
+          isOptimized: true,
+          mergedInto: {
+            select: {
+              code: true,
+              name: true,
+            },
+          },
+          mergedMahallas: {
+            select: {
+              code: true,
+              name: true,
+            },
+          },
+          oldName: true,
+          regulation: true,
+          regulationUrl: true,
+          district: {
+            select: {
+              id: true,
+              name: true,
+              region: {
+                select: {
+                  id: true,
+                  name: true,
+                },
+              },
+            },
+          },
+        },
+      });
 
       return mahalla;
     });
 
-    return { success: true, data: updatedMahalla as unknown as Mahalla };
+    return { success: true, data: updatedMahalla };
   } catch (error) {
     console.error('Failed to update mahalla:', error);
     return { success: false, error: 'INTERNAL_SERVER_ERROR' };

@@ -15,16 +15,17 @@ import { useMapHighlighting } from '@/hooks/useMapHighlighting';
 import { MapAutoCenter } from './MapAutoCenter';
 import { MapEvents } from './MapEvents';
 import {
-  MahallaPopup,
   MapZoomManager,
   MapFilters,
   MapStatistics,
   MapLayersControl,
   MapControls,
   StreetPopup,
+  PropertyDetailsSheet,
 } from './';
 import { Spinner } from '../shared';
 import { useMapHandlers } from '@/hooks/useMapHandlers';
+import { PropertyWithRelations } from '@/types';
 
 interface UzbekistanMapProps {
   regions: Region[];
@@ -48,25 +49,35 @@ export default function UzbekistanMap({ regions }: UzbekistanMapProps) {
     showDistricts,
     showMahallas,
     showStreets,
+    showProperties,
     baseMap,
     setBaseMap,
   } = filterState;
 
   const [mapBounds, setMapBounds] = useState<LatLngBounds | null>(null);
+  const [selectedProperty, setSelectedProperty] =
+    useState<PropertyWithRelations | null>(null);
 
-  const { onEachRegion, onEachDistrict, onEachMahalla, onEachStreet } =
-    useMapHandlers({
-      regions,
-      selectedRegion,
-      selectedDistrict,
-      selectedMahalla,
-      selectedStreet,
-      setSelectedRegion,
-      setSelectedDistrict,
-      setSelectedMahalla,
-      setSelectedStreet,
-      setMapBounds,
-    });
+  const {
+    onEachRegion,
+    onEachDistrict,
+    onEachMahalla,
+    onEachStreet,
+    onEachProperty,
+  } = useMapHandlers({
+    regions,
+    selectedRegion,
+    selectedDistrict,
+    selectedMahalla,
+    properties: filterState.properties,
+    setSelectedRegion,
+    setSelectedDistrict,
+    setSelectedMahalla,
+    setSelectedProperty,
+    selectedStreet,
+    setSelectedStreet,
+    setMapBounds,
+  });
 
   const {
     currentMahalla,
@@ -75,11 +86,13 @@ export default function UzbekistanMap({ regions }: UzbekistanMapProps) {
     districtFeatures,
     mahallaFeatures,
     streetFeatures,
+    propertyFeatures,
   } = useMapFeatures({
     regions,
     districts,
     mahallas,
     streets,
+    properties: filterState.properties,
     selectedRegion,
     selectedDistrict,
     selectedMahalla,
@@ -108,7 +121,7 @@ export default function UzbekistanMap({ regions }: UzbekistanMapProps) {
   };
 
   return (
-    <div className="relative w-full h-full">
+    <div className='relative w-full h-full'>
       <MapFilters
         regions={regions}
         filterState={filterState}
@@ -118,10 +131,7 @@ export default function UzbekistanMap({ regions }: UzbekistanMapProps) {
       <MapLayersControl filterState={filterState} />
       <MapControls currentBaseMap={baseMap} onBaseMapChange={setBaseMap} />
 
-      {isLoading && <Spinner size="sm" />}
-      {selectedMahalla && currentMahalla && !selectedStreet && (
-        <MahallaPopup key={selectedMahalla} mahalla={currentMahalla} />
-      )}
+      {isLoading && <Spinner size='sm' />}
 
       <MapContainer baseMap={baseMap}>
         <MapAutoCenter bounds={mapBounds} />
@@ -148,7 +158,7 @@ export default function UzbekistanMap({ regions }: UzbekistanMapProps) {
                 features: regionFeatures,
               } as FeatureCollection
             }
-            pane="regionsPane"
+            pane='regionsPane'
             interactive={true}
             style={() => {
               return {
@@ -170,7 +180,7 @@ export default function UzbekistanMap({ regions }: UzbekistanMapProps) {
                 features: districtFeatures,
               } as FeatureCollection
             }
-            pane="districtsPane"
+            pane='districtsPane'
             style={MAP_LEVEL_STYLES.adminBoundary}
             onEachFeature={onEachDistrict}
           />
@@ -186,7 +196,7 @@ export default function UzbekistanMap({ regions }: UzbekistanMapProps) {
                 features: mahallaFeatures,
               } as FeatureCollection
             }
-            pane="mahallasPane"
+            pane='mahallasPane'
             style={(feature?: Feature) => {
               const props = feature?.properties as { id: string } | undefined;
               const isSelected = props?.id === selectedMahalla;
@@ -200,6 +210,22 @@ export default function UzbekistanMap({ regions }: UzbekistanMapProps) {
           />
         )}
 
+        {/* Properties Layer */}
+        {showProperties && selectedMahalla && propertyFeatures.length > 0 && (
+          <GeoJSON
+            key={`properties-${selectedMahalla}`}
+            data={
+              {
+                type: 'FeatureCollection',
+                features: propertyFeatures,
+              } as FeatureCollection
+            }
+            pane='propertiesPane'
+            style={MAP_LEVEL_STYLES.property}
+            onEachFeature={onEachProperty}
+          />
+        )}
+
         {/* Streets Layer */}
         {showStreets && selectedDistrict && streetFeatures.length > 0 && (
           <GeoJSON
@@ -210,7 +236,7 @@ export default function UzbekistanMap({ regions }: UzbekistanMapProps) {
                 features: streetFeatures,
               } as FeatureCollection
             }
-            pane="streetsPane"
+            pane='streetsPane'
             style={(feature?: Feature) => {
               const props = feature?.properties as { id: string } | undefined;
               const isSelected = props?.id === selectedStreet;
@@ -251,6 +277,12 @@ export default function UzbekistanMap({ regions }: UzbekistanMapProps) {
           />
         )}
       </MapContainer>
+
+      <PropertyDetailsSheet
+        property={selectedProperty}
+        isOpen={!!selectedProperty}
+        onClose={() => setSelectedProperty(null)}
+      />
     </div>
   );
 }

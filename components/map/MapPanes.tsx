@@ -9,10 +9,11 @@ export const MapPanes = () => {
     if (!map) return;
 
     const panes = [
-      { name: 'regionsPane', zIndex: 350 },
-      { name: 'districtsPane', zIndex: 400 },
-      { name: 'mahallasPane', zIndex: 450 },
-      { name: 'streetsPane', zIndex: 500 },
+      { name: 'regionsPane', zIndex: 'var(--z-map-pane-regions)' },
+      { name: 'districtsPane', zIndex: 'var(--z-map-pane-districts)' },
+      { name: 'mahallasPane', zIndex: 'var(--z-map-pane-mahallas)' },
+      { name: 'propertiesPane', zIndex: 'var(--z-map-pane-properties)' },
+      { name: 'streetsPane', zIndex: 'var(--z-map-pane-streets)' },
     ];
 
     panes.forEach(({ name, zIndex }) => {

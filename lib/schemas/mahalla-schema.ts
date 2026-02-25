@@ -42,9 +42,12 @@ export const mahallaSchema = z
     regionId: z.string().trim().min(1, 'Majburiy maydon'),
     districtId: z.string().trim().min(1, 'Majburiy maydon'),
 
-    hidden: z.boolean(),
-    mergedIntoId: z.string().trim().nullable().optional(),
-    mergedIntoName: z.string().trim().nullable().optional(),
+    mergedInto: z.array(
+      z.object({
+        mahallaCode: z.string().trim().min(1, 'Majburiy maydon'),
+        name: z.string().trim(),
+      }),
+    ),
     oldName: z.string().trim().nullable().optional(),
     regulation: z.string().trim().nullable().optional(),
     regulationUrl: z
@@ -57,7 +60,7 @@ export const mahallaSchema = z
     isOptimized: z.boolean(),
     mergingMahallas: z.array(
       z.object({
-        id: z.string().trim().min(1, 'Majburiy maydon'),
+        mahallaCode: z.string().trim().min(1, 'Majburiy maydon'),
         name: z.string().trim(),
       }),
     ),
@@ -73,11 +76,11 @@ export const mahallaSchema = z
       });
     }
 
-    if (!data.mergingMahallas.length) {
+    if (!data.mergedInto.length) {
       ctx.addIssue({
         code: 'custom',
         message: 'Majburiy maydon',
-        path: ['mergingMahallas'],
+        path: ['mergedInto'],
       });
     }
   });

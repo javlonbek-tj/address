@@ -11,3 +11,4 @@ export {
 export * from './streets';
 export * from './stats';
 export * from './regions';
+export * from './properties';

@@ -62,6 +62,12 @@ export const MAP_LEVEL_STYLES = {
       lineCap: 'round' as CanvasLineCap,
       lineJoin: 'round' as CanvasLineJoin,
     },
+    property: {
+      fillColor: '#4338ca',
+      fillOpacity: 0.7,
+      weight: 3,
+      color: '#312e81',
+    },
   },
   satellite: {
     mahalla: {

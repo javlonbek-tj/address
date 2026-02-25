@@ -7,13 +7,18 @@ import type {
   Region as RegionModel,
   District as DistrictModel,
 } from '@/lib/generated/prisma/client';
-import { MahallaWithRelations, StreetWithMetadata } from '@/types';
+import {
+  MahallaWithRelations,
+  StreetWithMetadata,
+  PropertyWithRelations,
+} from '@/types';
 
 interface Props {
   regions: RegionModel[];
   districts: DistrictModel[];
   mahallas: MahallaWithRelations[];
   streets: StreetWithMetadata[];
+  properties: PropertyWithRelations[];
   selectedRegion: string;
   selectedDistrict: string;
   selectedMahalla: string;
@@ -25,6 +30,7 @@ export function useMapFeatures({
   districts,
   mahallas,
   streets,
+  properties,
   selectedRegion,
   selectedDistrict,
   selectedMahalla,
@@ -114,6 +120,14 @@ export function useMapFeatures({
     }));
   }, [streets]);
 
+  const propertyFeatures = useMemo(() => {
+    return properties.map((property) => ({
+      type: 'Feature' as const,
+      properties: { id: property.id, cadNumber: property.cadNumber },
+      geometry: property.geometry as unknown as Geometry,
+    }));
+  }, [properties]);
+
   return {
     currentMahalla,
     currentStreet,
@@ -121,5 +135,6 @@ export function useMapFeatures({
     districtFeatures,
     mahallaFeatures,
     streetFeatures,
+    propertyFeatures,
   };
 }

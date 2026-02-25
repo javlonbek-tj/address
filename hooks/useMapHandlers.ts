@@ -6,15 +6,18 @@ import { Layer, LatLngBounds, Path } from 'leaflet';
 import L from 'leaflet';
 import type { Region } from '@/lib/generated/prisma/client';
 import { MAP_LEVEL_STYLES } from '@/lib/constants/map';
+import { PropertyWithRelations } from '@/types';
 
 interface Props {
   regions: Region[];
   selectedRegion: string;
   selectedDistrict: string;
   selectedMahalla: string;
+  properties: PropertyWithRelations[];
   setSelectedRegion: (id: string) => void;
   setSelectedDistrict: (id: string) => void;
   setSelectedMahalla: (id: string) => void;
+  setSelectedProperty: (prop: PropertyWithRelations | null) => void;
   selectedStreet: string;
   setSelectedStreet: (id: string) => void;
   setMapBounds: (bounds: LatLngBounds | null) => void;
@@ -25,9 +28,11 @@ export function useMapHandlers({
   selectedRegion,
   selectedDistrict,
   selectedMahalla,
+  properties,
   setSelectedRegion,
   setSelectedDistrict,
   setSelectedMahalla,
+  setSelectedProperty,
   selectedStreet,
   setSelectedStreet,
   setMapBounds,
@@ -215,5 +220,40 @@ export function useMapHandlers({
     [setSelectedStreet],
   );
 
-  return { onEachRegion, onEachDistrict, onEachMahalla, onEachStreet };
+  const onEachProperty = useCallback(
+    (feature: Feature, layer: Layer) => {
+      const props = feature.properties as { id: string; cadNumber: string };
+
+      layer.on({
+        mouseover: (e) => {
+          const l = e.target as Path;
+          if (typeof l.setStyle === 'function') {
+            l.setStyle(MAP_LEVEL_STYLES.highlight.property);
+          }
+        },
+        mouseout: (e) => {
+          const l = e.target as Path;
+          if (typeof l.setStyle === 'function') {
+            l.setStyle(MAP_LEVEL_STYLES.property);
+          }
+        },
+        click: (e) => {
+          L.DomEvent.stopPropagation(e);
+          const property = properties.find((p) => p.id === props.id);
+          if (property) {
+            setSelectedProperty(property);
+          }
+        },
+      });
+    },
+    [properties, setSelectedProperty],
+  );
+
+  return {
+    onEachRegion,
+    onEachDistrict,
+    onEachMahalla,
+    onEachStreet,
+    onEachProperty,
+  };
 }

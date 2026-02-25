@@ -42,6 +42,7 @@ model District {
   mahallas Mahalla[]
   streets  Street[]
   users    User[]
+  properties Property[]
 
   @@index([name])
   @@map("districts")
@@ -59,10 +60,9 @@ model Mahalla {
   uzKadName String
   geoCode   String
   oneId     String
-
-  hidden         Boolean @default(false)
-  mergedIntoId   String?
-  mergedIntoName String?
+  isOptimized Boolean @default(false)
+  mergedInto     Mahalla[] @relation("MahallaMerge")
+  mergedMahallas Mahalla[] @relation("MahallaMerge")
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -74,9 +74,9 @@ model Mahalla {
   districtId String
   district   District @relation(fields: [districtId], references: [id], onDelete: Cascade)
   streets    Street[]
+  properties Property[]
 
   @@index([name])
-  @@index([hidden])
   @@map("mahallas")
 }
 
@@ -102,14 +102,40 @@ model Street {
   mahallaId  String
   mahalla    Mahalla  @relation(fields: [mahallaId], references: [code], onDelete: Cascade)
 
+  properties Property[]
+
   @@index([name])
   @@map("streets")
+}
+
+model Property {
+  id           String   @id @default(cuid())
+  cadNumber    String   @unique
+  newCadNumber String?   @unique
+  type         String?   @default("residential")
+
+  districtId String
+  district   District @relation(fields: [districtId], references: [id], onDelete: Cascade)
+
+  mahallaId String
+  mahalla   Mahalla  @relation(fields: [mahallaId], references: [code], onDelete: Cascade)
+
+  streetId String?
+  street   Street?   @relation(fields: [streetId], references: [code], onDelete: Cascade)
+
+  geometry Json
+  center   Json?
+  isActive Boolean @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("properties")
 }
 
 model User {
   id          String  @id @default(cuid())
   fullName    String?
-  jshshir     String? @unique
   phoneNumber String?
 
   role   UserRole

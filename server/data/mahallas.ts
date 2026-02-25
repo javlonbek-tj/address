@@ -76,9 +76,9 @@ export async function getMahallaTableData(
     }
 
     if (isOptimized === 'true') {
-      where.mergedIntoId = { not: null };
+      where.isOptimized = true;
     } else if (isOptimized === 'false') {
-      where.mergedIntoId = null;
+      where.isOptimized = false;
     }
 
     if (search) {
@@ -105,9 +105,19 @@ export async function getMahallaTableData(
           uzKadName: true,
           geoCode: true,
           oneId: true,
-          hidden: true,
-          mergedIntoId: true,
-          mergedIntoName: true,
+          isOptimized: true,
+          mergedInto: {
+            select: {
+              code: true,
+              name: true,
+            },
+          },
+          mergedMahallas: {
+            select: {
+              code: true,
+              name: true,
+            },
+          },
           oldName: true,
           regulation: true,
           regulationUrl: true,

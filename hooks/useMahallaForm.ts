@@ -38,12 +38,20 @@ export function useMahallaForm({
     oneId: mahalla?.oneId || '',
     regionId: mahalla?.district?.region?.id || '',
     districtId: mahalla?.district?.id || '',
-    hidden: !!mahalla?.hidden,
     oldName: mahalla?.oldName || null,
     regulation: mahalla?.regulation || null,
     regulationUrl: mahalla?.regulationUrl || null,
-    isOptimized: !!mahalla?.hidden || !!mahalla?.mergedIntoId,
-    mergingMahallas: [],
+    mergedInto:
+      mahalla?.mergedInto?.map((m) => ({
+        mahallaCode: m.code,
+        name: m.name,
+      })) || [],
+    isOptimized: mahalla?.isOptimized || false,
+    mergingMahallas:
+      mahalla?.mergedMahallas?.map((m) => ({
+        mahallaCode: m.code,
+        name: m.name,
+      })) || [],
   });
 
   const form = useForm<MahallaSchemaType>({

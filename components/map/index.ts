@@ -1,4 +1,3 @@
-export { MahallaPopup } from './MahallaPopup';
 export { MapContainer } from './MapContainer';
 export { MapZoomManager } from './MapZoomManager';
 export { MapFilters } from './MapFilters';
@@ -7,3 +6,4 @@ export { MapLayersControl } from './MapLayersControl';
 export { MapControls } from './MapControls';
 export { StreetPopup } from './StreetPopup';
 export { MapResizeHandler } from './MapResizeHandler';
+export { PropertyDetailsSheet } from './PropertyDetailsSheet';

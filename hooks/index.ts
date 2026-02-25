@@ -19,3 +19,5 @@ export { useTableFilters } from './useTableFilters';
 export { useRegions, useRegionTableData, useRegionsList } from './useRegions';
 export { useFileUpload } from './useFileUpload';
 export { useMahallaForm } from './useMahallaForm';
+export { useProperties } from './useProperties';
+export { usePropertyForm } from './usePropertyForm';

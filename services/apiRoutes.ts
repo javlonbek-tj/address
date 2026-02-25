@@ -3,6 +3,7 @@ export enum ApiRoutes {
   MAP_MAHALLAS = '/map/mahallas',
   MAP_DISTRICTS = '/map/districts',
   MAP_STREETS = '/map/streets',
+  MAP_PROPERTIES = '/map/properties',
   MAP_STATS = '/map/stats',
   REGIONS = '/regions',
   DISTRICTS = '/districts',

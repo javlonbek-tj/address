@@ -31,7 +31,7 @@ export function Spinner({
   }
 
   return (
-    <div className="z-25000 absolute inset-0 flex justify-center items-center bg-white/10 dark:bg-gray-800/10 backdrop-blur-[1px]">
+    <div className='z-(--z-overlay) absolute inset-0 flex justify-center items-center bg-white/10 dark:bg-gray-800/10 backdrop-blur-[1px]'>
       {spinnerElement}
     </div>
   );

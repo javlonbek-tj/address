@@ -240,7 +240,7 @@ export function MahallaTable() {
                   mahallas.map((mahalla, index) => (
                     <tr
                       key={mahalla.id}
-                      className={`group hover:bg-blue-50/30 dark:hover:bg-blue-900/10 dark:even:bg-gray-700/20 dark:odd:bg-gray-800 even:bg-gray-50/50 odd:bg-white transition-all duration-200 ${mahalla.mergedIntoId ? 'opacity-60' : ''}`}
+                      className={`group hover:bg-blue-50/30 dark:hover:bg-blue-900/10 dark:even:bg-gray-700/20 dark:odd:bg-gray-800 even:bg-gray-50/50 odd:bg-white transition-all duration-200 ${mahalla.mergedInto && mahalla.mergedInto.length > 0 ? 'opacity-60' : ''}`}
                     >
                       <td className='px-6 py-1 2xl:py-1.5 font-bold text-gray-600 dark:text-gray-300 text-xs whitespace-nowrap'>
                         {actualStartIndex + index + 1}
@@ -268,9 +268,19 @@ export function MahallaTable() {
                           'px-6 py-1 2xl:py-1.5 font-bold text-gray-600 dark:text-gray-300 text-xs text-center whitespace-nowrap'
                         }
                       >
-                        {mahalla.mergedIntoId ? (
-                          <span className='font-medium text-orange-500'>
-                            Ha
+                        {mahalla.mergedInto && mahalla.mergedInto.length > 0 ? (
+                          <span className='inline-flex items-center justify-center w-6 h-6 rounded-full bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400 border border-emerald-100 dark:border-emerald-800/50'>
+                            <svg
+                              className='w-4 h-4'
+                              fill='currentColor'
+                              viewBox='0 0 20 20'
+                            >
+                              <path
+                                fillRule='evenodd'
+                                d='M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z'
+                                clipRule='evenodd'
+                              />
+                            </svg>
                           </span>
                         ) : (
                           <span className='text-green-500'>&mdash;</span>

@@ -28,6 +28,8 @@ interface Props {
     setShowMahallas: (v: boolean) => void;
     showStreets: boolean;
     setShowStreets: (v: boolean) => void;
+    showProperties: boolean;
+    setShowProperties: (v: boolean) => void;
   };
 }
 
@@ -71,6 +73,15 @@ export function MapLayersControl({ filterState }: Props) {
       color: 'text-amber-500',
       bgColor: 'bg-amber-50 dark:bg-amber-900/20',
     },
+    {
+      id: 'properties',
+      label: 'Binolar',
+      icon: Home,
+      value: filterState.showProperties,
+      setValue: filterState.setShowProperties,
+      color: 'text-purple-500',
+      bgColor: 'bg-purple-50 dark:bg-purple-900/20',
+    },
   ];
 
   const allVisible = layers.every((l) => l.value);
@@ -80,7 +91,7 @@ export function MapLayersControl({ filterState }: Props) {
   };
 
   return (
-    <div className='absolute bottom-6 left-6 z-1000 flex flex-col gap-2'>
+    <div className='absolute bottom-6 left-6 z-(--z-map-ui) flex flex-col gap-2'>
       <div
         className={`
         flex flex-col bg-background/95 backdrop-blur-md rounded-2xl shadow-2xl border border-border overflow-hidden transition-all duration-300

@@ -16,7 +16,7 @@ interface Props {
 
 export function MapControls({ currentBaseMap, onBaseMapChange }: Props) {
   return (
-    <div className="top-1/2 right-3 z-1000 absolute flex flex-col gap-3 -translate-y-1/2">
+    <div className='top-1/2 right-3 z-(--z-map-ui) absolute flex flex-col gap-3 -translate-y-1/2'>
       <Tooltip>
         <TooltipTrigger asChild>
           <button
@@ -27,10 +27,10 @@ export function MapControls({ currentBaseMap, onBaseMapChange }: Props) {
                 : 'bg-background/90 backdrop-blur-md text-muted-foreground border-transparent hover:bg-background'
             }`}
           >
-            <Map className="size-5" />
+            <Map className='size-5' />
           </button>
         </TooltipTrigger>
-        <TooltipContent side="left" className="font-medium">
+        <TooltipContent side='left' className='font-medium'>
           Oddiy xarita
         </TooltipContent>
       </Tooltip>
@@ -45,10 +45,10 @@ export function MapControls({ currentBaseMap, onBaseMapChange }: Props) {
                 : 'bg-background/90 backdrop-blur-md text-muted-foreground border-transparent hover:bg-background'
             }`}
           >
-            <Satellite className="size-5" />
+            <Satellite className='size-5' />
           </button>
         </TooltipTrigger>
-        <TooltipContent side="left" className="font-medium">
+        <TooltipContent side='left' className='font-medium'>
           Sputnik xaritasi
         </TooltipContent>
       </Tooltip>

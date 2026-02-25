@@ -23,7 +23,7 @@ export function StreetPopup({ street, onClose }: Props) {
   const formatCoord = (coord?: number) => coord?.toFixed(6) || '—';
 
   return (
-    <div className='absolute top-20 left-6 z-2000 min-w-3xs max-w-2xs bg-white dark:bg-slate-900 overflow-hidden rounded-lg shadow-xl border border-slate-200 dark:border-slate-800'>
+    <div className='absolute top-20 left-6 z-(--z-map-ui) min-w-3xs max-w-2xs bg-white dark:bg-slate-900 overflow-hidden rounded-lg shadow-xl border border-slate-200 dark:border-slate-800'>
       <div className='flex items-center justify-between px-3 py-2 bg-slate-50 dark:bg-slate-800/50 border-b border-slate-100 dark:border-slate-800'>
         <div className='flex items-center gap-2'>
           <div className='p-1 bg-amber-100 dark:bg-amber-900/30 rounded'>

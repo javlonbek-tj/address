@@ -12,12 +12,12 @@ export function Header() {
   return (
     <header
       className={
-        'sticky top-0 z-20 bg-background flex h-16 shrink-0 items-center justify-between gap-2 border-b px-6 transition-all duration-300'
+        'sticky top-0 z-(--z-header) bg-background flex h-16 shrink-0 items-center justify-between gap-2 border-b px-6 transition-all duration-300'
       }
     >
-      <div className="flex items-center gap-2">
+      <div className='flex items-center gap-2'>
         <SidebarTrigger />
-        <h1 className="font-semibold text-base tracking-tight">{title}</h1>
+        <h1 className='font-semibold text-base tracking-tight'>{title}</h1>
       </div>
       <HeaderActions />
     </header>

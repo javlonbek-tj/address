@@ -56,12 +56,6 @@ export function MahallaFormDialog({
   districts,
 }: Props) {
   const [showExistingFiles, setShowExistingFiles] = useState(false);
-  const regionPart = mahalla?.district?.region?.name?.split(' ') || [];
-  let folderSuffix = regionPart[0] || 'default';
-
-  if (regionPart[0] === 'Toshkent' && regionPart[1] === 'shahri') {
-    folderSuffix = 'Toshkent_sh';
-  }
   const {
     removeImage,
     cleanupOrphanedImage,
@@ -71,7 +65,7 @@ export function MahallaFormDialog({
   } = useFileUpload(
     mahalla?.regulationUrl,
     mahalla?.regulationUrl,
-    `optimization/${folderSuffix}`,
+    `optimization/${mahalla?.district?.region?.name}`,
     ACCEPTED_DOCUMENT_TYPES,
     true,
     open,
@@ -84,21 +78,25 @@ export function MahallaFormDialog({
     markAsSubmitted,
   });
 
-  const { fields, append, remove } = useFieldArray({
+  const {
+    fields: mergingFields,
+    append: appendMerging,
+    remove: removeMerging,
+  } = useFieldArray({
     control: form.control,
     name: 'mergingMahallas',
   });
 
-  const handleAddMergedMahalla = () => {
-    append({ id: '', name: '' });
-  };
+  const {
+    fields: mergedIntoFields,
+    append: appendMergedInto,
+    remove: removeMergedInto,
+  } = useFieldArray({
+    control: form.control,
+    name: 'mergedInto',
+  });
 
-  const handleRemoveMergedMahalla = (index: number) => {
-    remove(index);
-  };
-
-  const handleMergedMahallaIdChange = async (index: number, code: string) => {
-    form.setValue(`mergingMahallas.${index}.id`, code);
+  const handleMergingMahallaIdChange = async (index: number, code: string) => {
     if (code) {
       const mahalla = await fetchMahallaByCode(code);
       if (mahalla) {
@@ -106,13 +104,18 @@ export function MahallaFormDialog({
       } else {
         form.setValue(`mergingMahallas.${index}.name`, '');
       }
-    } else {
-      form.setValue(`mergingMahallas.${index}.name`, '');
     }
   };
 
-  const handleMergedMahallaNameChange = (index: number, name: string) => {
-    form.setValue(`mergingMahallas.${index}.name`, name);
+  const handleMergedIntoIdChange = async (index: number, code: string) => {
+    if (code) {
+      const mahalla = await fetchMahallaByCode(code);
+      if (mahalla) {
+        form.setValue(`mergedInto.${index}.name`, mahalla.uzKadName);
+      } else {
+        form.setValue(`mergedInto.${index}.name`, '');
+      }
+    }
   };
 
   const handleClose = async (isOpen: boolean) => {
@@ -143,7 +146,6 @@ export function MahallaFormDialog({
   };
 
   const isOptimized = form.watch('isOptimized');
-  const mergingMahallas = form.watch('mergingMahallas') || [];
 
   return (
     <Dialog open={open} onOpenChange={handleClose}>
@@ -365,33 +367,138 @@ export function MahallaFormDialog({
                 )}
               />
             </div>
+          </div>
 
-            <div className='flex items-center space-x-2 col-span-2 py-2'>
-              <Controller
-                control={form.control}
-                name='isOptimized'
-                render={({ field }) => (
-                  <div className='flex items-center space-x-2'>
-                    <Checkbox
-                      id='isOptimized'
-                      checked={field.value}
-                      onCheckedChange={(checked) => {
-                        field.onChange(checked);
-                        if (checked && fields.length === 0) {
-                          handleAddMergedMahalla();
-                        }
-                      }}
-                    />
-                    <label
-                      htmlFor='isOptimized'
-                      className='peer-disabled:opacity-70 font-medium text-sm leading-none peer-disabled:cursor-not-allowed'
-                    >
-                      Optimallashgan
-                    </label>
-                  </div>
-                )}
-              />
+          {/* Birlashtiruvchi mahallalar (Manbalar) - ALWAYS VISIBLE */}
+          <div className='space-y-4 border rounded-xl overflow-hidden bg-blue-50/20 dark:bg-blue-900/10 border-blue-100 dark:border-blue-900/30 mt-4'>
+            <div className='flex items-center justify-between p-2 border-b dark:border-gray-700 bg-blue-50/50 dark:bg-blue-900/20'>
+              <FieldLabel className='font-bold flex items-center gap-2 text-blue-700 dark:text-blue-300 text-xs tracking-wider'>
+                <Plus className='w-4 h-4' />
+                Ushbu mahallaga qo'shib yuborilgan mahallalar
+              </FieldLabel>
+              <Button
+                type='button'
+                variant='outline'
+                size='sm'
+                onClick={() => appendMerging({ mahallaCode: '', name: '' })}
+                className='cursor-pointer h-8 bg-white dark:bg-gray-800 text-xs'
+              >
+                + Qo'shish
+              </Button>
             </div>
+
+            <div className='p-4 space-y-4'>
+              {mergingFields.length === 0 ? (
+                <p className='text-xs text-muted-foreground text-center py-2 italic'>
+                  Ushbu mahallaga hali hech qanday mahalla qo'shilmagan
+                </p>
+              ) : (
+                mergingFields.map((mm, index) => (
+                  <div
+                    key={mm.id}
+                    className='grid grid-cols-[30%_60%_10%] gap-3 items-end bg-white dark:bg-gray-800 p-3 rounded-lg border border-gray-100 dark:border-gray-700 shadow-sm'
+                  >
+                    <div className='space-y-1.5'>
+                      <FieldLabel className='text-[10px] text-muted-foreground uppercase font-bold'>
+                        UzKad kodi
+                      </FieldLabel>
+                      <Controller
+                        control={form.control}
+                        name={`mergingMahallas.${index}.mahallaCode`}
+                        render={({ field, fieldState }) => (
+                          <Field data-invalid={fieldState.invalid}>
+                            <Input
+                              {...field}
+                              onChange={(e) => {
+                                field.onChange(e);
+                                handleMergingMahallaIdChange(
+                                  index,
+                                  e.target.value,
+                                );
+                              }}
+                              placeholder='UzKad kodi'
+                              className='h-9 text-xs dark:bg-gray-700 dark:text-white'
+                            />
+                          </Field>
+                        )}
+                      />
+                    </div>
+
+                    <div className='space-y-1.5'>
+                      <FieldLabel className='text-[10px] text-muted-foreground uppercase font-bold'>
+                        Mahalla nomi
+                      </FieldLabel>
+                      <Controller
+                        control={form.control}
+                        name={`mergingMahallas.${index}.name`}
+                        render={({ field }) => (
+                          <Input
+                            {...field}
+                            placeholder='Nomi'
+                            className='h-9 text-xs dark:bg-gray-700 dark:text-white'
+                            disabled
+                          />
+                        )}
+                      />
+                    </div>
+
+                    <Button
+                      type='button'
+                      variant='ghost'
+                      size='icon'
+                      onClick={() => removeMerging(index)}
+                      className='h-9 w-9 text-red-500 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/30 self-center'
+                    >
+                      <Trash2 className='w-4 h-4' />
+                    </Button>
+
+                    <div className='col-span-3'>
+                      <Controller
+                        control={form.control}
+                        name={`mergingMahallas.${index}.mahallaCode`}
+                        render={({ fieldState }) => (
+                          <>
+                            {fieldState.invalid && (
+                              <FieldError
+                                errors={[fieldState.error]}
+                                className='mt-0 text-[11px]'
+                              />
+                            )}
+                          </>
+                        )}
+                      />
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+
+          <div className='flex items-center space-x-2 col-span-2 py-2'>
+            <Controller
+              control={form.control}
+              name='isOptimized'
+              render={({ field }) => (
+                <div className='flex items-center space-x-2'>
+                  <Checkbox
+                    id='isOptimized'
+                    checked={field.value}
+                    onCheckedChange={(checked) => {
+                      field.onChange(checked);
+                      if (checked && mergedIntoFields.length === 0) {
+                        appendMergedInto({ mahallaCode: '', name: '' });
+                      }
+                    }}
+                  />
+                  <label
+                    htmlFor='isOptimized'
+                    className='peer-disabled:opacity-70 font-medium text-sm leading-none peer-disabled:cursor-not-allowed'
+                  >
+                    Optimallashgan
+                  </label>
+                </div>
+              )}
+            />
           </div>
 
           {isOptimized && (
@@ -456,8 +563,8 @@ export function MahallaFormDialog({
               <Controller
                 control={form.control}
                 name='regulationUrl'
-                render={({ field }) => (
-                  <Field>
+                render={({ field, fieldState }) => (
+                  <Field data-invalid={fieldState.invalid}>
                     <FileUploadInput
                       value={field.value || mahalla?.regulationUrl || ''}
                       fileName={
@@ -471,70 +578,83 @@ export function MahallaFormDialog({
                       onRemove={handleRemoveImage}
                       accept='application/pdf, .pdf'
                     />
+                    {fieldState.invalid && (
+                      <FieldError
+                        errors={[fieldState.error]}
+                        className='text-[11px]'
+                      />
+                    )}
                   </Field>
                 )}
               />
             </div>
           )}
 
+          {/* O'zi boshqasiga qo'shilgan mahallalar (Targetlar) - ONLY IF OPTIMIZED */}
           {isOptimized && (
-            <div className='space-y-4 border rounded-xl overflow-hidden bg-gray-50/50 dark:bg-gray-900/50 border-gray-200 dark:border-gray-700'>
-              <div className='flex items-center justify-between p-4 border-b dark:border-gray-700'>
-                <FieldLabel className='font-bold flex items-center gap-2'>
-                  <Plus className='w-4 h-4 text-blue-600' />
-                  Birlashtiruvchi mahallalar
+            <div className='space-y-4 border rounded-xl overflow-hidden bg-orange-50/20 dark:bg-orange-900/10 border-orange-100 dark:border-orange-900/30 mt-4'>
+              <div className='flex items-center justify-between p-2 border-b dark:border-gray-700 bg-orange-50/50 dark:bg-orange-900/20'>
+                <FieldLabel className='font-bold flex items-center gap-2 text-xs text-orange-700 dark:text-orange-300'>
+                  <Plus className='w-4 h-4' />
+                  Ushbu mahalla qaysi mahallalarga qo'shilgan
                 </FieldLabel>
                 <Button
                   type='button'
                   variant='outline'
                   size='sm'
-                  onClick={handleAddMergedMahalla}
-                  className='cursor-pointer h-8'
+                  onClick={() =>
+                    appendMergedInto({ mahallaCode: '', name: '' })
+                  }
+                  className='cursor-pointer h-8 text-xs bg-white dark:bg-gray-800'
                 >
                   + Qo'shish
                 </Button>
               </div>
 
               <div className='p-4 space-y-4'>
-                {mergingMahallas.map((mm, index) => (
+                {mergedIntoFields.map((mm, index) => (
                   <div
-                    key={index}
+                    key={mm.id}
                     className='grid grid-cols-[30%_60%_10%] gap-3 items-end bg-white dark:bg-gray-800 p-3 rounded-lg border border-gray-100 dark:border-gray-700 shadow-sm'
                   >
                     <div className='space-y-1.5'>
-                      <FieldLabel
-                        htmlFor={`edit-mergedIntoId-${index}`}
-                        className='text-xs text-muted-foreground'
-                      >
+                      <FieldLabel className='text-xs text-muted-foreground'>
                         UzKad kodi
                       </FieldLabel>
-                      <Input
-                        id={`edit-mergedIntoId-${index}`}
-                        value={mm.id}
-                        onChange={(e) =>
-                          handleMergedMahallaIdChange(index, e.target.value)
-                        }
-                        placeholder='UzKad kodi'
-                        className='h-9 text-xs dark:bg-gray-700 dark:text-white'
+                      <Controller
+                        control={form.control}
+                        name={`mergedInto.${index}.mahallaCode`}
+                        render={({ field, fieldState }) => (
+                          <Field data-invalid={fieldState.invalid}>
+                            <Input
+                              {...field}
+                              onChange={(e) => {
+                                field.onChange(e);
+                                handleMergedIntoIdChange(index, e.target.value);
+                              }}
+                              placeholder='UzKad kodi'
+                              className='h-9 text-xs dark:bg-gray-700 dark:text-white'
+                            />
+                          </Field>
+                        )}
                       />
                     </div>
 
                     <div className='space-y-1.5'>
-                      <FieldLabel
-                        htmlFor={`edit-mergedIntoName-${index}`}
-                        className='text-xs text-muted-foreground'
-                      >
+                      <FieldLabel className='text-xs text-muted-foreground'>
                         Mahalla nomi
                       </FieldLabel>
-                      <Input
-                        id={`edit-mergedIntoName-${index}`}
-                        value={mm.name}
-                        onChange={(e) =>
-                          handleMergedMahallaNameChange(index, e.target.value)
-                        }
-                        placeholder='Nomi'
-                        className='h-9 text-xs dark:bg-gray-700 dark:text-white'
-                        disabled
+                      <Controller
+                        control={form.control}
+                        name={`mergedInto.${index}.name`}
+                        render={({ field }) => (
+                          <Input
+                            {...field}
+                            placeholder='Nomi'
+                            className='h-9 text-xs dark:bg-gray-700 dark:text-white'
+                            disabled
+                          />
+                        )}
                       />
                     </div>
 
@@ -542,16 +662,37 @@ export function MahallaFormDialog({
                       type='button'
                       variant='ghost'
                       size='icon'
-                      onClick={() => handleRemoveMergedMahalla(index)}
-                      className='h-9 w-9 text-red-500 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/30'
-                      disabled={
-                        mergingMahallas.length === 1 && !mm.id && !mm.name
-                      }
+                      onClick={() => removeMergedInto(index)}
+                      className='h-9 w-9 text-red-500 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/30 self-center'
                     >
                       <Trash2 className='w-4 h-4' />
                     </Button>
+
+                    <div className='col-span-3'>
+                      <Controller
+                        control={form.control}
+                        name={`mergedInto.${index}.mahallaCode`}
+                        render={({ fieldState }) => (
+                          <>
+                            {fieldState.invalid && (
+                              <FieldError
+                                errors={[fieldState.error]}
+                                className='mt-0 text-[11px]'
+                              />
+                            )}
+                          </>
+                        )}
+                      />
+                    </div>
                   </div>
                 ))}
+                {form.formState.errors.mergedInto?.message && (
+                  <div className='bg-red-50 dark:bg-red-900/10 border border-red-100 dark:border-red-900/30 rounded-lg p-2 mt-2'>
+                    <p className='text-[10px] text-red-600 dark:text-red-400 font-medium text-center'>
+                      {form.formState.errors.mergedInto.message}
+                    </p>
+                  </div>
+                )}
               </div>
             </div>
           )}

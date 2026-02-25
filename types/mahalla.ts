@@ -23,9 +23,9 @@ export type Mahalla = {
   uzKadName: string;
   geoCode: string;
   oneId: string;
-  hidden: boolean;
-  mergedIntoId: string | null;
-  mergedIntoName: string | null;
+  isOptimized: boolean;
+  mergedInto: Array<{ code: string; name: string }>;
+  mergedMahallas: Array<{ code: string; name: string }>;
   oldName: string | null;
   regulation: string | null;
   regulationUrl: string | null;

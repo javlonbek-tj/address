@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { useDistricts, useMahallas, useStreets } from './';
+import { useDistricts, useMahallas, useStreets, useProperties } from './';
 import type { BaseMapKey } from '@/lib/constants/map';
 
 export function useMapFilters() {
@@ -14,6 +14,7 @@ export function useMapFilters() {
   const [showDistricts, setShowDistricts] = useState(true);
   const [showMahallas, setShowMahallas] = useState(true);
   const [showStreets, setShowStreets] = useState(true);
+  const [showProperties, setShowProperties] = useState(true);
 
   const [baseMap, setBaseMap] = useState<BaseMapKey>('osm');
 
@@ -25,6 +26,12 @@ export function useMapFilters() {
 
   // 3. Fetch Streets (Only if a district is selected)
   const { streets, isLoadingStreets } = useStreets(selectedDistrict);
+
+  // 4. Fetch Properties (Only if a mahalla is selected)
+  const selectedMahallaData = mahallas.find((m) => m.id === selectedMahalla);
+  const { properties, isLoadingProperties } = useProperties(
+    selectedMahallaData?.code || null,
+  );
 
   const handleSetSelectedRegion = (regionId: string) => {
     setSelectedRegion(regionId);
@@ -56,6 +63,7 @@ export function useMapFilters() {
     districts,
     mahallas,
     streets,
+    properties,
     showRegions,
     setShowRegions,
     showDistricts,
@@ -64,8 +72,14 @@ export function useMapFilters() {
     setShowMahallas,
     showStreets,
     setShowStreets,
+    showProperties,
+    setShowProperties,
     baseMap,
     setBaseMap,
-    isLoading: isLoadingDistricts || isLoadingMahallas || isLoadingStreets,
+    isLoading:
+      isLoadingDistricts ||
+      isLoadingMahallas ||
+      isLoadingStreets ||
+      isLoadingProperties,
   };
 }
