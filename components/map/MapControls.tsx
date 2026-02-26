@@ -1,20 +1,17 @@
 'use client';
 
-import React from 'react';
 import { Map, Satellite } from 'lucide-react';
-import { BaseMapKey } from '@/lib/constants/map';
 import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
 } from '@/components/ui/tooltip';
 
-interface Props {
-  currentBaseMap: BaseMapKey;
-  onBaseMapChange: (key: BaseMapKey) => void;
-}
+import { useMapFilterStore } from '@/store/useMapFilterStore';
 
-export function MapControls({ currentBaseMap, onBaseMapChange }: Props) {
+export function MapControls() {
+  const { baseMap: currentBaseMap, setBaseMap: onBaseMapChange } =
+    useMapFilterStore();
   return (
     <div className='top-1/2 right-3 z-(--z-map-ui) absolute flex flex-col gap-3 -translate-y-1/2'>
       <Tooltip>

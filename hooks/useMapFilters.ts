@@ -1,22 +1,11 @@
 'use client';
 
-import { useState } from 'react';
 import { useDistricts, useMahallas, useStreets, useProperties } from './';
-import type { BaseMapKey } from '@/lib/constants/map';
+import { useMapFilterStore } from '@/store/useMapFilterStore';
 
 export function useMapFilters() {
-  const [selectedRegion, setSelectedRegion] = useState('');
-  const [selectedDistrict, setSelectedDistrict] = useState('');
-  const [selectedMahalla, setSelectedMahalla] = useState('');
-  const [selectedStreet, setSelectedStreet] = useState('');
-
-  const [showRegions, setShowRegions] = useState(true);
-  const [showDistricts, setShowDistricts] = useState(true);
-  const [showMahallas, setShowMahallas] = useState(true);
-  const [showStreets, setShowStreets] = useState(true);
-  const [showProperties, setShowProperties] = useState(true);
-
-  const [baseMap, setBaseMap] = useState<BaseMapKey>('osm');
+  const { selectedRegion, selectedDistrict, selectedMahalla } =
+    useMapFilterStore();
 
   // 1. Fetch Districts (Only if a region is selected)
   const { districts, isLoadingDistricts } = useDistricts(selectedRegion);
@@ -33,49 +22,11 @@ export function useMapFilters() {
     selectedMahallaData?.code || null,
   );
 
-  const handleSetSelectedRegion = (regionId: string) => {
-    setSelectedRegion(regionId);
-    setSelectedDistrict('');
-    setSelectedMahalla('');
-    setSelectedStreet('');
-  };
-
-  const handleSetSelectedDistrict = (districtId: string) => {
-    setSelectedDistrict(districtId);
-    setSelectedMahalla('');
-    setSelectedStreet('');
-  };
-
-  const handleSetSelectedMahalla = (mahallaId: string) => {
-    setSelectedMahalla(mahallaId);
-    setSelectedStreet('');
-  };
-
   return {
-    selectedRegion,
-    setSelectedRegion: handleSetSelectedRegion,
-    selectedDistrict,
-    setSelectedDistrict: handleSetSelectedDistrict,
-    selectedMahalla,
-    setSelectedMahalla: handleSetSelectedMahalla,
-    selectedStreet,
-    setSelectedStreet,
     districts,
     mahallas,
     streets,
     properties,
-    showRegions,
-    setShowRegions,
-    showDistricts,
-    setShowDistricts,
-    showMahallas,
-    setShowMahallas,
-    showStreets,
-    setShowStreets,
-    showProperties,
-    setShowProperties,
-    baseMap,
-    setBaseMap,
     isLoading:
       isLoadingDistricts ||
       isLoadingMahallas ||

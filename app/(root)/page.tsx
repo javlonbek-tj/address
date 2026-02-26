@@ -3,11 +3,20 @@
 import dynamic from 'next/dynamic';
 import { useRegions } from '@/hooks/useRegions';
 import { ErrorMessage, Spinner } from '@/components/shared';
-
 const UzbekistanMap = dynamic(() => import('@/components/map/UzbekistanMap'), {
   ssr: false,
   loading: () => <Spinner />,
 });
+
+const PropertyDetailsSheet = dynamic(
+  () =>
+    import('@/components/map/PropertyDetailsSheet').then(
+      (mod) => mod.PropertyDetailsSheet,
+    ),
+  {
+    ssr: false,
+  },
+);
 
 export default function HomePage() {
   const { regions, isLoadingRegions } = useRegions();
@@ -17,8 +26,13 @@ export default function HomePage() {
   }
 
   if (!regions || regions.length === 0) {
-    return <ErrorMessage className="min-h-[calc(100vh-4rem)]" />;
+    return <ErrorMessage className='min-h-[calc(100vh-4rem)]' />;
   }
 
-  return <UzbekistanMap regions={regions} />;
+  return (
+    <>
+      <UzbekistanMap regions={regions} />;
+      <PropertyDetailsSheet />
+    </>
+  );
 }

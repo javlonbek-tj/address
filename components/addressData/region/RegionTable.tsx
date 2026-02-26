@@ -1,6 +1,6 @@
 'use client';
 
-import { RegionFormDialog } from './';
+import { RegionFormDialog, RegionTableFilters } from './';
 import type { Region } from '@/types';
 import {
   useTableActions,
@@ -8,7 +8,6 @@ import {
   useTableFilters,
   useRegionTableData,
 } from '@/hooks';
-import { Input } from '@/components/ui/input';
 import { DataTable } from '../table';
 import { DeleteDialog } from '@/components/shared';
 import { deleteRegion } from '@/app/actions';
@@ -63,14 +62,7 @@ export function RegionTable() {
   return (
     <div className='p-8'>
       <div className='bg-white dark:bg-gray-800 shadow-sm rounded-lg transition-opacity duration-200'>
-        <div className='relative flex flex-wrap items-center gap-3 p-4 border-b'>
-          <Input
-            placeholder='Qidiruv...'
-            className='shadow-sm w-52 h-8 2xl:h-9 2xl:w-64'
-            defaultValue={search}
-            onChange={(e) => handleSearch(e.target.value)}
-          />
-        </div>
+        <RegionTableFilters search={search} handleSearch={handleSearch} />
         <DataTable
           data={regions}
           onEdit={handleEdit}

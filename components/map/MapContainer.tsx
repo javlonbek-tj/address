@@ -1,8 +1,8 @@
 'use client';
 
+import 'leaflet/dist/leaflet.css';
 import { MapContainer as RLMapContainer, TileLayer } from 'react-leaflet';
-import 'leaflet/dist/leaflet.css'; // Ensure CSS is available to this component
-import { baseMaps } from '@/lib';
+import { baseMaps, BaseMapKey } from '@/lib/constants/map';
 import { MapPanes } from './MapPanes';
 import { MapResizeHandler } from './MapResizeHandler';
 
@@ -11,8 +11,6 @@ interface Props {
   className?: string;
   baseMap?: BaseMapKey;
 }
-
-import { BaseMapKey } from '@/lib/constants/map';
 
 export const MapContainer = ({
   children,

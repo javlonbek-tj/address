@@ -1,12 +1,7 @@
 'use client';
 
-import { Controller } from 'react-hook-form';
-import {
-  Field,
-  FieldError,
-  FieldGroup,
-  FieldLabel,
-} from '@/components/ui/field';
+import { FormProvider } from 'react-hook-form';
+import { FieldGroup } from '@/components/ui/field';
 import type { Region } from '@/types';
 import {
   Dialog,
@@ -15,8 +10,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { Input } from '@/components/ui/input';
-import { FormActions } from '@/components/shared';
+import { FormActions, FormInputField } from '@/components/shared';
 
 import { useRegionForm } from '@/hooks';
 
@@ -41,60 +35,32 @@ export function RegionFormDialog({ open, onClose, region }: Props) {
         <DialogDescription className='sr-only'>
           Hududni tahrirlash
         </DialogDescription>
-        <form onSubmit={form.handleSubmit(onSubmit)}>
-          <FieldGroup>
-            <Controller
-              control={form.control}
-              name='name'
-              render={({ field, fieldState }) => (
-                <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor='name'>Hudud nomi</FieldLabel>
-                  <Input
-                    id='name'
-                    {...field}
-                    className='dark:bg-gray-700 dark:text-white'
-                    placeholder='Hudud nomi'
-                    autoComplete='off'
-                    aria-invalid={fieldState.invalid}
-                  />
-                  {fieldState.invalid && (
-                    <FieldError errors={[fieldState.error]} />
-                  )}
-                </Field>
-              )}
+        <FormProvider {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)}>
+            <FieldGroup>
+              <FormInputField
+                label='Hudud nomi'
+                name='name'
+                autoComplete='off'
+              />
+              <FormInputField
+                label='Soato kodi'
+                name='code'
+                autoComplete='off'
+                inputMode='numeric'
+                onChange={(e) => {
+                  const value = e.target.value.replace(/\D/g, '');
+                  form.setValue('code', value);
+                }}
+              />
+            </FieldGroup>
+            <FormActions
+              onCancel={onClose}
+              isEditing={true}
+              isPending={submitting}
             />
-            <Controller
-              control={form.control}
-              name='code'
-              render={({ field, fieldState }) => (
-                <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor='code'>Soato kodi</FieldLabel>
-                  <Input
-                    id='code'
-                    {...field}
-                    onChange={(e) => {
-                      const value = e.target.value.replace(/\D/g, '');
-                      field.onChange(value);
-                    }}
-                    className='dark:bg-gray-700 dark:text-white'
-                    placeholder='Soato kodi'
-                    autoComplete='off'
-                    aria-invalid={fieldState.invalid}
-                    inputMode='numeric'
-                  />
-                  {fieldState.invalid && (
-                    <FieldError errors={[fieldState.error]} />
-                  )}
-                </Field>
-              )}
-            />
-          </FieldGroup>
-          <FormActions
-            onCancel={onClose}
-            isEditing={true}
-            isPending={submitting}
-          />
-        </form>
+          </form>
+        </FormProvider>
       </DialogContent>
     </Dialog>
   );

@@ -21,17 +21,19 @@ import {
   MapLayersControl,
   MapControls,
   StreetPopup,
-  PropertyDetailsSheet,
 } from './';
 import { Spinner } from '../shared';
 import { useMapHandlers } from '@/hooks/useMapHandlers';
-import { PropertyWithRelations } from '@/types';
 
 interface UzbekistanMapProps {
   regions: Region[];
 }
+import { useMapFilterStore } from '@/store/useMapFilterStore';
+
 export default function UzbekistanMap({ regions }: UzbekistanMapProps) {
-  const filterState = useMapFilters();
+  const { districts, mahallas, streets, properties, isLoading } =
+    useMapFilters();
+
   const {
     selectedRegion,
     setSelectedRegion,
@@ -41,10 +43,6 @@ export default function UzbekistanMap({ regions }: UzbekistanMapProps) {
     setSelectedMahalla,
     selectedStreet,
     setSelectedStreet,
-    districts,
-    mahallas,
-    streets,
-    isLoading,
     showRegions,
     showDistricts,
     showMahallas,
@@ -52,11 +50,9 @@ export default function UzbekistanMap({ regions }: UzbekistanMapProps) {
     showProperties,
     baseMap,
     setBaseMap,
-  } = filterState;
+  } = useMapFilterStore();
 
   const [mapBounds, setMapBounds] = useState<LatLngBounds | null>(null);
-  const [selectedProperty, setSelectedProperty] =
-    useState<PropertyWithRelations | null>(null);
 
   const {
     onEachRegion,
@@ -69,18 +65,16 @@ export default function UzbekistanMap({ regions }: UzbekistanMapProps) {
     selectedRegion,
     selectedDistrict,
     selectedMahalla,
-    properties: filterState.properties,
+    properties,
     setSelectedRegion,
     setSelectedDistrict,
     setSelectedMahalla,
-    setSelectedProperty,
     selectedStreet,
     setSelectedStreet,
     setMapBounds,
   });
 
   const {
-    currentMahalla,
     currentStreet,
     regionFeatures,
     districtFeatures,
@@ -92,7 +86,7 @@ export default function UzbekistanMap({ regions }: UzbekistanMapProps) {
     districts,
     mahallas,
     streets,
-    properties: filterState.properties,
+    properties,
     selectedRegion,
     selectedDistrict,
     selectedMahalla,
@@ -124,12 +118,12 @@ export default function UzbekistanMap({ regions }: UzbekistanMapProps) {
     <div className='relative w-full h-full'>
       <MapFilters
         regions={regions}
-        filterState={filterState}
+        filterState={{ districts, mahallas, streets, isLoading }}
         setMapBounds={setMapBounds}
       />
       <MapStatistics stats={displayStats} />
-      <MapLayersControl filterState={filterState} />
-      <MapControls currentBaseMap={baseMap} onBaseMapChange={setBaseMap} />
+      <MapLayersControl />
+      <MapControls />
 
       {isLoading && <Spinner size='sm' />}
 
@@ -277,12 +271,6 @@ export default function UzbekistanMap({ regions }: UzbekistanMapProps) {
           />
         )}
       </MapContainer>
-
-      <PropertyDetailsSheet
-        property={selectedProperty}
-        isOpen={!!selectedProperty}
-        onClose={() => setSelectedProperty(null)}
-      />
     </div>
   );
 }

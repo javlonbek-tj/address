@@ -1,15 +1,24 @@
 'use client';
 
 import React from 'react';
-import { useMapFilters } from '@/hooks';
 import type { Region } from '@/lib/generated/prisma/client';
 import { FilterSelect } from './FilterSelect';
 import { LatLngBounds } from 'leaflet';
 import L from 'leaflet';
 
+import { useMapFilterStore } from '@/store/useMapFilterStore';
+
+import { District } from '@/lib/generated/prisma/client';
+import { MahallaWithRelations, StreetWithMetadata } from '@/types';
+
 interface MapFiltersProps {
   regions: Region[];
-  filterState: ReturnType<typeof useMapFilters>;
+  filterState: {
+    districts: District[];
+    mahallas: MahallaWithRelations[];
+    streets: StreetWithMetadata[];
+    isLoading: boolean;
+  };
   setMapBounds: (bounds: LatLngBounds | null) => void;
 }
 
@@ -21,17 +30,15 @@ export function MapFilters({
   const {
     selectedRegion,
     setSelectedRegion,
-    districts,
     selectedDistrict,
     setSelectedDistrict,
-    mahallas,
     selectedMahalla,
     setSelectedMahalla,
-    streets,
     selectedStreet,
     setSelectedStreet,
-    isLoading,
-  } = filterState;
+  } = useMapFilterStore();
+
+  const { districts, mahallas, streets, isLoading } = filterState;
 
   const flyToItem = (
     items: { id: string; geometry?: unknown }[],

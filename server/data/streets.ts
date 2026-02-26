@@ -73,3 +73,21 @@ export const getStreets = async (): Promise<Street[]> => {
     return [];
   }
 };
+
+export const getStreetListByDistrictId = async (districtId: string) => {
+  try {
+    const streets = await prisma.street.findMany({
+      where: { districtId, isActive: true },
+      select: {
+        id: true,
+        name: true,
+        code: true,
+      },
+      orderBy: { name: 'asc' },
+    });
+    return streets;
+  } catch (error) {
+    console.error('Failed to fetch streets:', error);
+    return [];
+  }
+};

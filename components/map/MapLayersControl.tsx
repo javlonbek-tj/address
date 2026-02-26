@@ -18,22 +18,22 @@ import {
   TooltipTrigger,
 } from '@/components/ui/tooltip';
 
-interface Props {
-  filterState: {
-    showRegions: boolean;
-    setShowRegions: (v: boolean) => void;
-    showDistricts: boolean;
-    setShowDistricts: (v: boolean) => void;
-    showMahallas: boolean;
-    setShowMahallas: (v: boolean) => void;
-    showStreets: boolean;
-    setShowStreets: (v: boolean) => void;
-    showProperties: boolean;
-    setShowProperties: (v: boolean) => void;
-  };
-}
+import { useMapFilterStore } from '@/store/useMapFilterStore';
 
-export function MapLayersControl({ filterState }: Props) {
+export function MapLayersControl() {
+  const {
+    showRegions,
+    setShowRegions,
+    showDistricts,
+    setShowDistricts,
+    showMahallas,
+    setShowMahallas,
+    showStreets,
+    setShowStreets,
+    showProperties,
+    setShowProperties,
+  } = useMapFilterStore();
+
   const [isOpen, setIsOpen] = useState(false);
 
   const layers = [
@@ -41,8 +41,8 @@ export function MapLayersControl({ filterState }: Props) {
       id: 'regions',
       label: 'Viloyatlar',
       icon: MapIcon,
-      value: filterState.showRegions,
-      setValue: filterState.setShowRegions,
+      value: showRegions,
+      setValue: setShowRegions,
       color: 'text-blue-500',
       bgColor: 'bg-blue-50 dark:bg-blue-900/20',
     },
@@ -50,8 +50,8 @@ export function MapLayersControl({ filterState }: Props) {
       id: 'districts',
       label: 'Tumanlar',
       icon: Navigation,
-      value: filterState.showDistricts,
-      setValue: filterState.setShowDistricts,
+      value: showDistricts,
+      setValue: setShowDistricts,
       color: 'text-indigo-500',
       bgColor: 'bg-indigo-50 dark:bg-indigo-900/20',
     },
@@ -59,8 +59,8 @@ export function MapLayersControl({ filterState }: Props) {
       id: 'mahallas',
       label: 'Mahallalar',
       icon: Home,
-      value: filterState.showMahallas,
-      setValue: filterState.setShowMahallas,
+      value: showMahallas,
+      setValue: setShowMahallas,
       color: 'text-emerald-500',
       bgColor: 'bg-emerald-50 dark:bg-emerald-900/20',
     },
@@ -68,8 +68,8 @@ export function MapLayersControl({ filterState }: Props) {
       id: 'streets',
       label: "Ko'chalar",
       icon: Waypoints,
-      value: filterState.showStreets,
-      setValue: filterState.setShowStreets,
+      value: showStreets,
+      setValue: setShowStreets,
       color: 'text-amber-500',
       bgColor: 'bg-amber-50 dark:bg-amber-900/20',
     },
@@ -77,8 +77,8 @@ export function MapLayersControl({ filterState }: Props) {
       id: 'properties',
       label: 'Binolar',
       icon: Home,
-      value: filterState.showProperties,
-      setValue: filterState.setShowProperties,
+      value: showProperties,
+      setValue: setShowProperties,
       color: 'text-purple-500',
       bgColor: 'bg-purple-50 dark:bg-purple-900/20',
     },

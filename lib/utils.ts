@@ -71,3 +71,31 @@ export const validateFile = (
   }
   return null;
 };
+
+export const formatCadastralNumber = (raw: string): string => {
+  const cleaned = raw.replace(/[^\d/]/g, '');
+  const [mainPart, suffixPart] = cleaned.split('/');
+
+  const segLengths = [2, 2, 2, 2, 2, 4];
+  const digits = mainPart || '';
+  const segments: string[] = [];
+  let pos = 0;
+
+  for (let i = 0; i < segLengths.length; i++) {
+    const len = segLengths[i];
+    const chunk = digits.slice(pos, pos + len);
+    if (!chunk) break;
+    segments.push(chunk);
+    pos += len;
+    if (pos >= digits.length) break;
+  }
+
+  let result = segments.join(':');
+
+  if (suffixPart !== undefined) {
+    // Limit suffix to 4 digits
+    result += '/' + suffixPart.slice(0, 4);
+  }
+
+  return result;
+};

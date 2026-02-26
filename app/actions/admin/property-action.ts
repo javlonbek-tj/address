@@ -32,7 +32,7 @@ export async function updateProperty(
       if (existingProperty) {
         return {
           success: false,
-          message: 'Ushbu yangi kadastr raqami boshqa bino uchun kiritilgan',
+          message: 'Ushbu kadastr raqami allaqachon mavjud',
         };
       }
     }
@@ -58,7 +58,7 @@ export async function updateProperty(
       },
     });
 
-    return { success: true, data: updatedProperty as PropertyWithRelations };
+    return { success: true, data: updatedProperty };
   } catch (error) {
     console.error('Failed to update property:', error);
     return { success: false, error: 'INTERNAL_SERVER_ERROR' };

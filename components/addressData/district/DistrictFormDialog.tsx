@@ -1,12 +1,7 @@
 'use client';
 
-import { Controller } from 'react-hook-form';
-import {
-  Field,
-  FieldError,
-  FieldGroup,
-  FieldLabel,
-} from '@/components/ui/field';
+import { FormProvider } from 'react-hook-form';
+import { FieldGroup } from '@/components/ui/field';
 import type { District, Region } from '@/types';
 import { useDistrictForm } from '@/hooks';
 import {
@@ -17,14 +12,10 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
-import { Input } from '@/components/ui/input';
-import { FormActions } from '@/components/shared';
+  FormActions,
+  FormInputField,
+  FormSelectField,
+} from '@/components/shared';
 
 interface Props {
   open: boolean;
@@ -54,85 +45,40 @@ export function DistrictFormDialog({
         <DialogDescription className='sr-only'>
           Tumanni tahrirlash
         </DialogDescription>
-        <form onSubmit={form.handleSubmit(onSubmit)}>
-          <FieldGroup>
-            <Controller
-              control={form.control}
-              name='regionId'
-              render={({ field, fieldState }) => (
-                <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel>Hudud</FieldLabel>
-                  <Select value={field.value} onValueChange={field.onChange}>
-                    <SelectTrigger className='w-full dark:bg-gray-700 dark:text-white'>
-                      <SelectValue placeholder='Hududni tanlang' />
-                    </SelectTrigger>
-                    <SelectContent className='dark:bg-gray-700 dark:text-white'>
-                      {regions.map((region) => (
-                        <SelectItem key={region.id} value={region.id}>
-                          {region.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  {fieldState.invalid && (
-                    <FieldError errors={[fieldState.error]} />
-                  )}
-                </Field>
-              )}
-            />
+        <FormProvider {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)}>
+            <FieldGroup>
+              <FormSelectField
+                name='regionId'
+                label='Hudud'
+                options={regions}
+                placeholder='Hududni tanlang'
+              />
 
-            <Controller
-              control={form.control}
-              name='name'
-              render={({ field, fieldState }) => (
-                <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor='name'>Tuman nomi</FieldLabel>
-                  <Input
-                    id='name'
-                    {...field}
-                    className='dark:bg-gray-700 dark:text-white'
-                    placeholder='Tuman nomi'
-                    autoComplete='off'
-                    aria-invalid={fieldState.invalid}
-                  />
-                  {fieldState.invalid && (
-                    <FieldError errors={[fieldState.error]} />
-                  )}
-                </Field>
-              )}
-            />
+              <FormInputField
+                label='Tuman nomi'
+                name='name'
+                autoComplete='off'
+              />
 
-            <Controller
-              control={form.control}
-              name='code'
-              render={({ field, fieldState }) => (
-                <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor='code'>Soato kodi</FieldLabel>
-                  <Input
-                    id='code'
-                    {...field}
-                    onChange={(e) => {
-                      const value = e.target.value.replace(/\D/g, '');
-                      field.onChange(value);
-                    }}
-                    className='dark:bg-gray-700 dark:text-white'
-                    placeholder='Soato kodi'
-                    autoComplete='off'
-                    aria-invalid={fieldState.invalid}
-                  />
-                  {fieldState.invalid && (
-                    <FieldError errors={[fieldState.error]} />
-                  )}
-                </Field>
-              )}
+              <FormInputField
+                label='Soato kodi'
+                name='code'
+                autoComplete='off'
+                inputMode='numeric'
+                onChange={(e) => {
+                  const value = e.target.value.replace(/\D/g, '');
+                  form.setValue('code', value);
+                }}
+              />
+            </FieldGroup>
+            <FormActions
+              onCancel={onClose}
+              isEditing={!!district}
+              isPending={submitting}
             />
-          </FieldGroup>
-          <FormActions
-            onCancel={onClose}
-            isEditing={!!district}
-            isPending={submitting}
-          />
-        </form>
+          </form>
+        </FormProvider>
       </DialogContent>
     </Dialog>
   );

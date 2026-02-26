@@ -8,11 +8,11 @@ import { propertySchema } from '@/lib';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { updateProperty } from '@/app/actions';
 import toast from 'react-hot-toast';
-import type { PropertyWithRelations } from '@/types';
+import type { PropertyForForm } from '@/types';
 import { useEffect } from 'react';
 
 interface Props {
-  property: PropertyWithRelations | null;
+  property: PropertyForForm | null | undefined;
   open: boolean;
   onClose: () => void;
 }
@@ -22,11 +22,11 @@ export function usePropertyForm({ property, open, onClose }: Props) {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const getFormattedValues = (
-    property: PropertyWithRelations | null,
+    property: PropertyForForm | null | undefined,
   ): PropertySchemaType => ({
-    newCadNumber: property?.newCadNumber || null,
-    type: property?.type || 'residential',
-    streetId: property?.streetId || null,
+    newCadNumber: property?.newCadNumber || '',
+    type: property?.type || '',
+    streetId: property?.streetId || '',
   });
 
   const form = useForm<PropertySchemaType>({
@@ -53,7 +53,7 @@ export function usePropertyForm({ property, open, onClose }: Props) {
     }
 
     toast.success('Obyekt muvaffaqiyatli tahrirlandi');
-    queryClient.invalidateQueries({ queryKey: ['properties'] });
+    queryClient.invalidateQueries({ queryKey: ['property', property.id] });
     onClose();
     setIsSubmitting(false);
   };

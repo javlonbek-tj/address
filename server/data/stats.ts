@@ -1,4 +1,5 @@
 import 'server-only';
+
 import { prisma } from '../prisma';
 
 export async function getGlobalStatistics() {
@@ -74,7 +75,7 @@ export async function getDashboardAnalytics() {
       }),
       prisma.mahalla.count({
         where: {
-          hidden: true,
+          isOptimized: true,
         },
       }),
     ]);

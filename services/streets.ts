@@ -9,3 +9,11 @@ export const fetchStreets = async (districtId: string) => {
   }>(`${ApiRoutes.MAP_STREETS}?districtId=${districtId}`);
   return data?.data || [];
 };
+
+export const fetchStreetListByDistrictId = async (districtId: string) => {
+  const { data } = await axiosInstance.get<{
+    success: boolean;
+    data: { id: string; name: string; code: string }[];
+  }>(`${ApiRoutes.STREETS}/${districtId}`);
+  return data?.data || [];
+};

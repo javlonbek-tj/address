@@ -7,6 +7,7 @@ import L from 'leaflet';
 import type { Region } from '@/lib/generated/prisma/client';
 import { MAP_LEVEL_STYLES } from '@/lib/constants/map';
 import { PropertyWithRelations } from '@/types';
+import { usePropertySheetStore } from '@/store/usePropertySheetStore';
 
 interface Props {
   regions: Region[];
@@ -17,7 +18,6 @@ interface Props {
   setSelectedRegion: (id: string) => void;
   setSelectedDistrict: (id: string) => void;
   setSelectedMahalla: (id: string) => void;
-  setSelectedProperty: (prop: PropertyWithRelations | null) => void;
   selectedStreet: string;
   setSelectedStreet: (id: string) => void;
   setMapBounds: (bounds: LatLngBounds | null) => void;
@@ -32,7 +32,6 @@ export function useMapHandlers({
   setSelectedRegion,
   setSelectedDistrict,
   setSelectedMahalla,
-  setSelectedProperty,
   selectedStreet,
   setSelectedStreet,
   setMapBounds,
@@ -42,6 +41,8 @@ export function useMapHandlers({
   const selectedDistrictRef = useRef(selectedDistrict);
   const selectedMahallaRef = useRef(selectedMahalla);
   const selectedStreetRef = useRef(selectedStreet);
+
+  const openSheet = usePropertySheetStore((s) => s.open);
 
   useEffect(() => {
     selectedRegionRef.current = selectedRegion;
@@ -239,14 +240,11 @@ export function useMapHandlers({
         },
         click: (e) => {
           L.DomEvent.stopPropagation(e);
-          const property = properties.find((p) => p.id === props.id);
-          if (property) {
-            setSelectedProperty(property);
-          }
+          openSheet(props.id);
         },
       });
     },
-    [properties, setSelectedProperty],
+    [openSheet],
   );
 
   return {

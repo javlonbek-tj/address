@@ -1,6 +1,6 @@
 'use client';
 
-import { DistrictFormDialog } from './';
+import { DistrictFormDialog, DistrictTableFilters } from './';
 import type { District, Region } from '@/types';
 import {
   useTableActions,
@@ -9,14 +9,6 @@ import {
   useDistrictTableData,
   useRegionsList,
 } from '@/hooks';
-import { Input } from '@/components/ui/input';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
 import { DataTable } from '../table';
 import { DeleteDialog } from '@/components/shared';
 import { deleteDistrict } from '@/app/actions';
@@ -67,42 +59,13 @@ export function DistrictTable() {
   return (
     <div className='px-8 py-10'>
       <div className='bg-white dark:bg-gray-800 shadow-sm rounded-lg'>
-        <div className='flex flex-wrap items-center gap-3 p-4 border-b'>
-          <Input
-            placeholder='Qidiruv...'
-            className='shadow-sm w-52 h-8 2xl:h-9 2xl:w-64'
-            defaultValue={search}
-            onChange={(e) => handleSearch(e.target.value)}
-          />
-          <Select
-            value={regionId}
-            onValueChange={(value) => handleFilterChange('regionId', value)}
-          >
-            <SelectTrigger
-              className='dark:bg-gray-700 shadow-sm w-52 dark:text-white'
-              size='sm'
-            >
-              <SelectValue
-                placeholder="Hudud bo'yicha filter"
-                className='text-xs 2xl:text-sm'
-              />
-            </SelectTrigger>
-            <SelectContent className='dark:bg-gray-700 dark:text-white'>
-              <SelectItem value='all' className='text-xs 2xl:text-sm'>
-                Barcha hududlar
-              </SelectItem>
-              {regions.map((region: Region) => (
-                <SelectItem
-                  key={region.id}
-                  value={region.id}
-                  className='text-xs 2xl:text-sm'
-                >
-                  {region.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
+        <DistrictTableFilters
+          search={search}
+          handleSearch={handleSearch}
+          regionId={regionId}
+          handleFilterChange={handleFilterChange}
+          regions={regions}
+        />
         <DataTable
           data={districts}
           onEdit={handleEdit}

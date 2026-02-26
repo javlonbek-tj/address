@@ -1,4 +1,5 @@
 import { prisma } from '@/server/prisma';
+import { PropertyForForm } from '@/types';
 
 export async function getPropertiesByMahallaCode(mahallaCode: string) {
   return await prisma.property.findMany({
@@ -26,6 +27,29 @@ export async function getPropertiesByMahallaCode(mahallaCode: string) {
           },
         },
       },
+    },
+  });
+}
+
+export async function getPropertyById(
+  id: string,
+): Promise<PropertyForForm | null> {
+  return await prisma.property.findUnique({
+    where: {
+      id,
+    },
+    select: {
+      id: true,
+      newCadNumber: true,
+      type: true,
+      streetId: true,
+      street: {
+        select: {
+          id: true,
+          name: true,
+        },
+      },
+      districtId: true,
     },
   });
 }
