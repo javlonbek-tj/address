@@ -41,6 +41,8 @@ export async function getPropertyById(
     select: {
       id: true,
       newCadNumber: true,
+      newHouseNumber: true,
+      mahallaId: true,
       type: true,
       streetId: true,
       street: {

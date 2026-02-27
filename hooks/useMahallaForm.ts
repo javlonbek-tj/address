@@ -87,8 +87,12 @@ export function useMahallaForm({
 
     markAsSubmitted();
     toast.success('Mahalla muvaffaqiyatli tahrirlandi');
-    queryClient.invalidateQueries({ queryKey: ['mahallas'] });
-    queryClient.invalidateQueries({ queryKey: ['mahallas-table-data'] });
+    queryClient.invalidateQueries({
+      queryKey: ['mahallas-map', mahalla.district?.id],
+    });
+    queryClient.invalidateQueries({
+      queryKey: ['mahallas-table', mahalla.district?.id],
+    });
     onClose();
     setIsSubmitting(false);
   };

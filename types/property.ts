@@ -12,6 +12,8 @@ export type PropertyWithRelations = PrismaProperty & {
 export type PropertyForForm = {
   id: string;
   newCadNumber: string | null;
+  newHouseNumber: string | null;
+  mahallaId: string;
   type: string | null;
   streetId: string | null;
   street?: {

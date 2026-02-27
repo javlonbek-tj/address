@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { GeoJSON, Marker } from 'react-leaflet';
 import L, { LatLngBounds } from 'leaflet';
 import { Feature, FeatureCollection } from 'geojson';
@@ -34,23 +34,35 @@ export default function UzbekistanMap({ regions }: UzbekistanMapProps) {
   const { districts, mahallas, streets, properties, isLoading } =
     useMapFilters();
 
-  const {
-    selectedRegion,
-    setSelectedRegion,
-    selectedDistrict,
-    setSelectedDistrict,
-    selectedMahalla,
-    setSelectedMahalla,
-    selectedStreet,
-    setSelectedStreet,
-    showRegions,
-    showDistricts,
-    showMahallas,
-    showStreets,
-    showProperties,
-    baseMap,
-    setBaseMap,
-  } = useMapFilterStore();
+  const selectedRegion = useMapFilterStore((state) => state.selectedRegion);
+  const setSelectedRegion = useMapFilterStore(
+    (state) => state.setSelectedRegion,
+  );
+  const selectedDistrict = useMapFilterStore((state) => state.selectedDistrict);
+  const setSelectedDistrict = useMapFilterStore(
+    (state) => state.setSelectedDistrict,
+  );
+  const selectedMahalla = useMapFilterStore((state) => state.selectedMahalla);
+  const setSelectedMahalla = useMapFilterStore(
+    (state) => state.setSelectedMahalla,
+  );
+  const selectedStreet = useMapFilterStore((state) => state.selectedStreet);
+  const setSelectedStreet = useMapFilterStore(
+    (state) => state.setSelectedStreet,
+  );
+  const showRegions = useMapFilterStore((state) => state.showRegions);
+  const showDistricts = useMapFilterStore((state) => state.showDistricts);
+  const showMahallas = useMapFilterStore((state) => state.showMahallas);
+  const showStreets = useMapFilterStore((state) => state.showStreets);
+  const showProperties = useMapFilterStore((state) => state.showProperties);
+  const baseMap = useMapFilterStore((state) => state.baseMap);
+  const resetFilters = useMapFilterStore((state) => state.resetFilters);
+
+  useEffect(() => {
+    return () => {
+      resetFilters();
+    };
+  }, [resetFilters]);
 
   const [mapBounds, setMapBounds] = useState<LatLngBounds | null>(null);
 
@@ -204,10 +216,12 @@ export default function UzbekistanMap({ regions }: UzbekistanMapProps) {
           />
         )}
 
-        {/* Properties Layer */}
         {showProperties && selectedMahalla && propertyFeatures.length > 0 && (
           <GeoJSON
-            key={`properties-${selectedMahalla}`}
+            key={`properties-${selectedMahalla}-${properties.reduce(
+              (acc, p) => acc + (p.newCadNumber ? '1' : '0'),
+              '',
+            )}`}
             data={
               {
                 type: 'FeatureCollection',
@@ -215,7 +229,14 @@ export default function UzbekistanMap({ regions }: UzbekistanMapProps) {
               } as FeatureCollection
             }
             pane='propertiesPane'
-            style={MAP_LEVEL_STYLES.property}
+            style={(feature?: Feature) => {
+              const props = feature?.properties as
+                | { newCadNumber?: string }
+                | undefined;
+              return props?.newCadNumber
+                ? MAP_LEVEL_STYLES.propertyDone
+                : MAP_LEVEL_STYLES.property;
+            }}
             onEachFeature={onEachProperty}
           />
         )}

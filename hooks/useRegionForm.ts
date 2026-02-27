@@ -47,8 +47,9 @@ export function useRegionForm({ region, open, onClose }: Props) {
     }
 
     toast.success('Hudud muvaffaqiyatli tahrirlandi');
-    queryClient.invalidateQueries({ queryKey: ['regions'] });
-    queryClient.invalidateQueries({ queryKey: ['regions-table-data'] });
+    queryClient.invalidateQueries({ queryKey: ['regions-map'] });
+    queryClient.invalidateQueries({ queryKey: ['regions-table'] });
+    queryClient.invalidateQueries({ queryKey: ['regions-list'] });
     onClose();
     setIsSubmitting(false);
   };

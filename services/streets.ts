@@ -17,3 +17,20 @@ export const fetchStreetListByDistrictId = async (districtId: string) => {
   }>(`${ApiRoutes.STREETS}/${districtId}`);
   return data?.data || [];
 };
+
+export const fetchStreetTableData = async (
+  page = 1,
+  limit = 10,
+  search = '',
+  regionId = '',
+  districtId = '',
+  mahallaId = '',
+) => {
+  const { data } = await axiosInstance.get<{
+    success: boolean;
+    data: any;
+  }>(ApiRoutes.STREETS, {
+    params: { page, limit, search, regionId, districtId, mahallaId },
+  });
+  return data?.data;
+};

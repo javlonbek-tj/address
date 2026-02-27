@@ -112,6 +112,7 @@ model Property {
   id           String   @id @default(cuid())
   cadNumber    String   @unique
   newCadNumber String?   @unique
+  newHouseNumber String?
   type         String?   @default("residential")
 
   districtId String

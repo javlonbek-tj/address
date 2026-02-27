@@ -41,8 +41,9 @@ export function RegionTable() {
   const { isDeleting, handleDelete } = useDelete(deleteRegion, {
     onSuccess: () => {
       handleCloseDelete();
-      queryClient.invalidateQueries({ queryKey: ['regions'] });
-      queryClient.invalidateQueries({ queryKey: ['regions-table-data'] });
+      queryClient.invalidateQueries({ queryKey: ['regions-map'] });
+      queryClient.invalidateQueries({ queryKey: ['regions-table'] });
+      queryClient.invalidateQueries({ queryKey: ['regions-list'] });
     },
     successMessage: "Hudud muvaffaqiyatli o'chirildi",
     errorMessage: "Hududni o'chirishda xatolik yuz berdi",

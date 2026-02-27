@@ -23,12 +23,16 @@ export const MapContainer = ({
     <RLMapContainer
       center={[41.377, 64.585]} // Default center: Uzbekistan
       zoom={6}
+      maxZoom={selectedBase.maxZoom + 1}
       className={className}
       zoomControl={true}
     >
       <TileLayer
         url={selectedBase.url}
         attribution={selectedBase.attribution}
+        maxZoom={selectedBase.maxZoom + 1}
+        maxNativeZoom={selectedBase.maxZoom}
+        crossOrigin='anonymous'
       />
       <MapPanes />
       <MapResizeHandler />

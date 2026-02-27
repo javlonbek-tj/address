@@ -1,14 +1,16 @@
 import { useQuery, keepPreviousData } from '@tanstack/react-query';
 import type { MahallaTableData, MahallaWithRelations } from '@/types';
 import { fetchMahallas, fetchMahallaTableData } from '@/services';
+import { fetchMahallasList } from '@/services/mahallas';
 
 export function useMahallas(districtId: string) {
   const { data: mahallas = [], isLoading: isLoadingMahallas } = useQuery<
     MahallaWithRelations[]
   >({
-    queryKey: ['mahallas', districtId],
+    queryKey: ['mahallas-map', districtId],
     queryFn: () => fetchMahallas(districtId),
     enabled: !!districtId,
+    staleTime: Infinity,
   });
 
   return { mahallas, isLoadingMahallas };
@@ -29,10 +31,10 @@ export function useMahallasTableData({
   districtId: string;
   isOptimized: string;
 }) {
-  const { data, isFetching: isLoadingMahallaTableData } =
+  const { data, isPending: isLoadingMahallaTableData } =
     useQuery<MahallaTableData>({
       queryKey: [
-        'mahallas-table-data',
+        'mahallas-table',
         page,
         limit,
         search,
@@ -54,4 +56,17 @@ export function useMahallasTableData({
     });
 
   return { data, isLoadingMahallaTableData };
+}
+
+export function useMahallasList(districtId?: string) {
+  const { data: mahallas = [], isLoading: isLoadingMahallas } = useQuery<
+    { id: string; name: string; code: string }[]
+  >({
+    queryKey: ['mahallas-list', districtId],
+    queryFn: () => fetchMahallasList(districtId),
+    enabled: !!districtId && districtId !== 'all',
+    staleTime: Infinity,
+  });
+
+  return { mahallas, isLoadingMahallas };
 }

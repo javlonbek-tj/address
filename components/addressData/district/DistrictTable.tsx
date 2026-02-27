@@ -13,9 +13,11 @@ import { DataTable } from '../table';
 import { DeleteDialog } from '@/components/shared';
 import { deleteDistrict } from '@/app/actions';
 import { useSearchParams } from 'next/navigation';
+import { useQueryClient } from '@tanstack/react-query';
 
 export function DistrictTable() {
   const searchParams = useSearchParams();
+  const queryClient = useQueryClient();
 
   const page = Number(searchParams.get('page')) || 1;
   const limit = Number(searchParams.get('limit')) || 10;
@@ -45,7 +47,16 @@ export function DistrictTable() {
   } = useTableActions();
 
   const { isDeleting, handleDelete } = useDelete(deleteDistrict, {
-    onSuccess: handleCloseDelete,
+    onSuccess: () => {
+      handleCloseDelete();
+      queryClient.invalidateQueries({ queryKey: ['districts-map', regionId] });
+      queryClient.invalidateQueries({
+        queryKey: ['districts-table', regionId],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ['districts-list', regionId],
+      });
+    },
     successMessage: "Tuman muvaffaqiyatli o'chirildi",
     errorMessage: "Tumanni o'chirishda xatolik yuz berdi",
   });

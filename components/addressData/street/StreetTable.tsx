@@ -1,23 +1,24 @@
 'use client';
 
-import { MahallaFormDialog, MahallaTableFilters } from './';
-import type { District, Mahalla, Region } from '@/types';
+import { StreetTableFilters } from './';
+import type { Street } from '@/types';
 import {
   useTableActions,
   useDelete,
   useTableFilters,
-  useMahallasTableData,
+  useStreetsTableData,
   useRegionsList,
   useDistrictsList,
+  useMahallasList,
 } from '@/hooks';
 import { CopyableCode, PaginationWrapper, Spinner } from '@/components/shared';
 import { TableActions } from '../table';
 import { DeleteDialog } from '@/components/shared/modal';
-import { deleteMahalla } from '@/app/actions/admin';
+import { deleteStreet } from '@/app/actions';
 import { useSearchParams } from 'next/navigation';
 import { useQueryClient } from '@tanstack/react-query';
 
-export function MahallaTable() {
+export function StreetTable() {
   const searchParams = useSearchParams();
   const queryClient = useQueryClient();
 
@@ -26,20 +27,21 @@ export function MahallaTable() {
   const search = searchParams.get('search') || '';
   const regionId = searchParams.get('regionId') || 'all';
   const districtId = searchParams.get('districtId') || 'all';
-  const isOptimized = searchParams.get('isOptimized') || 'all';
+  const mahallaId = searchParams.get('mahallaId') || 'all';
 
-  const { data: mahallaTableData, isLoadingMahallaTableData } =
-    useMahallasTableData({
+  const { data: streetTableData, isLoadingStreetTableData } =
+    useStreetsTableData({
       page,
       limit,
       search,
       regionId,
       districtId,
-      isOptimized,
+      mahallaId,
     });
 
   const { regions, isLoadingRegions } = useRegionsList();
   const { districts, isLoadingDistricts } = useDistrictsList(regionId);
+  const { mahallas, isLoadingMahallas } = useMahallasList(districtId);
 
   const {
     handleSearch,
@@ -56,34 +58,43 @@ export function MahallaTable() {
     deleteId,
     setDeleteId,
     handleCloseDelete,
-  } = useTableActions<Mahalla>();
+  } = useTableActions<Street>();
 
-  const { handleDelete, isDeleting } = useDelete(deleteMahalla, {
+  const { handleDelete, isDeleting } = useDelete(deleteStreet, {
     onSuccess: () => {
       handleCloseDelete();
       queryClient.invalidateQueries({
-        queryKey: ['mahallas-map', districtId],
+        queryKey: ['streets-map', districtId],
       });
-      queryClient.invalidateQueries({ queryKey: ['mahallas-table'] });
+      queryClient.invalidateQueries({ queryKey: ['streets-table'] });
     },
-    successMessage: "Mahalla muvaffaqiyatli o'chirildi",
-    errorMessage: "Mahallani o'chirishda xatolik yuz berdi",
+    successMessage: "Ko'cha muvaffaqiyatli o'chirildi",
+    errorMessage: "Ko'chani o'chirishda xatolik yuz berdi",
   });
 
   const onRegionChange = (value: string) => {
     handleFilterChange({
       regionId: value,
       districtId: 'all',
+      mahallaId: 'all',
     });
   };
 
-  const mahallas = mahallaTableData?.data || [];
-  const totalCount = mahallaTableData?.total || 0;
+  const onDistrictChange = (value: string) => {
+    handleFilterChange({
+      districtId: value,
+      mahallaId: 'all',
+    });
+  };
+
+  const streets = streetTableData?.data || [];
+  const totalCount = streetTableData?.total || 0;
   const totalPages = Math.ceil(totalCount / limit);
   const isLoading =
-    isLoadingMahallaTableData ||
+    isLoadingStreetTableData ||
     isLoadingRegions ||
     isLoadingDistricts ||
+    isLoadingMahallas ||
     isFilterLoading;
 
   const actualStartIndex = (page - 1) * limit;
@@ -91,17 +102,20 @@ export function MahallaTable() {
   return (
     <div className='px-8 py-10'>
       <div className='bg-white dark:bg-gray-800 shadow-sm rounded-lg'>
-        <MahallaTableFilters
+        <StreetTableFilters
           search={search}
           handleSearch={handleSearch}
           regionId={regionId}
           onRegionChange={onRegionChange}
           regions={regions}
           districtId={districtId}
-          handleFilterChange={handleFilterChange}
+          onDistrictChange={onDistrictChange}
           districts={districts}
           isLoadingDistricts={isLoadingDistricts}
-          isOptimized={isOptimized}
+          mahallaId={mahallaId}
+          handleFilterChange={handleFilterChange}
+          mahallas={mahallas}
+          isLoadingMahallas={isLoadingMahallas}
         />
 
         <div className='p-4 overflow-hidden'>
@@ -120,19 +134,19 @@ export function MahallaTable() {
                     Tuman
                   </th>
                   <th className='px-6 py-3 font-bold text-[10px] text-gray-800 dark:text-gray-300 3xl:text-xs text-left uppercase leading-none tracking-widest'>
-                    Uzkad Nomi
+                    Nomi
                   </th>
                   <th className='px-6 py-3 font-bold text-[10px] text-gray-800 dark:text-gray-300 3xl:text-xs text-left uppercase leading-none tracking-widest'>
-                    Uzkad Kodi
+                    Turi
                   </th>
                   <th className='px-6 py-3 font-bold text-[10px] text-gray-800 dark:text-gray-300 3xl:text-xs text-left uppercase leading-none tracking-widest'>
-                    Apu Kodi
+                    Kodi
                   </th>
                   <th className='px-6 py-3 font-bold text-[10px] text-gray-800 dark:text-gray-300 3xl:text-xs text-left uppercase leading-none tracking-widest'>
-                    1C Kodi
+                    Mahalla bog&apos;lanish
                   </th>
                   <th className='px-6 py-3 font-bold text-[10px] text-gray-800 dark:text-gray-300 3xl:text-xs text-left uppercase leading-none tracking-widest'>
-                    Optimallashgan
+                    Uzkad kodi
                   </th>
                   <th className='px-6 py-3 pr-8 2xl:pr-10 font-bold text-[10px] text-gray-800 dark:text-gray-300 3xl:text-xs text-right uppercase leading-none tracking-widest'>
                     Amallar
@@ -140,72 +154,52 @@ export function MahallaTable() {
                 </tr>
               </thead>
               <tbody
-                className={`divide-y divide-gray-100 dark:divide-gray-700/50 transition-opacity duration-200 ${isLoading && mahallas.length > 0 ? 'opacity-40 pointer-events-none' : ''}`}
+                className={`divide-y divide-gray-100 dark:divide-gray-700/50 transition-opacity duration-200 ${isLoading && streets.length > 0 ? 'opacity-40 pointer-events-none' : ''}`}
               >
-                {mahallas.length === 0 && !isLoading ? (
+                {streets.length === 0 && !isLoading ? (
                   <tr>
                     <td
-                      colSpan={11}
+                      colSpan={9}
                       className='px-6 py-12 font-medium text-gray-800 dark:text-gray-400 text-sm text-center'
                     >
                       Ma&apos;lumot topilmadi
                     </td>
                   </tr>
                 ) : (
-                  mahallas.map((mahalla, index) => (
+                  streets.map((street, index) => (
                     <tr
-                      key={mahalla.id}
-                      className={`group hover:bg-blue-50/30 dark:hover:bg-blue-900/10 dark:even:bg-gray-700/20 dark:odd:bg-gray-800 even:bg-gray-50/50 odd:bg-white transition-all duration-200 ${mahalla.mergedInto && mahalla.mergedInto.length > 0 ? 'opacity-60' : ''}`}
+                      key={street.id}
+                      className='group hover:bg-blue-50/30 dark:hover:bg-blue-900/10 dark:even:bg-gray-700/20 dark:odd:bg-gray-800 even:bg-gray-50/50 odd:bg-white transition-all duration-200'
                     >
-                      <td className='px-6 py-1 2xl:py-1.5 font-bold text-gray-600 dark:text-gray-300 text-xs whitespace-nowrap'>
+                      <td className='px-6 py-2 font-bold text-gray-600 dark:text-gray-300 text-xs whitespace-nowrap'>
                         {actualStartIndex + index + 1}
                       </td>
-                      <td className='px-6 py-1 2xl:py-1.5 font-bold text-gray-600 dark:text-gray-300 text-xs whitespace-nowrap'>
-                        {mahalla.district.region.name}
+                      <td className='px-6 py-2 font-bold text-gray-600 dark:text-gray-300 text-xs whitespace-nowrap'>
+                        {street.district.region.name}
                       </td>
-                      <td className='px-6 py-1 2xl:py-1.5 font-bold text-gray-600 dark:text-gray-300 text-xs whitespace-nowrap'>
-                        {mahalla.district.name}
+                      <td className='px-6 py-2 font-bold text-gray-600 dark:text-gray-300 text-xs whitespace-nowrap'>
+                        {street.district.name}
                       </td>
-                      <td className='px-6 py-1 2xl:py-1.5 font-bold text-gray-600 dark:text-gray-300 text-xs whitespace-nowrap'>
-                        {mahalla.uzKadName}
+                      <td className='px-6 py-2 font-bold text-gray-600 dark:text-gray-300 text-xs whitespace-nowrap'>
+                        {street.name}
                       </td>
-                      <td className='px-6 py-1 2xl:py-1.5 font-bold text-gray-600 dark:text-gray-300 text-xs whitespace-nowrap'>
-                        <CopyableCode code={mahalla.code.toString()} />
+                      <td className='px-6 py-2 font-bold text-gray-600 dark:text-gray-300 text-xs whitespace-nowrap'>
+                        {street.type}
                       </td>
-                      <td className='px-6 py-1 2xl:py-1.5 font-bold text-gray-600 dark:text-gray-300 text-xs whitespace-nowrap'>
-                        <CopyableCode code={mahalla.geoCode.toString()} />
+                      <td className='px-6 py-2 font-bold text-gray-600 dark:text-gray-300 text-xs whitespace-nowrap'>
+                        <CopyableCode code={street.code} />
                       </td>
-                      <td className='px-6 py-1 2xl:py-1.5 font-bold text-gray-600 dark:text-gray-300 text-xs whitespace-nowrap'>
-                        <CopyableCode code={mahalla.oneId} />
+                      <td className='px-6 py-2 font-bold text-gray-600 dark:text-gray-300 text-xs whitespace-nowrap'>
+                        {street.mahalla.name}
                       </td>
-                      <td
-                        className={
-                          'px-6 py-1 2xl:py-1.5 font-bold text-gray-600 dark:text-gray-300 text-xs text-center whitespace-nowrap'
-                        }
-                      >
-                        {mahalla.mergedInto && mahalla.mergedInto.length > 0 ? (
-                          <span className='inline-flex items-center justify-center w-6 h-6 rounded-full bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400 border border-emerald-100 dark:border-emerald-800/50'>
-                            <svg
-                              className='w-4 h-4'
-                              fill='currentColor'
-                              viewBox='0 0 20 20'
-                            >
-                              <path
-                                fillRule='evenodd'
-                                d='M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z'
-                                clipRule='evenodd'
-                              />
-                            </svg>
-                          </span>
-                        ) : (
-                          <span className='text-green-500'>&mdash;</span>
-                        )}
+                      <td className='px-6 py-2 font-bold text-gray-600 dark:text-gray-300 text-xs whitespace-nowrap'>
+                        <CopyableCode code={street.uzKadCode} />
                       </td>
-                      <td className='px-6 py-1 2xl:py-1.5 whitespace-nowrap'>
+                      <td className='px-6 py-2 whitespace-nowrap'>
                         <TableActions
-                          id={mahalla.id}
-                          onEdit={() => handleEdit(mahalla)}
-                          onDelete={() => setDeleteId(mahalla.id)}
+                          id={street.id}
+                          onEdit={() => handleEdit(street)}
+                          onDelete={() => setDeleteId(street.id)}
                         />
                       </td>
                     </tr>
@@ -232,21 +226,22 @@ export function MahallaTable() {
         </div>
       </div>
 
-      <MahallaFormDialog
+      {/* StreetFormDialog will be implemented later if needed */}
+      {/* <StreetFormDialog
         open={isFormOpen}
         onClose={handleCloseForm}
-        mahalla={editingItem as Mahalla}
+        street={editingItem as Street}
         regions={regions}
         districts={districts}
-      />
+      /> */}
 
       <DeleteDialog
         open={!!deleteId}
         onClose={handleCloseDelete}
         onConfirm={() => handleDelete(deleteId!)}
         isDeleting={isDeleting}
-        title="Mahallani o'chirish"
-        description="Haqiqatdan ham ushbu mahallani o'chirmoqchimisiz? Ushbu amalni ortga qaytarib bo'lmaydi."
+        title="Ko'chani o'chirish"
+        description="Haqiqatdan ham ushbu ko'chani o'chirmoqchimisiz? Ushbu amalni ortga qaytarib bo'lmaydi."
       />
     </div>
   );

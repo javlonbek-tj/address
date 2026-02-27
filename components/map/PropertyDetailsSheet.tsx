@@ -9,7 +9,12 @@ import {
 } from '@/components/ui/sheet';
 import { usePropertyForm } from '@/hooks';
 import { FormProvider } from 'react-hook-form';
-import { FormActions, FormSelectField, Spinner } from '@/components/shared';
+import {
+  FormActions,
+  FormSelectField,
+  FormInputField,
+  Spinner,
+} from '@/components/shared';
 import { cn } from '@/lib/utils';
 import { CadastralInput } from './CadastralInput';
 import { useStreetsByDistrictId } from '@/hooks/useStreets';
@@ -80,9 +85,11 @@ export function PropertyDetailsSheet() {
                 className='px-6 py-5 space-y-6'
               >
                 {/* Cadastral Number */}
-                <CadastralInput
-                  name='newCadNumber'
-                  label='Yangi kadastr raqami'
+                <CadastralInput name='newCadNumber' label='Kadastr raqami' />
+                <FormInputField
+                  name='newHouseNumber'
+                  label='Uy raqami'
+                  placeholder='Uy raqamini kiriting'
                 />
 
                 {/* Divider */}

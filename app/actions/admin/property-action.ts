@@ -17,14 +17,15 @@ export async function updateProperty(
     };
   }
 
-  const { newCadNumber, type, streetId } = validationResult.data;
+  const { newCadNumber, newHouseNumber, type, streetId } =
+    validationResult.data;
 
   try {
     // Check if newCadNumber already exists (if provided)
     if (newCadNumber) {
       const existingProperty = await prisma.property.findFirst({
         where: {
-          newCadNumber,
+          OR: [{ newCadNumber }, { cadNumber: newCadNumber }],
           NOT: { id },
         },
       });
@@ -41,6 +42,7 @@ export async function updateProperty(
       where: { id },
       data: {
         newCadNumber,
+        newHouseNumber,
         type,
         streetId,
       },

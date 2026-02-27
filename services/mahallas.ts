@@ -41,3 +41,16 @@ export const fetchMahallaByCode = async (code: string) => {
   }>(`${ApiRoutes.MAHALLAS}/${code}`);
   return data?.data || null;
 };
+
+export const fetchMahallasList = async (
+  districtId?: string,
+): Promise<{ id: string; name: string; code: string }[]> => {
+  const url = districtId
+    ? `${ApiRoutes.LIST_MAHALLAS}?districtId=${districtId}`
+    : ApiRoutes.LIST_MAHALLAS;
+  const { data } = await axiosInstance.get<{
+    success: boolean;
+    data: { id: string; name: string; code: string }[];
+  }>(url);
+  return data?.data || [];
+};

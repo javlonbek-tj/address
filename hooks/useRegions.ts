@@ -11,7 +11,7 @@ export function useRegions() {
   const { data: regions = [], isPending: isLoadingRegions } = useQuery<
     Region[]
   >({
-    queryKey: ['regions'],
+    queryKey: ['regions-map'],
     queryFn: () => fetchRegions(),
     staleTime: Infinity,
   });
@@ -24,9 +24,9 @@ export function useRegionTableData(
   limit: number,
   search: string,
 ) {
-  const { data, isFetching: isLoadingRegionTableData } =
+  const { data, isPending: isLoadingRegionTableData } =
     useQuery<RegionTableData>({
-      queryKey: ['regions-table-data', page, limit, search],
+      queryKey: ['regions-table', page, limit, search],
       queryFn: () => fetchRegionTableData(page, limit, search),
       staleTime: Infinity,
       placeholderData: keepPreviousData,

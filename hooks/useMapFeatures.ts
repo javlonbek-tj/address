@@ -123,7 +123,11 @@ export function useMapFeatures({
   const propertyFeatures = useMemo(() => {
     return properties.map((property) => ({
       type: 'Feature' as const,
-      properties: { id: property.id, cadNumber: property.cadNumber },
+      properties: {
+        id: property.id,
+        cadNumber: property.cadNumber,
+        newCadNumber: property.newCadNumber,
+      },
       geometry: property.geometry as unknown as Geometry,
     }));
   }, [properties]);

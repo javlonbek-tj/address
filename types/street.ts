@@ -36,3 +36,10 @@ export type Street = {
     name: string;
   };
 };
+
+export type StreetTableData = {
+  data: Street[];
+  total: number;
+  page: number;
+  limit: number;
+};

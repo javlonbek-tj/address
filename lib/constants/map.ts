@@ -7,13 +7,11 @@ export const baseMaps = {
     url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
     attribution:
       '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-    label: 'Standart Map',
     maxZoom: 17,
   },
   satellite: {
     url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
     attribution: '&copy; Esri',
-    label: "Sun'iy yo'ldosh",
     maxZoom: 17,
   },
 } as const;
@@ -52,6 +50,13 @@ export const MAP_LEVEL_STYLES = {
     color: '#4338ca',
     fillOpacity: 0.5,
   },
+  propertyDone: {
+    fillColor: '#10b981', // emerald-500
+    weight: 2,
+    opacity: 1,
+    color: '#fbbf24', // amber-400 (yellowish)
+    fillOpacity: 0.6,
+  },
   highlight: {
     adminBoundary: BLUE_HIGHLIGHT_STYLE,
     mahalla: BLUE_HIGHLIGHT_STYLE,
@@ -67,6 +72,12 @@ export const MAP_LEVEL_STYLES = {
       fillOpacity: 0.7,
       weight: 3,
       color: '#312e81',
+    },
+    propertyDone: {
+      fillColor: '#059669', // emerald-600
+      fillOpacity: 0.8,
+      weight: 3,
+      color: '#f59e0b', // amber-500 (yellowish highlight)
     },
   },
   satellite: {
@@ -114,3 +125,10 @@ export const MAP_LEVEL_STYLES = {
     },
   },
 };
+
+export const ZOOM_THRESHOLDS = {
+  STREET: 14,
+  MAHALLA: 12,
+  DISTRICT: 9,
+  REGION: 7,
+} as const;

@@ -5,8 +5,12 @@ export {
   useDistrictTableData,
   useDistrictsList,
 } from './useDistricts';
-export { useMahallas, useMahallasTableData } from './useMahallas';
-export { useStreets } from './useStreets';
+export {
+  useMahallas,
+  useMahallasTableData,
+  useMahallasList,
+} from './useMahallas';
+export { useStreets, useStreetsTableData } from './useStreets';
 export * from './useStats';
 export { useTableActions } from './useTableActions';
 export { useMapFeatures } from './useMapFeatures';

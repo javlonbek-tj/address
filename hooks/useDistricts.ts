@@ -8,7 +8,7 @@ export function useDistricts(regionId: string) {
   const { data: districts = [], isLoading: isLoadingDistricts } = useQuery<
     District[]
   >({
-    queryKey: ['districts', regionId],
+    queryKey: ['districts-map', regionId],
     queryFn: () => fetchDistricts(regionId),
     enabled: !!regionId,
     staleTime: Infinity,
@@ -23,9 +23,9 @@ export function useDistrictTableData(
   search: string,
   regionId: string,
 ) {
-  const { data, isFetching: isLoadingDistrictTableData } =
+  const { data, isPending: isLoadingDistrictTableData } =
     useQuery<DistrictTableData>({
-      queryKey: ['districts-table-data', page, limit, search, regionId],
+      queryKey: ['districts-table', page, limit, search, regionId],
       queryFn: () => fetchDistrictTableData(page, limit, search, regionId),
       staleTime: Infinity,
       placeholderData: keepPreviousData,
@@ -35,11 +35,12 @@ export function useDistrictTableData(
 }
 
 export function useDistrictsList(regionId: string) {
-  const { data: districts = [], isPending: isLoadingDistricts } = useQuery<
+  const { data: districts = [], isLoading: isLoadingDistricts } = useQuery<
     District[]
   >({
     queryKey: ['districts-list', regionId],
     queryFn: () => fetchDistrictsList(regionId),
+    enabled: !!regionId && regionId !== 'all',
     staleTime: Infinity,
   });
 

@@ -25,6 +25,7 @@ export function usePropertyForm({ property, open, onClose }: Props) {
     property: PropertyForForm | null | undefined,
   ): PropertySchemaType => ({
     newCadNumber: property?.newCadNumber || '',
+    newHouseNumber: property?.newHouseNumber || '',
     type: property?.type || '',
     streetId: property?.streetId || '',
   });
@@ -54,6 +55,12 @@ export function usePropertyForm({ property, open, onClose }: Props) {
 
     toast.success('Obyekt muvaffaqiyatli tahrirlandi');
     queryClient.invalidateQueries({ queryKey: ['property', property.id] });
+    queryClient.invalidateQueries({
+      queryKey: ['properties-map', property.mahallaId],
+    });
+    queryClient.invalidateQueries({
+      queryKey: ['properties-list', property.mahallaId],
+    });
     onClose();
     setIsSubmitting(false);
   };

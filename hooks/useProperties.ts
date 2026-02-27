@@ -6,7 +6,7 @@ export function useProperties(mahallaCode: string | null) {
   const { data: properties = [], isLoading: isLoadingProperties } = useQuery<
     PropertyWithRelations[]
   >({
-    queryKey: ['properties', mahallaCode],
+    queryKey: ['properties-map', mahallaCode],
     queryFn: () => (mahallaCode ? fetchProperties(mahallaCode) : []),
     enabled: !!mahallaCode,
   });

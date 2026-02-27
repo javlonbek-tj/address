@@ -223,19 +223,32 @@ export function useMapHandlers({
 
   const onEachProperty = useCallback(
     (feature: Feature, layer: Layer) => {
-      const props = feature.properties as { id: string; cadNumber: string };
+      const props = feature.properties as {
+        id: string;
+        cadNumber: string;
+        newCadNumber?: string;
+      };
+      const isDone = !!props.newCadNumber;
 
       layer.on({
         mouseover: (e) => {
           const l = e.target as Path;
           if (typeof l.setStyle === 'function') {
-            l.setStyle(MAP_LEVEL_STYLES.highlight.property);
+            l.setStyle(
+              isDone
+                ? MAP_LEVEL_STYLES.highlight.propertyDone
+                : MAP_LEVEL_STYLES.highlight.property,
+            );
           }
         },
         mouseout: (e) => {
           const l = e.target as Path;
           if (typeof l.setStyle === 'function') {
-            l.setStyle(MAP_LEVEL_STYLES.property);
+            l.setStyle(
+              isDone
+                ? MAP_LEVEL_STYLES.propertyDone
+                : MAP_LEVEL_STYLES.property,
+            );
           }
         },
         click: (e) => {

@@ -11,6 +11,7 @@ export const propertySchema = z.object({
     ),
   type: z.string().trim().min(1, 'Majburiy maydon'),
   streetId: z.string().trim().min(1, 'Majburiy maydon'),
+  newHouseNumber: z.string().trim().min(1, 'Majburiy maydon'),
 });
 
 export type PropertySchemaType = z.infer<typeof propertySchema>;

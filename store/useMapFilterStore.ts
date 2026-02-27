@@ -28,21 +28,24 @@ interface MapFilterState {
   setShowProperties: (show: boolean) => void;
 
   setBaseMap: (baseMap: BaseMapKey) => void;
+  resetFilters: () => void;
 }
 
-export const useMapFilterStore = create<MapFilterState>((set) => ({
+const initialState = {
   selectedRegion: '',
   selectedDistrict: '',
   selectedMahalla: '',
   selectedStreet: '',
-
   showRegions: true,
   showDistricts: true,
   showMahallas: true,
   showStreets: true,
   showProperties: true,
+  baseMap: 'osm' as BaseMapKey,
+};
 
-  baseMap: 'osm',
+export const useMapFilterStore = create<MapFilterState>((set) => ({
+  ...initialState,
 
   setSelectedRegion: (id) =>
     set({
@@ -74,4 +77,6 @@ export const useMapFilterStore = create<MapFilterState>((set) => ({
   setShowProperties: (show) => set({ showProperties: show }),
 
   setBaseMap: (baseMap) => set({ baseMap }),
+
+  resetFilters: () => set(initialState),
 }));
