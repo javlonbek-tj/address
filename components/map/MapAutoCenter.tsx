@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo } from 'react';
+import { useEffect } from 'react';
 import { useMap } from 'react-leaflet';
 import { LatLngBounds } from 'leaflet';
 
@@ -10,7 +10,7 @@ interface MapAutoCenterProps {
 
 export function MapAutoCenter({ bounds }: MapAutoCenterProps) {
   const map = useMap();
-  useMemo(() => {
+  useEffect(() => {
     if (bounds) {
       map.fitBounds(bounds, { padding: [40, 40], animate: true });
     } else {

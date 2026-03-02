@@ -13,4 +13,5 @@ export enum ApiRoutes {
   LIST_REGIONS = '/regions/list',
   LIST_DISTRICTS = '/districts/list',
   LIST_MAHALLAS = '/mahallas/list',
+  USERS = '/users',
 }

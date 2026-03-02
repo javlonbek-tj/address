@@ -14,9 +14,9 @@ import {
   FormSelectField,
   FormInputField,
   Spinner,
+  CadastralInput,
 } from '@/components/shared';
 import { cn } from '@/lib/utils';
-import { CadastralInput } from './CadastralInput';
 import { useStreetsByDistrictId } from '@/hooks/useStreets';
 import { useProperty } from '@/hooks/useProperties';
 import { usePropertySheetStore } from '@/store/usePropertySheetStore';
@@ -32,6 +32,7 @@ export function PropertyDetailsSheet() {
     property,
     open: isOpen,
     onClose: close,
+    markAsSubmitted: () => {},
   });
 
   const { streets, isLoadingStreets } =

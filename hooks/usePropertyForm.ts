@@ -1,33 +1,42 @@
 'use client';
 
 import { useQueryClient } from '@tanstack/react-query';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import type { PropertySchemaType } from '@/lib';
 import { propertySchema } from '@/lib';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { updateProperty } from '@/app/actions';
 import toast from 'react-hot-toast';
-import type { PropertyForForm } from '@/types';
-import { useEffect } from 'react';
+import type { Property, PropertyForForm } from '@/types';
 
 interface Props {
-  property: PropertyForForm | null | undefined;
+  property: Property | PropertyForForm | null;
   open: boolean;
   onClose: () => void;
+  markAsSubmitted?: () => void;
 }
 
-export function usePropertyForm({ property, open, onClose }: Props) {
+export function usePropertyForm({
+  property,
+  open,
+  onClose,
+  markAsSubmitted,
+}: Props) {
   const queryClient = useQueryClient();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const getFormattedValues = (
-    property: PropertyForForm | null | undefined,
+    property: Property | PropertyForForm | null,
   ): PropertySchemaType => ({
+    cadNumber: property?.cadNumber || '',
     newCadNumber: property?.newCadNumber || '',
     newHouseNumber: property?.newHouseNumber || '',
-    type: property?.type || '',
-    streetId: property?.streetId || '',
+    type: property?.type || 'residential',
+    regionId: property?.district?.region?.id || '',
+    districtId: property?.district?.id || '',
+    mahallaId: property?.mahalla?.code || '',
+    streetId: property?.street?.code || null,
   });
 
   const form = useForm<PropertySchemaType>({
@@ -36,7 +45,7 @@ export function usePropertyForm({ property, open, onClose }: Props) {
   });
 
   useEffect(() => {
-    if (open && property) {
+    if (open) {
       form.reset(getFormattedValues(property));
     }
   }, [property, form, open]);
@@ -48,18 +57,20 @@ export function usePropertyForm({ property, open, onClose }: Props) {
     const result = await updateProperty(property.id, data);
 
     if (!result.success) {
-      toast.error(result.message || 'Obyektni saqlashda xatolik yuz berdi');
+      toast.error(
+        result.message || "Ko'chmas mulkni saqlashda xatolik yuz berdi",
+      );
       setIsSubmitting(false);
       return;
     }
 
-    toast.success('Obyekt muvaffaqiyatli tahrirlandi');
-    queryClient.invalidateQueries({ queryKey: ['property', property.id] });
+    markAsSubmitted?.();
+    toast.success("Ko'chmas mulk muvaffaqiyatli tahrirlandi");
     queryClient.invalidateQueries({
-      queryKey: ['properties-map', property.mahallaId],
+      queryKey: ['properties-table'],
     });
     queryClient.invalidateQueries({
-      queryKey: ['properties-list', property.mahallaId],
+      queryKey: ['properties-map'],
     });
     onClose();
     setIsSubmitting(false);

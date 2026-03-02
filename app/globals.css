@@ -141,11 +141,18 @@
   }
 }
 
-.dark .leaflet-layer,
+.dark .leaflet-layer:not(.sputnik-layer),
 .dark .leaflet-control-zoom-in,
 .dark .leaflet-control-zoom-out,
 .dark .leaflet-control-attribution {
   filter: invert(100%) hue-rotate(180deg) brightness(95%) contrast(90%);
+}
+
+.dark .satellite-active .leaflet-layer,
+.dark .satellite-active .leaflet-control-zoom-in,
+.dark .satellite-active .leaflet-control-zoom-out,
+.dark .satellite-active .leaflet-control-attribution {
+  filter: none;
 }
 
 .leaflet-tooltip.map-label {

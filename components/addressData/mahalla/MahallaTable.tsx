@@ -14,11 +14,12 @@ import { CopyableCode, PaginationWrapper, Spinner } from '@/components/shared';
 import { TableActions } from '../table';
 import { DeleteDialog } from '@/components/shared/modal';
 import { deleteMahalla } from '@/app/actions/admin';
-import { useSearchParams } from 'next/navigation';
+import { useSearchParams, useRouter } from 'next/navigation';
 import { useQueryClient } from '@tanstack/react-query';
 
 export function MahallaTable() {
   const searchParams = useSearchParams();
+  const router = useRouter();
   const queryClient = useQueryClient();
 
   const page = Number(searchParams.get('page')) || 1;
@@ -206,6 +207,7 @@ export function MahallaTable() {
                           id={mahalla.id}
                           onEdit={() => handleEdit(mahalla)}
                           onDelete={() => setDeleteId(mahalla.id)}
+                          onView={() => router.push(`/mahallas/${mahalla.id}`)}
                         />
                       </td>
                     </tr>

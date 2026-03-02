@@ -96,6 +96,8 @@ export function MahallaFormDialog({
       } else {
         form.setValue(`mergingMahallas.${index}.name`, '');
       }
+    } else {
+      form.setValue(`mergingMahallas.${index}.name`, '');
     }
   };
 
@@ -107,6 +109,8 @@ export function MahallaFormDialog({
       } else {
         form.setValue(`mergedInto.${index}.name`, '');
       }
+    } else {
+      form.setValue(`mergedInto.${index}.name`, '');
     }
   };
 
@@ -255,6 +259,7 @@ export function MahallaFormDialog({
                         name={`mergingMahallas.${index}.mahallaCode`}
                         label='UzKad kodi'
                         placeholder='UzKad kodi'
+                        onClear={() => handleMergingMahallaIdChange(index, '')}
                         onChange={(e) => {
                           form.setValue(
                             `mergingMahallas.${index}.mahallaCode`,
@@ -268,6 +273,7 @@ export function MahallaFormDialog({
                         name={`mergingMahallas.${index}.name`}
                         label='Mahalla nomi'
                         placeholder='Nomi'
+                        hasClearBtn={false}
                         disabled
                       />
 
@@ -433,6 +439,7 @@ export function MahallaFormDialog({
                         name={`mergedInto.${index}.mahallaCode`}
                         label='UzKad kodi'
                         placeholder='UzKad kodi'
+                        onClear={() => handleMergedIntoIdChange(index, '')}
                         onChange={(e) => {
                           form.setValue(
                             `mergedInto.${index}.mahallaCode`,
@@ -446,6 +453,7 @@ export function MahallaFormDialog({
                         name={`mergedInto.${index}.name`}
                         label='Mahalla nomi'
                         placeholder='Nomi'
+                        hasClearBtn={false}
                         disabled
                       />
 

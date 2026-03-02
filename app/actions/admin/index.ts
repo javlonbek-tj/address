@@ -4,3 +4,4 @@ export * from './property-action';
 export * from './district-action';
 export * from './mahalla-action';
 export * from './file-action';
+export * from './user-action';

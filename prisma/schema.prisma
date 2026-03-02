@@ -92,15 +92,14 @@ model Street {
   type      String
   oldNameId String?
   oldName   String?
-  uzKadCode String
+  uzKadCode String?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   districtId String
   district   District @relation(fields: [districtId], references: [id])
-  mahallaId  String
-  mahalla    Mahalla  @relation(fields: [mahallaId], references: [code], onDelete: Cascade)
+  mahalla    Mahalla[]
 
   properties Property[]
 
@@ -139,7 +138,7 @@ model User {
   fullName    String?
   phoneNumber String?
 
-  role   UserRole
+  role   UserRole  @default(district_user)
   status UserStatus @default(active)
   isActive Boolean @default(true)
 

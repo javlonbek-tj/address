@@ -104,3 +104,41 @@ export async function getRegionsList(): Promise<Region[]> {
     return [];
   }
 }
+export async function getRegionById(id: string) {
+  try {
+    const region = await prisma.region.findUnique({
+      where: { id },
+      include: {
+        districts: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
+      },
+    });
+
+    if (!region) return null;
+
+    const districtIds = region.districts.map((d) => d.id);
+
+    const [mahallaCount, streetCount, propertyCount] = await Promise.all([
+      prisma.mahalla.count({ where: { districtId: { in: districtIds } } }),
+      prisma.street.count({ where: { districtId: { in: districtIds } } }),
+      prisma.property.count({ where: { districtId: { in: districtIds } } }),
+    ]);
+
+    return {
+      ...region,
+      stats: {
+        districtCount: region.districts.length,
+        mahallaCount,
+        streetCount,
+        propertyCount,
+      },
+    };
+  } catch (error) {
+    console.error('Failed to fetch region by ID:', error);
+    return null;
+  }
+}

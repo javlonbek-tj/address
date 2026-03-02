@@ -10,7 +10,7 @@ export type StreetWithMetadata = StreetType & {
     id: string;
     name: string;
     code: string;
-  };
+  }[];
   metadata?: {
     length: number;
     bearing: number;
@@ -23,18 +23,22 @@ export type Street = {
   id: string;
   name: string;
   code: string;
-  uzKadCode: string;
+  uzKadCode: string | null;
   type: string;
   oldName: string | null;
   district: {
+    id: string;
     name: string;
     region: {
+      id: string;
       name: string;
     };
   };
   mahalla: {
+    id: string;
     name: string;
-  };
+    code: string;
+  }[];
 };
 
 export type StreetTableData = {

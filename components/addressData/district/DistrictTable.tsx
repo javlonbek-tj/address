@@ -12,11 +12,12 @@ import {
 import { DataTable } from '../table';
 import { DeleteDialog } from '@/components/shared';
 import { deleteDistrict } from '@/app/actions';
-import { useSearchParams } from 'next/navigation';
+import { useSearchParams, useRouter } from 'next/navigation';
 import { useQueryClient } from '@tanstack/react-query';
 
 export function DistrictTable() {
   const searchParams = useSearchParams();
+  const router = useRouter();
   const queryClient = useQueryClient();
 
   const page = Number(searchParams.get('page')) || 1;
@@ -81,6 +82,7 @@ export function DistrictTable() {
           data={districts}
           onEdit={handleEdit}
           onDelete={setDeleteId}
+          onView={(id: string) => router.push(`/districts/${id}`)}
           isLoading={isLoading}
           pagination={{
             currentPage: page,

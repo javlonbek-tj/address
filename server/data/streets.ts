@@ -1,12 +1,9 @@
 import 'server-only';
 
 import { prisma } from '../prisma';
-import type { Street as StreetModel } from '@/lib/generated/prisma/client';
 import type { Street } from '@/types';
 
-export async function getStreetsByDistrictId(
-  districtId: string,
-): Promise<StreetModel[]> {
+export async function getStreetsByDistrictId(districtId: string) {
   if (!districtId) return [];
 
   const streets = await prisma.street.findMany({
@@ -51,9 +48,11 @@ export const getStreets = async (): Promise<Street[]> => {
         oldName: true,
         district: {
           select: {
+            id: true,
             name: true,
             region: {
               select: {
+                id: true,
                 name: true,
               },
             },
@@ -61,7 +60,9 @@ export const getStreets = async (): Promise<Street[]> => {
         },
         mahalla: {
           select: {
+            id: true,
             name: true,
+            code: true,
           },
         },
       },
@@ -123,7 +124,7 @@ export async function getStreetTableData(
     };
 
     if (mahallaId !== 'all') {
-      where.mahallaId = mahallaId;
+      where.mahalla = { some: { code: mahallaId } };
     } else if (districtId !== 'all') {
       where.districtId = districtId;
     } else if (regionId !== 'all') {
@@ -166,6 +167,7 @@ export async function getStreetTableData(
             select: {
               id: true,
               name: true,
+              code: true,
             },
           },
         },
@@ -190,5 +192,43 @@ export async function getStreetTableData(
       page,
       limit,
     };
+  }
+}
+export async function getStreetById(id: string) {
+  try {
+    const street = await prisma.street.findUnique({
+      where: { id },
+      include: {
+        district: {
+          select: {
+            id: true,
+            name: true,
+            region: {
+              select: {
+                id: true,
+                name: true,
+              },
+            },
+          },
+        },
+        mahalla: {
+          select: {
+            id: true,
+            name: true,
+            code: true,
+          },
+        },
+        _count: {
+          select: {
+            properties: true,
+          },
+        },
+      },
+    });
+
+    return street;
+  } catch (error) {
+    console.error('Failed to fetch street by ID:', error);
+    return null;
   }
 }

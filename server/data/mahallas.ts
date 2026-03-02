@@ -173,3 +173,49 @@ export const getMahallaByCode = async (code: string) => {
     return null;
   }
 };
+export async function getMahallaById(id: string) {
+  try {
+    const mahalla = await prisma.mahalla.findUnique({
+      where: { id },
+      include: {
+        district: {
+          select: {
+            id: true,
+            name: true,
+            region: {
+              select: {
+                id: true,
+                name: true,
+              },
+            },
+          },
+        },
+        mergedInto: {
+          select: {
+            id: true,
+            name: true,
+            code: true,
+          },
+        },
+        mergedMahallas: {
+          select: {
+            id: true,
+            name: true,
+            code: true,
+          },
+        },
+        _count: {
+          select: {
+            streets: true,
+            properties: true,
+          },
+        },
+      },
+    });
+
+    return mahalla;
+  } catch (error) {
+    console.error('Failed to fetch mahalla by ID:', error);
+    return null;
+  }
+}

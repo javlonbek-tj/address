@@ -1,6 +1,14 @@
-import { useQuery } from '@tanstack/react-query';
-import { PropertyForForm, PropertyWithRelations } from '@/types';
-import { fetchProperties, fetchPropertyById } from '@/services';
+import type {
+  PropertyForForm,
+  PropertyTableData,
+  PropertyWithRelations,
+} from '@/types';
+import {
+  fetchProperties,
+  fetchPropertyById,
+  fetchPropertyTableData,
+} from '@/services';
+import { keepPreviousData, useQuery } from '@tanstack/react-query';
 
 export function useProperties(mahallaCode: string | null) {
   const { data: properties = [], isLoading: isLoadingProperties } = useQuery<
@@ -23,4 +31,50 @@ export function useProperty(propertyId: string) {
     });
 
   return { property, isLoadingProperty };
+}
+
+export function usePropertiesTableData({
+  page,
+  limit,
+  search,
+  regionId,
+  districtId,
+  mahallaId,
+  streetId,
+}: {
+  page: number;
+  limit: number;
+  search: string;
+  regionId: string;
+  districtId: string;
+  mahallaId: string;
+  streetId: string;
+}) {
+  const { data, isPending: isLoadingPropertyTableData } =
+    useQuery<PropertyTableData>({
+      queryKey: [
+        'properties-table',
+        page,
+        limit,
+        search,
+        regionId,
+        districtId,
+        mahallaId,
+        streetId,
+      ],
+      queryFn: () =>
+        fetchPropertyTableData(
+          page,
+          limit,
+          search,
+          regionId,
+          districtId,
+          mahallaId,
+          streetId,
+        ),
+      staleTime: Infinity,
+      placeholderData: keepPreviousData,
+    });
+
+  return { data, isLoadingPropertyTableData };
 }

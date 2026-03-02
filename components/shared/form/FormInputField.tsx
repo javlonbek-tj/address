@@ -17,6 +17,7 @@ interface Props extends React.InputHTMLAttributes<HTMLInputElement> {
   hasClearBtn?: boolean;
   suffix?: React.ReactNode;
   controlled?: boolean;
+  onClear?: () => void;
 }
 
 export function FormInputField({
@@ -28,6 +29,7 @@ export function FormInputField({
   hasClearBtn = true,
   suffix,
   controlled = false,
+  onClear: onClearProp,
   ...props
 }: Props) {
   const {
@@ -42,7 +44,10 @@ export function FormInputField({
   const value = controlled ? props.value : watch(name);
   const fieldError = errors[name];
   const isFieldInvalid = !!fieldError;
-  const onClear = () => setValue(name, '', { shouldValidate: true });
+  const onClear = () => {
+    setValue(name, '', { shouldValidate: true });
+    if (onClearProp) onClearProp();
+  };
 
   // Register props only when not controlled
   const registeredProps = controlled
@@ -73,7 +78,7 @@ export function FormInputField({
             {...registeredProps}
             aria-invalid={isFieldInvalid}
             {...props}
-            className={cn('pr-20 h-10 text-md', className)}
+            className={cn('pr-10 h-10 text-md', className)}
           />
           {value && !suffix && hasClearBtn && <ClearButton onClick={onClear} />}
           {suffix && (

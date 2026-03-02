@@ -1,7 +1,9 @@
+'use client';
+
 import { formatCadastralNumber } from '@/lib';
 import { useCallback } from 'react';
-import { FormInputField } from '../shared';
 import { useFormContext } from 'react-hook-form';
+import { FormInputField } from './FormInputField';
 
 interface Props {
   name: string;
@@ -15,15 +17,15 @@ export const CadastralInput = ({ name, label = 'Kadastr raqami' }: Props) => {
   const handleChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
       const formatted = formatCadastralNumber(e.target.value);
-      setValue(name, formatted, { shouldValidate: false }); // ← don't validate on every keystroke
-      clearErrors(name); // ← clear error manually as user types
+      setValue(name, formatted, { shouldValidate: false });
+      clearErrors(name);
     },
     [name, setValue, clearErrors],
   );
 
   return (
     <FormInputField
-      controlled // ← skips register(), no double-binding
+      controlled
       value={value}
       onChange={handleChange}
       placeholder='12:10:44:02:01:0295'

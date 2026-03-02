@@ -11,11 +11,12 @@ import {
 import { DataTable } from '../table';
 import { DeleteDialog } from '@/components/shared';
 import { deleteRegion } from '@/app/actions';
-import { useSearchParams } from 'next/navigation';
+import { useSearchParams, useRouter } from 'next/navigation';
 import { useQueryClient } from '@tanstack/react-query';
 
 export function RegionTable() {
   const searchParams = useSearchParams();
+  const router = useRouter();
 
   const page = Number(searchParams.get('page')) || 1;
   const limit = Number(searchParams.get('limit')) || 10;
@@ -68,6 +69,7 @@ export function RegionTable() {
           data={regions}
           onEdit={handleEdit}
           onDelete={setDeleteId}
+          onView={(id: string) => router.push(`/regions/${id}`)}
           isLoading={isLoading}
           pagination={{
             currentPage: page,

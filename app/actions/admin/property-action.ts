@@ -17,23 +17,45 @@ export async function updateProperty(
     };
   }
 
-  const { newCadNumber, newHouseNumber, type, streetId } =
-    validationResult.data;
+  const {
+    cadNumber,
+    newCadNumber,
+    newHouseNumber,
+    type,
+    streetId,
+    mahallaId,
+    districtId,
+  } = validationResult.data;
 
   try {
+    // Check if cadNumber already exists
+    const existingCad = await prisma.property.findFirst({
+      where: {
+        cadNumber,
+        NOT: { id },
+      },
+    });
+
+    if (existingCad) {
+      return {
+        success: false,
+        message: 'Ushbu eski kadastr raqami allaqachon mavjud',
+      };
+    }
+
     // Check if newCadNumber already exists (if provided)
     if (newCadNumber) {
-      const existingProperty = await prisma.property.findFirst({
+      const existingNewCad = await prisma.property.findFirst({
         where: {
-          OR: [{ newCadNumber }, { cadNumber: newCadNumber }],
+          newCadNumber,
           NOT: { id },
         },
       });
 
-      if (existingProperty) {
+      if (existingNewCad) {
         return {
           success: false,
-          message: 'Ushbu kadastr raqami allaqachon mavjud',
+          message: 'Ushbu yangi kadastr raqami allaqachon mavjud',
         };
       }
     }
@@ -41,28 +63,62 @@ export async function updateProperty(
     const updatedProperty = await prisma.property.update({
       where: { id },
       data: {
-        newCadNumber,
-        newHouseNumber,
-        type,
-        streetId,
+        cadNumber,
+        newCadNumber: newCadNumber || null,
+        newHouseNumber: newHouseNumber || null,
+        type: type || 'residential',
+        streetId: streetId || null,
+        mahallaId,
+        districtId,
       },
       include: {
         district: {
           select: {
+            id: true,
             name: true,
             region: {
               select: {
+                id: true,
                 name: true,
               },
             },
           },
         },
+        mahalla: {
+          select: {
+            id: true,
+            name: true,
+            code: true,
+          },
+        },
+        street: {
+          select: {
+            id: true,
+            name: true,
+            code: true,
+          },
+        },
       },
     });
 
-    return { success: true, data: updatedProperty };
+    return { success: true, data: updatedProperty as any };
   } catch (error) {
     console.error('Failed to update property:', error);
+    return { success: false, error: 'INTERNAL_SERVER_ERROR' };
+  }
+}
+
+export async function deleteProperty(
+  id: string,
+): Promise<ActionResult<PropertyWithRelations>> {
+  try {
+    const deletedProperty = await prisma.property.update({
+      where: { id },
+      data: { isActive: false },
+    });
+    return { success: true, data: deletedProperty as any };
+  } catch (error) {
+    console.error('Failed to delete property:', error);
     return { success: false, error: 'INTERNAL_SERVER_ERROR' };
   }
 }

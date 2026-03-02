@@ -1,6 +1,6 @@
 'use client';
 
-import { StreetTableFilters } from './';
+import { StreetTableFilters, StreetFormDialog } from './';
 import type { Street } from '@/types';
 import {
   useTableActions,
@@ -15,11 +15,12 @@ import { CopyableCode, PaginationWrapper, Spinner } from '@/components/shared';
 import { TableActions } from '../table';
 import { DeleteDialog } from '@/components/shared/modal';
 import { deleteStreet } from '@/app/actions';
-import { useSearchParams } from 'next/navigation';
+import { useSearchParams, useRouter } from 'next/navigation';
 import { useQueryClient } from '@tanstack/react-query';
 
 export function StreetTable() {
   const searchParams = useSearchParams();
+  const router = useRouter();
   const queryClient = useQueryClient();
 
   const page = Number(searchParams.get('page')) || 1;
@@ -190,16 +191,17 @@ export function StreetTable() {
                         <CopyableCode code={street.code} />
                       </td>
                       <td className='px-6 py-2 font-bold text-gray-600 dark:text-gray-300 text-xs whitespace-nowrap'>
-                        {street.mahalla.name}
+                        {street.mahalla?.map((m) => m.name).join(', ')}
                       </td>
                       <td className='px-6 py-2 font-bold text-gray-600 dark:text-gray-300 text-xs whitespace-nowrap'>
-                        <CopyableCode code={street.uzKadCode} />
+                        <CopyableCode code={street.uzKadCode || ''} />
                       </td>
                       <td className='px-6 py-2 whitespace-nowrap'>
                         <TableActions
                           id={street.id}
                           onEdit={() => handleEdit(street)}
                           onDelete={() => setDeleteId(street.id)}
+                          onView={() => router.push(`/streets/${street.id}`)}
                         />
                       </td>
                     </tr>
@@ -227,13 +229,13 @@ export function StreetTable() {
       </div>
 
       {/* StreetFormDialog will be implemented later if needed */}
-      {/* <StreetFormDialog
+      <StreetFormDialog
         open={isFormOpen}
         onClose={handleCloseForm}
         street={editingItem as Street}
         regions={regions}
         districts={districts}
-      /> */}
+      />
 
       <DeleteDialog
         open={!!deleteId}
