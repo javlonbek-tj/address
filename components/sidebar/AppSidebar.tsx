@@ -7,8 +7,6 @@ import {
   Sidebar,
   SidebarContent,
   SidebarGroup,
-  SidebarGroupContent,
-  SidebarGroupLabel,
   SidebarHeader,
   SidebarMenu,
   SidebarMenuButton,
@@ -76,7 +74,7 @@ export function AppSidebar() {
                 </SidebarMenuItem>
               ))}
 
-            <Collapsible defaultOpen className='group/collapsible'>
+            <Collapsible className='group/collapsible'>
               <SidebarMenuItem className='border-sidebar-border/50 border-b last:border-b-0'>
                 <CollapsibleTrigger asChild>
                   <SidebarMenuButton

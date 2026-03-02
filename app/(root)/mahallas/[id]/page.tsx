@@ -218,7 +218,7 @@ async function MahallaDetailContent({ id }: { id: string }) {
           )}
         </div>
 
-        <Card className='bg-white dark:bg-gray-900 dark:border-white/20 flex flex-col h-125 lg:h-full min-h-[500px] overflow-hidden'>
+        <Card className='bg-white dark:bg-gray-900 dark:border-white/20 flex flex-col h-125 lg:h-full min-h-125 overflow-hidden'>
           <CardHeader>
             <CardTitle className='flex items-center gap-2 text-base'>
               <Map className='w-5 h-5' />
