@@ -6,4 +6,3 @@ export { MapLayersControl } from './MapLayersControl';
 export { MapControls } from './MapControls';
 export { StreetPopup } from './StreetPopup';
 export { MapResizeHandler } from './MapResizeHandler';
-export { PropertyDetailsSheet } from './PropertyDetailsSheet';

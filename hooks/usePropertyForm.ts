@@ -3,15 +3,20 @@
 import { useQueryClient } from '@tanstack/react-query';
 import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
-import type { PropertySchemaType } from '@/lib';
-import { propertySchema } from '@/lib';
+import {
+  propertySchema,
+  updatePropertySchema,
+  createPropertySchema,
+  type PropertySchemaType,
+} from '@/lib';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { updateProperty } from '@/app/actions';
+import { createProperty, updateProperty } from '@/app/actions';
 import toast from 'react-hot-toast';
 import type { Property, PropertyForForm } from '@/types';
 
 interface Props {
   property: Property | PropertyForForm | null;
+  geometry?: any | null;
   open: boolean;
   onClose: () => void;
   markAsSubmitted?: () => void;
@@ -19,6 +24,7 @@ interface Props {
 
 export function usePropertyForm({
   property,
+  geometry,
   open,
   onClose,
   markAsSubmitted,
@@ -28,44 +34,59 @@ export function usePropertyForm({
 
   const getFormattedValues = (
     property: Property | PropertyForForm | null,
+    geometry?: any | null,
   ): PropertySchemaType => ({
     cadNumber: property?.cadNumber || '',
     newCadNumber: property?.newCadNumber || '',
     newHouseNumber: property?.newHouseNumber || '',
     type: property?.type || 'residential',
-    regionId: property?.district?.region?.id || '',
-    districtId: property?.district?.id || '',
-    mahallaId: property?.mahalla?.code || '',
-    streetId: property?.street?.code || null,
+    regionId: (property as any)?.district?.region?.id || '',
+    districtId: (property as any)?.district?.id || '',
+    mahallaId: (property as any)?.mahalla?.code || '',
+    streetId: (property as any)?.street?.code || null,
+    geometry: geometry || (property as any)?.geometry || null,
   });
 
   const form = useForm<PropertySchemaType>({
-    resolver: zodResolver(propertySchema),
-    defaultValues: getFormattedValues(property),
+    resolver: zodResolver(
+      property?.id ? updatePropertySchema : createPropertySchema,
+    ),
+    defaultValues: getFormattedValues(property, geometry),
   });
 
   useEffect(() => {
     if (open) {
-      form.reset(getFormattedValues(property));
+      form.reset(getFormattedValues(property, geometry));
     }
-  }, [property, form, open]);
+  }, [property, geometry, form, open]);
 
   const onSubmit = async (data: PropertySchemaType) => {
-    if (!property) return;
-
     setIsSubmitting(true);
-    const result = await updateProperty(property.id, data);
+    let result;
+
+    if (property?.id) {
+      result = await updateProperty(property.id, data);
+    } else {
+      result = await createProperty(data);
+    }
 
     if (!result.success) {
       toast.error(
-        result.message || "Ko'chmas mulkni saqlashda xatolik yuz berdi",
+        result.message ||
+          (property?.id
+            ? "Ko'chmas mulkni tahrirlashda xatolik yuz berdi"
+            : "Yangi ko'chmas mulk yaratishda xatolik yuz berdi"),
       );
       setIsSubmitting(false);
       return;
     }
 
     markAsSubmitted?.();
-    toast.success("Ko'chmas mulk muvaffaqiyatli tahrirlandi");
+    toast.success(
+      property?.id
+        ? "Ko'chmas mulk muvaffaqiyatli tahrirlandi"
+        : "Yangi ko'chmas mulk muvaffaqiyatli yaratildi",
+    );
     queryClient.invalidateQueries({
       queryKey: ['properties-table'],
     });

@@ -8,16 +8,6 @@ const UzbekistanMap = dynamic(() => import('@/components/map/UzbekistanMap'), {
   loading: () => <Spinner />,
 });
 
-const PropertyDetailsSheet = dynamic(
-  () =>
-    import('@/components/map/PropertyDetailsSheet').then(
-      (mod) => mod.PropertyDetailsSheet,
-    ),
-  {
-    ssr: false,
-  },
-);
-
 export default function HomePage() {
   const { regions, isLoadingRegions } = useRegions();
 
@@ -29,10 +19,5 @@ export default function HomePage() {
     return <ErrorMessage className='min-h-[calc(100vh-4rem)]' />;
   }
 
-  return (
-    <>
-      <UzbekistanMap regions={regions} />;
-      <PropertyDetailsSheet />
-    </>
-  );
+  return <UzbekistanMap regions={regions} />;
 }

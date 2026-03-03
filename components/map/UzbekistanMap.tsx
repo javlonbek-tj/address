@@ -14,6 +14,10 @@ import { useStats } from '@/hooks/useStats';
 import { useMapHighlighting } from '@/hooks/useMapHighlighting';
 import { MapAutoCenter } from './MapAutoCenter';
 import { MapEvents } from './MapEvents';
+import { MapDrawControl } from './MapDrawControl';
+import { PropertyFormDialog } from '../addressData/property/PropertyFormDialog';
+import { useProperty } from '@/hooks/useProperties';
+import { usePropertySheetStore } from '@/store/usePropertySheetStore';
 import {
   MapZoomManager,
   MapFilters,
@@ -57,6 +61,21 @@ export default function UzbekistanMap({ regions }: UzbekistanMapProps) {
   const showProperties = useMapFilterStore((state) => state.showProperties);
   const baseMap = useMapFilterStore((state) => state.baseMap);
   const resetFilters = useMapFilterStore((state) => state.resetFilters);
+
+  // Drawing state
+  const isCreatePropertyOpen = useMapFilterStore(
+    (state) => state.isCreatePropertyOpen,
+  );
+  const setIsCreatePropertyOpen = useMapFilterStore(
+    (state) => state.setIsCreatePropertyOpen,
+  );
+  const drawGeometry = useMapFilterStore((state) => state.drawGeometry);
+  const setDrawGeometry = useMapFilterStore((state) => state.setDrawGeometry);
+
+  // Property update state
+  const { selectedPropertyId, close: closePropertyForm } =
+    usePropertySheetStore();
+  const { property: selectedProperty } = useProperty(selectedPropertyId || '');
 
   useEffect(() => {
     return () => {
@@ -143,6 +162,31 @@ export default function UzbekistanMap({ regions }: UzbekistanMapProps) {
         <MapAutoCenter bounds={mapBounds} />
         <MapEvents onMapClick={handleBackToRegions} />
         <MapZoomManager />
+        {showProperties && !!selectedDistrict && <MapDrawControl />}
+
+        {isCreatePropertyOpen && (
+          <PropertyFormDialog
+            open={isCreatePropertyOpen}
+            onClose={() => {
+              setIsCreatePropertyOpen(false);
+              setDrawGeometry(null);
+            }}
+            property={null}
+            geometry={drawGeometry}
+            regions={regions}
+            districts={districts}
+          />
+        )}
+
+        {!!selectedPropertyId && (
+          <PropertyFormDialog
+            open={!!selectedPropertyId}
+            onClose={closePropertyForm}
+            property={selectedProperty}
+            regions={regions}
+            districts={districts}
+          />
+        )}
 
         {currentStreet && showStreets && (
           <StreetPopup

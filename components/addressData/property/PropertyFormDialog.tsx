@@ -1,6 +1,8 @@
 'use client';
 
+import { useEffect } from 'react';
 import { FormProvider } from 'react-hook-form';
+import * as turf from '@turf/turf';
 import {
   FormActions,
   FormInputField,
@@ -18,13 +20,14 @@ import {
   useMahallasList,
   useStreetsByDistrictId,
 } from '@/hooks';
-import type { Property, Region, District } from '@/types';
+import type { Property, PropertyForForm, Region, District } from '@/types';
 import { CadastralInput } from '@/components/shared';
 
 interface Props {
   open: boolean;
   onClose: () => void;
-  property: Property | null;
+  property: Property | PropertyForForm | null;
+  geometry?: any | null;
   regions: Region[];
   districts: District[];
 }
@@ -33,17 +36,57 @@ export function PropertyFormDialog({
   open,
   onClose,
   property,
+  geometry,
   regions,
   districts,
 }: Props) {
   const { form, isSubmitting, onSubmit } = usePropertyForm({
     property,
+    geometry,
     open,
     onClose,
     markAsSubmitted: () => {},
   });
 
-  const propertyDistrictId = property?.district?.id;
+  // Automatic region and district detection when drawing
+  useEffect(() => {
+    if (open && geometry && !property?.id) {
+      try {
+        let center: number[];
+
+        if (geometry.type === 'Point') {
+          center = geometry.coordinates;
+        } else {
+          center = turf.coordAll(turf.centroid(geometry))[0];
+        }
+
+        const point = turf.point(center);
+
+        // Find region
+        const region = regions.find((r: any) => {
+          if (!r.geometry) return false;
+          return turf.booleanPointInPolygon(point, r.geometry as any);
+        });
+
+        if (region) {
+          form.setValue('regionId', region.id);
+          // Find district
+          const district = districts.find((d: any) => {
+            if (!d.geometry || d.regionId !== (region as any).id) return false;
+            return turf.booleanPointInPolygon(point, d.geometry as any);
+          });
+
+          if (district) {
+            form.setValue('districtId', district.id);
+          }
+        }
+      } catch (error) {
+        console.error('Error auto-detecting location:', error);
+      }
+    }
+  }, [open, geometry, property, regions, districts, form]);
+
+  const propertyDistrictId = form.watch('districtId') || property?.district?.id;
 
   const { mahallas = [] } = useMahallasList(propertyDistrictId || 'all');
   const { streets = [] } = useStreetsByDistrictId(propertyDistrictId || 'all');
@@ -106,8 +149,6 @@ export function PropertyFormDialog({
               />
 
               <CadastralInput name='newCadNumber' label='Yangi kadastr' />
-
-              <CadastralInput name='cadNumber' label='Eski kadastr' />
 
               <FormInputField
                 name='newHouseNumber'

@@ -15,6 +15,11 @@ interface MapFilterState {
 
   baseMap: BaseMapKey;
 
+  // Drawing state
+  isDrawing: boolean;
+  drawGeometry: any | null;
+  isCreatePropertyOpen: boolean;
+
   // Actions
   setSelectedRegion: (id: string) => void;
   setSelectedDistrict: (id: string) => void;
@@ -28,6 +33,12 @@ interface MapFilterState {
   setShowProperties: (show: boolean) => void;
 
   setBaseMap: (baseMap: BaseMapKey) => void;
+
+  // Drawing actions
+  setIsDrawing: (isDrawing: boolean) => void;
+  setDrawGeometry: (geometry: any | null) => void;
+  setIsCreatePropertyOpen: (isOpen: boolean) => void;
+
   resetFilters: () => void;
 }
 
@@ -42,6 +53,9 @@ const initialState = {
   showStreets: true,
   showProperties: true,
   baseMap: 'osm' as BaseMapKey,
+  isDrawing: false,
+  drawGeometry: null,
+  isCreatePropertyOpen: false,
 };
 
 export const useMapFilterStore = create<MapFilterState>((set) => ({
@@ -77,6 +91,10 @@ export const useMapFilterStore = create<MapFilterState>((set) => ({
   setShowProperties: (show) => set({ showProperties: show }),
 
   setBaseMap: (baseMap) => set({ baseMap }),
+
+  setIsDrawing: (isDrawing) => set({ isDrawing }),
+  setDrawGeometry: (drawGeometry) => set({ drawGeometry }),
+  setIsCreatePropertyOpen: (isOpen) => set({ isCreatePropertyOpen: isOpen }),
 
   resetFilters: () => set(initialState),
 }));

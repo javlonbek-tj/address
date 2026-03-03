@@ -109,16 +109,17 @@ model Street {
 
 model Property {
   id           String   @id @default(cuid())
-  cadNumber    String   @unique
+  cadNumber    String?   @unique
   newCadNumber String?   @unique
   newHouseNumber String?
-  type         String?   @default("residential")
+  type         String   @default("residential")
+  isNew        Boolean  @default(false)
 
   districtId String
   district   District @relation(fields: [districtId], references: [id], onDelete: Cascade)
 
-  mahallaId String
-  mahalla   Mahalla  @relation(fields: [mahallaId], references: [code], onDelete: Cascade)
+  mahallaId String?
+  mahalla   Mahalla?  @relation(fields: [mahallaId], references: [code], onDelete: Cascade)
 
   streetId String?
   street   Street?   @relation(fields: [streetId], references: [code], onDelete: Cascade)
