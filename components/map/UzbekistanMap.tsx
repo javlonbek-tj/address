@@ -146,7 +146,7 @@ export default function UzbekistanMap({ regions }: UzbekistanMapProps) {
   };
 
   return (
-    <div className='relative w-full h-full'>
+    <div className='relative w-full h-full min-h-0 flex-1'>
       <MapFilters
         regions={regions}
         filterState={{ districts, mahallas, streets, isLoading }}
