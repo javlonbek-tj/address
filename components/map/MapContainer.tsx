@@ -24,11 +24,11 @@ export const MapContainer = ({
       className={`h-full w-full ${baseMap === 'satellite' ? 'satellite-active' : ''}`}
     >
       <RLMapContainer
-        center={[41.377, 64.585]} // Default center: Uzbekistan
+        center={[41.377, 64.585]}
         zoom={6}
         maxZoom={selectedBase.maxZoom + 1}
-        className={className}
         zoomControl={true}
+        className={className}
       >
         <TileLayer
           url={selectedBase.url}

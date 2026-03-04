@@ -6,19 +6,23 @@ import { ThemeProvider } from '@/contexts/ThemeContext';
 
 export default function RootLayout({
   children,
-}: Readonly<{ children: React.ReactNode }>) {
+}: {
+  children: React.ReactNode;
+}) {
   return (
     <ThemeProvider attribute='class' defaultTheme='system' enableSystem>
       <SidebarProvider defaultOpen>
-        <>
+        <div className='flex h-screen min-h-0 w-full'>
           <AppSidebar />
-          <div className='flex flex-col flex-1 border-l min-w-0 min-h-0'>
+
+          <div className='flex flex-col flex-1 min-w-0 min-h-0 border-l'>
             <Header />
-            <SidebarInset className='bg-blue-50 dark:bg-gray-900 h-screen'>
+
+            <SidebarInset className='flex-1 bg-blue-50 dark:bg-gray-900'>
               {children}
             </SidebarInset>
           </div>
-        </>
+        </div>
       </SidebarProvider>
     </ThemeProvider>
   );
