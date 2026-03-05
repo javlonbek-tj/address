@@ -2,12 +2,13 @@
 
 import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
+import { useQueryClient } from '@tanstack/react-query';
+import { zodResolver } from '@hookform/resolvers/zod';
+import toast from 'react-hot-toast';
+
 import type { Region } from '@/types';
 import { updateRegion } from '@/app/actions';
-import toast from 'react-hot-toast';
-import { useQueryClient } from '@tanstack/react-query';
 import { RegionSchemaType, regionSchema } from '@/lib';
-import { zodResolver } from '@hookform/resolvers/zod';
 
 interface Props {
   region: Region;
@@ -20,8 +21,8 @@ export function useRegionForm({ region, open, onClose }: Props) {
   const [submitting, setIsSubmitting] = useState(false);
 
   const getFormattedValues = (region: Region): RegionSchemaType => ({
-    name: region?.name || '',
-    code: region?.code || '',
+    name: region?.name,
+    code: region?.code,
   });
 
   const form = useForm<RegionSchemaType>({

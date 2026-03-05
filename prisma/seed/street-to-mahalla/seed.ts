@@ -1,3 +1,5 @@
+import 'server-only';
+
 import * as xlsx from 'xlsx';
 import path from 'path';
 import { prisma } from '@/server/prisma';

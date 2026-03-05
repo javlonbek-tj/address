@@ -4,7 +4,6 @@ import { useState, useMemo, useEffect } from 'react';
 import { GeoJSON, Marker } from 'react-leaflet';
 import L, { LatLngBounds } from 'leaflet';
 import { Feature, FeatureCollection } from 'geojson';
-import type { Region } from '@/lib/generated/prisma/client';
 import { MapContainer } from './MapContainer';
 import { MAP_LEVEL_STYLES } from '@/lib/constants/map';
 import { formatMapStatistics } from '@/lib/utils';
@@ -15,7 +14,8 @@ import { useMapHighlighting } from '@/hooks/useMapHighlighting';
 import { MapAutoCenter } from './MapAutoCenter';
 import { MapEvents } from './MapEvents';
 import { MapDrawControl } from './MapDrawControl';
-import { PropertyFormDialog } from '../addressData/property/PropertyFormDialog';
+import { CreatePropertyDialog } from '../addressData/property/CreatePropertyDialog';
+import { UpdatePropertyDialog } from '../addressData/property/UpdatePropertyDialog';
 import { useProperty } from '@/hooks/useProperties';
 import { usePropertySheetStore } from '@/store/usePropertySheetStore';
 import {
@@ -33,6 +33,7 @@ interface UzbekistanMapProps {
   regions: Region[];
 }
 import { useMapFilterStore } from '@/store/useMapFilterStore';
+import { District, Property, Region } from '@/types';
 
 export default function UzbekistanMap({ regions }: UzbekistanMapProps) {
   const { districts, mahallas, streets, properties, isLoading } =
@@ -165,26 +166,25 @@ export default function UzbekistanMap({ regions }: UzbekistanMapProps) {
         {showProperties && !!selectedDistrict && <MapDrawControl />}
 
         {isCreatePropertyOpen && (
-          <PropertyFormDialog
+          <CreatePropertyDialog
             open={isCreatePropertyOpen}
             onClose={() => {
               setIsCreatePropertyOpen(false);
               setDrawGeometry(null);
             }}
-            property={null}
             geometry={drawGeometry}
-            regions={regions}
-            districts={districts}
+            regions={regions as Region[]}
+            districts={districts as District[]}
           />
         )}
 
-        {!!selectedPropertyId && (
-          <PropertyFormDialog
+        {!!selectedPropertyId && selectedProperty && (
+          <UpdatePropertyDialog
             open={!!selectedPropertyId}
             onClose={closePropertyForm}
-            property={selectedProperty}
-            regions={regions}
-            districts={districts}
+            property={selectedProperty as Property}
+            regions={regions as Region[]}
+            districts={districts as District[]}
           />
         )}
 

@@ -1,14 +1,16 @@
 'use server';
 
-import { prisma } from '@/server/prisma';
 import { revalidatePath } from 'next/cache';
+
+import { prisma } from '@/server/prisma';
 import {
   UserRole,
   UserStatus,
   RegionUserPosition,
 } from '@/lib/generated/prisma/enums';
+import type { User } from '@/lib/generated/prisma/client';
 
-export async function createUser(data: any) {
+export async function createUser(data: User) {
   try {
     const user = await prisma.user.create({
       data: {
@@ -34,7 +36,7 @@ export async function createUser(data: any) {
   }
 }
 
-export async function updateUser(id: string, data: any) {
+export async function updateUser(id: string, data: User) {
   try {
     const user = await prisma.user.update({
       where: { id },

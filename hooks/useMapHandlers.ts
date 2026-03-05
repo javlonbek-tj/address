@@ -4,9 +4,8 @@ import { useEffect, useRef, useCallback } from 'react';
 import { Feature } from 'geojson';
 import { Layer, LatLngBounds, Path } from 'leaflet';
 import L from 'leaflet';
-import type { Region } from '@/lib/generated/prisma/client';
 import { MAP_LEVEL_STYLES } from '@/lib/constants/map';
-import { PropertyWithRelations } from '@/types';
+import { PropertyWithRelations, Region } from '@/types';
 import { usePropertySheetStore } from '@/store/usePropertySheetStore';
 
 interface Props {

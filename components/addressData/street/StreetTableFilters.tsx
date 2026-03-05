@@ -1,5 +1,7 @@
 'use client';
 
+import { Loader2Icon } from 'lucide-react';
+
 import { Input } from '@/components/ui/input';
 import {
   Select,
@@ -8,7 +10,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Loader2Icon } from 'lucide-react';
 import type { District, Region } from '@/types';
 
 interface Props {

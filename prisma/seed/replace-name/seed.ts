@@ -1,3 +1,5 @@
+import 'server-only';
+
 import 'dotenv/config';
 import { prisma } from '@/server/prisma';
 import * as xlsx from 'xlsx';

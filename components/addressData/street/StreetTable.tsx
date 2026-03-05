@@ -1,5 +1,8 @@
 'use client';
 
+import { useSearchParams, useRouter } from 'next/navigation';
+import { useQueryClient } from '@tanstack/react-query';
+
 import { StreetTableFilters, StreetFormDialog } from './';
 import type { Street } from '@/types';
 import {
@@ -15,8 +18,6 @@ import { CopyableCode, PaginationWrapper, Spinner } from '@/components/shared';
 import { TableActions } from '../table';
 import { DeleteDialog } from '@/components/shared/modal';
 import { deleteStreet } from '@/app/actions';
-import { useSearchParams, useRouter } from 'next/navigation';
-import { useQueryClient } from '@tanstack/react-query';
 
 export function StreetTable() {
   const searchParams = useSearchParams();

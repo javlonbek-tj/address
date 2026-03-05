@@ -1,5 +1,8 @@
 'use client';
 
+import { useSearchParams, useRouter } from 'next/navigation';
+import { useQueryClient } from '@tanstack/react-query';
+
 import { DistrictFormDialog, DistrictTableFilters } from './';
 import type { District, Region } from '@/types';
 import {
@@ -12,8 +15,6 @@ import {
 import { DataTable } from '../table';
 import { DeleteDialog } from '@/components/shared';
 import { deleteDistrict } from '@/app/actions';
-import { useSearchParams, useRouter } from 'next/navigation';
-import { useQueryClient } from '@tanstack/react-query';
 
 export function DistrictTable() {
   const searchParams = useSearchParams();

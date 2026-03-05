@@ -8,6 +8,7 @@ import { Spinner } from '@/components/shared';
 import { getPropertyDetailById } from '@/server/data/properties';
 import { notFound } from 'next/navigation';
 import { Badge } from '@/components/ui/badge';
+import type { Geometry } from 'geojson';
 
 export default async function PropertyDetailPage(props: {
   params: Promise<{ id: string }>;
@@ -78,7 +79,13 @@ async function PropertyDetailContent({ id }: { id: string }) {
                 <span className='font-medium text-muted-foreground col-span-1'>
                   Mahalla:
                 </span>
-                <span className='col-span-2'>{property.mahalla.name}</span>
+                <span className='col-span-2'>
+                  {property.mahalla?.name || (
+                    <span className='text-muted-foreground italic'>
+                      Mavjud emas
+                    </span>
+                  )}
+                </span>
               </div>
               <div className='grid grid-cols-3 gap-2 border-b border-gray-100 dark:border-gray-800 pb-2'>
                 <span className='font-medium text-muted-foreground col-span-1'>
@@ -165,7 +172,9 @@ async function PropertyDetailContent({ id }: { id: string }) {
             </CardTitle>
           </CardHeader>
           <CardContent className='flex-1 p-0 relative'>
-            <DetailMapWrapper geometry={property.geometry} />
+            <DetailMapWrapper
+              geometry={property.geometry as unknown as Geometry}
+            />
           </CardContent>
         </Card>
       </div>

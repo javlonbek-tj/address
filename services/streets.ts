@@ -1,6 +1,6 @@
 import { axiosInstance } from './instance';
 import { ApiRoutes } from './apiRoutes';
-import type { StreetWithMetadata } from '@/types';
+import type { StreetTableData, StreetWithMetadata } from '@/types';
 
 export const fetchStreets = async (districtId: string) => {
   const { data } = await axiosInstance.get<{
@@ -28,7 +28,7 @@ export const fetchStreetTableData = async (
 ) => {
   const { data } = await axiosInstance.get<{
     success: boolean;
-    data: any;
+    data: StreetTableData;
   }>(ApiRoutes.STREETS, {
     params: { page, limit, search, regionId, districtId, mahallaId },
   });

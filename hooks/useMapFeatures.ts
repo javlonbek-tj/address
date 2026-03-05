@@ -3,19 +3,17 @@
 import { useMemo } from 'react';
 import { Geometry } from 'geojson';
 import * as turf from '@turf/turf';
-import type {
-  Region as RegionModel,
-  District as DistrictModel,
-} from '@/lib/generated/prisma/client';
 import {
   MahallaWithRelations,
   StreetWithMetadata,
   PropertyWithRelations,
+  Region,
+  District,
 } from '@/types';
 
 interface Props {
-  regions: RegionModel[];
-  districts: DistrictModel[];
+  regions: Region[];
+  districts: District[];
   mahallas: MahallaWithRelations[];
   streets: StreetWithMetadata[];
   properties: PropertyWithRelations[];

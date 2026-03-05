@@ -2,6 +2,16 @@
 
 import { Controller, useFieldArray, FormProvider } from 'react-hook-form';
 import {
+  Check,
+  ChevronDown,
+  FileText,
+  Plus,
+  Trash2,
+  Upload,
+} from 'lucide-react';
+import { useState } from 'react';
+
+import {
   FileUploadInput,
   FormActions,
   FormInputField,
@@ -15,21 +25,11 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { Field, FieldError, FieldLabel } from '@/components/ui/field';
-
 import { Checkbox } from '@/components/ui/checkbox';
 import { useFileUpload, useMahallaForm } from '@/hooks';
 import type { District, Mahalla, Region } from '@/types';
-import {
-  Check,
-  ChevronDown,
-  FileText,
-  Plus,
-  Trash2,
-  Upload,
-} from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { ACCEPTED_DOCUMENT_TYPES } from '@/lib';
-import { useState } from 'react';
 import { fetchMahallaByCode } from '@/services';
 
 interface Props {

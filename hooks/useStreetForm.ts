@@ -3,11 +3,12 @@
 import { useQueryClient } from '@tanstack/react-query';
 import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import toast from 'react-hot-toast';
+
 import type { StreetSchemaType } from '@/lib';
 import { streetSchema } from '@/lib';
-import { zodResolver } from '@hookform/resolvers/zod';
 import { updateStreet } from '@/app/actions';
-import toast from 'react-hot-toast';
 import type { Street } from '@/types';
 
 interface Props {
@@ -27,17 +28,17 @@ export function useStreetForm({
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const getFormattedValues = (street: Street): StreetSchemaType => ({
-    name: street?.name || '',
-    code: street?.code || '',
-    type: street?.type || '',
-    uzKadCode: street?.uzKadCode || '',
+    name: street?.name,
+    code: street?.code,
+    type: street?.type,
+    uzKadCode: street?.uzKadCode,
     mahallas:
-      street?.mahalla?.map((m: any) => ({
+      street?.mahalla.map((m) => ({
         mahallaCode: m.code,
         name: m.name,
       })) || [],
-    regionId: street?.district?.region?.id || '',
-    districtId: street?.district?.id || '',
+    regionId: street?.district?.region?.id,
+    districtId: street?.district?.id,
   });
 
   const form = useForm<StreetSchemaType>({

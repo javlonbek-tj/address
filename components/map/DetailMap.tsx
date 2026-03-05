@@ -2,6 +2,7 @@
 
 import { MapContainer, TileLayer, GeoJSON, LayersControl } from 'react-leaflet';
 import L from 'leaflet';
+import type { Geometry } from 'geojson';
 import 'leaflet/dist/leaflet.css';
 import { useMemo, useEffect, useState } from 'react';
 import { MAP_LEVEL_STYLES } from '@/lib/constants/map';
@@ -9,7 +10,7 @@ import { MAP_LEVEL_STYLES } from '@/lib/constants/map';
 const { BaseLayer } = LayersControl;
 
 interface DetailMapProps {
-  geometry: any;
+  geometry: Geometry;
 }
 
 export default function DetailMap({ geometry }: DetailMapProps) {

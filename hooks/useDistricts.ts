@@ -1,7 +1,6 @@
 import { fetchDistricts, fetchDistrictsList } from '@/services';
 import { useQuery, keepPreviousData } from '@tanstack/react-query';
-import type { District } from '@/lib/generated/prisma/client';
-import { DistrictTableData } from '@/types';
+import { District, DistrictTableData } from '@/types';
 import { fetchDistrictTableData } from '@/services';
 
 export function useDistricts(regionId: string) {

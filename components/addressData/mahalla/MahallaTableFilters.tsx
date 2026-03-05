@@ -1,5 +1,7 @@
 'use client';
 
+import { Loader2Icon } from 'lucide-react';
+
 import { Input } from '@/components/ui/input';
 import {
   Select,
@@ -8,8 +10,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Loader2Icon } from 'lucide-react';
 import type { District, Region } from '@/types';
+import { MAHALLA_OPTIMIZATION_OPTIONS } from '@/lib';
 
 interface Props {
   search: string;
@@ -123,12 +125,15 @@ export function MahallaTableFilters({
           <SelectItem value='all' className='text-xs 2xl:text-sm'>
             Holati
           </SelectItem>
-          <SelectItem value='true' className='text-xs 2xl:text-sm'>
-            Optimallashgan
-          </SelectItem>
-          <SelectItem value='false' className='text-xs 2xl:text-sm'>
-            Optimallashmagan
-          </SelectItem>
+          {MAHALLA_OPTIMIZATION_OPTIONS.map((opt) => (
+            <SelectItem
+              key={opt.id}
+              value={opt.id}
+              className='text-xs 2xl:text-sm'
+            >
+              {opt.name}
+            </SelectItem>
+          ))}
         </SelectContent>
       </Select>
     </div>

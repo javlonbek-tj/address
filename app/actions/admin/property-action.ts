@@ -5,12 +5,13 @@ import type { ActionResult, PropertyWithRelations } from '@/types';
 import {
   updatePropertySchema,
   createPropertySchema,
-  type PropertySchemaType,
+  type UpdatePropertySchemaType,
+  type CreatePropertySchemaType,
 } from '@/lib';
 
 export async function updateProperty(
   id: string,
-  data: PropertySchemaType,
+  data: UpdatePropertySchemaType,
 ): Promise<ActionResult<PropertyWithRelations>> {
   const validationResult = updatePropertySchema.safeParse(data);
 
@@ -18,8 +19,6 @@ export async function updateProperty(
     return {
       success: false,
       error: 'VALIDATION_ERROR',
-      message:
-        validationResult.error.format()._errors[0] || 'Validatsiya xatosi',
     };
   }
 
@@ -64,10 +63,12 @@ export async function updateProperty(
           select: {
             id: true,
             name: true,
+            code: true,
             region: {
               select: {
                 id: true,
                 name: true,
+                code: true,
               },
             },
           },
@@ -97,7 +98,7 @@ export async function updateProperty(
 }
 
 export async function createProperty(
-  data: PropertySchemaType,
+  data: CreatePropertySchemaType,
 ): Promise<ActionResult<PropertyWithRelations>> {
   const validationResult = createPropertySchema.safeParse(data);
 
@@ -105,8 +106,6 @@ export async function createProperty(
     return {
       success: false,
       error: 'VALIDATION_ERROR',
-      message:
-        validationResult.error.format()._errors[0] || 'Validatsiya xatosi',
     };
   }
 
@@ -145,7 +144,7 @@ export async function createProperty(
         streetId: streetId,
         mahallaId,
         districtId,
-        geometry: geometry,
+        geometry: geometry as any,
         isActive: true,
       },
       include: {
@@ -153,10 +152,12 @@ export async function createProperty(
           select: {
             id: true,
             name: true,
+            code: true,
             region: {
               select: {
                 id: true,
                 name: true,
+                code: true,
               },
             },
           },

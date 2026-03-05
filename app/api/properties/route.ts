@@ -10,6 +10,7 @@ export async function GET(request: NextRequest) {
     const districtId = request.nextUrl.searchParams.get('districtId') || '';
     const mahallaId = request.nextUrl.searchParams.get('mahallaId') || '';
     const streetId = request.nextUrl.searchParams.get('streetId') || '';
+    const isNew = request.nextUrl.searchParams.get('isNew') || '';
 
     const data = await getPropertyTableData({
       page,
@@ -19,6 +20,7 @@ export async function GET(request: NextRequest) {
       districtId,
       mahallaId,
       streetId,
+      isNew,
     });
 
     return Response.json({ success: true, data });

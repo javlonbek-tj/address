@@ -1,5 +1,8 @@
 'use client';
 
+import { useSearchParams, useRouter } from 'next/navigation';
+import { useQueryClient } from '@tanstack/react-query';
+
 import { MahallaFormDialog, MahallaTableFilters } from './';
 import type { District, Mahalla, Region } from '@/types';
 import {
@@ -14,8 +17,6 @@ import { CopyableCode, PaginationWrapper, Spinner } from '@/components/shared';
 import { TableActions } from '../table';
 import { DeleteDialog } from '@/components/shared/modal';
 import { deleteMahalla } from '@/app/actions/admin';
-import { useSearchParams, useRouter } from 'next/navigation';
-import { useQueryClient } from '@tanstack/react-query';
 
 export function MahallaTable() {
   const searchParams = useSearchParams();

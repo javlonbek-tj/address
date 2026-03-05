@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import type { BaseMapKey } from '@/lib/constants/map';
+import type { Geometry } from 'geojson';
 
 interface MapFilterState {
   selectedRegion: string;
@@ -17,7 +18,7 @@ interface MapFilterState {
 
   // Drawing state
   isDrawing: boolean;
-  drawGeometry: any | null;
+  drawGeometry: Geometry | null;
   isCreatePropertyOpen: boolean;
 
   // Actions
@@ -36,7 +37,7 @@ interface MapFilterState {
 
   // Drawing actions
   setIsDrawing: (isDrawing: boolean) => void;
-  setDrawGeometry: (geometry: any | null) => void;
+  setDrawGeometry: (geometry: Geometry | null) => void;
   setIsCreatePropertyOpen: (isOpen: boolean) => void;
 
   resetFilters: () => void;

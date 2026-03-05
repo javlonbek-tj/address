@@ -1,6 +1,10 @@
 'use client';
 
+import { useSearchParams, useRouter } from 'next/navigation';
+import { useQueryClient } from '@tanstack/react-query';
+
 import { PropertyTableFilters } from './PropertyTableFilters';
+import { UpdatePropertyDialog } from './UpdatePropertyDialog';
 import type { Property } from '@/types';
 import {
   useTableFilters,
@@ -13,12 +17,9 @@ import {
   useDelete,
 } from '@/hooks';
 import { CopyableCode, PaginationWrapper, Spinner } from '@/components/shared';
-import { useSearchParams, useRouter } from 'next/navigation';
 import { TableActions } from '../table';
 import { DeleteDialog } from '@/components/shared/modal';
 import { deleteProperty } from '@/app/actions';
-import { useQueryClient } from '@tanstack/react-query';
-import { PropertyFormDialog } from './PropertyFormDialog';
 
 export function PropertyTable() {
   const searchParams = useSearchParams();
@@ -32,6 +33,7 @@ export function PropertyTable() {
   const districtId = searchParams.get('districtId') || 'all';
   const mahallaId = searchParams.get('mahallaId') || 'all';
   const streetId = searchParams.get('streetId') || 'all';
+  const isNew = searchParams.get('isNew') || 'all';
 
   const { data: propertyTableData, isLoadingPropertyTableData } =
     usePropertiesTableData({
@@ -42,6 +44,7 @@ export function PropertyTable() {
       districtId,
       mahallaId,
       streetId,
+      isNew,
     });
 
   const { regions, isLoadingRegions } = useRegionsList();
@@ -134,6 +137,7 @@ export function PropertyTable() {
           handleFilterChange={handleFilterChange}
           streets={streets}
           isLoadingStreets={isLoadingStreets}
+          isNew={isNew}
         />
 
         <div className='p-4 overflow-hidden'>
@@ -166,6 +170,9 @@ export function PropertyTable() {
                   <th className='px-6 py-3 font-bold text-[10px] text-gray-800 dark:text-gray-300 3xl:text-xs text-left uppercase leading-none tracking-widest'>
                     Yangi uy raqami
                   </th>
+                  <th className='px-6 py-3 font-bold text-[10px] text-gray-800 dark:text-gray-300 3xl:text-xs text-center uppercase leading-none tracking-widest'>
+                    Holati
+                  </th>
                   <th className='px-6 py-3 pr-8 2xl:pr-10 font-bold text-[10px] text-gray-800 dark:text-gray-300 3xl:text-xs text-right uppercase leading-none tracking-widest'>
                     Amallar
                   </th>
@@ -177,7 +184,7 @@ export function PropertyTable() {
                 {properties.length === 0 && !isLoading ? (
                   <tr>
                     <td
-                      colSpan={9}
+                      colSpan={10}
                       className='px-6 py-12 font-medium text-gray-800 dark:text-gray-400 text-sm text-center'
                     >
                       Ma&apos;lumot topilmadi
@@ -199,7 +206,7 @@ export function PropertyTable() {
                         {property.district.name}
                       </td>
                       <td className='px-6 py-2 font-bold text-gray-600 dark:text-gray-300 text-xs whitespace-nowrap'>
-                        {property.mahalla.name}
+                        {property.mahalla?.name}
                       </td>
                       <td className='px-6 py-2 font-bold text-gray-600 dark:text-gray-300 text-xs whitespace-nowrap'>
                         {property.street?.name || '-'}
@@ -212,6 +219,13 @@ export function PropertyTable() {
                       </td>
                       <td className='px-6 py-2 font-bold text-gray-600 text-center dark:text-gray-300 text-xs whitespace-nowrap'>
                         {property.newHouseNumber || '-'}
+                      </td>
+                      <td className='px-6 py-2 font-bold text-gray-600 text-center dark:text-gray-300 text-xs whitespace-nowrap'>
+                        <span
+                          className={`px-2 py-1 rounded-full text-[10px] ${property.isNew ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' : 'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-400'}`}
+                        >
+                          {property.isNew ? 'Yangi' : 'Eski'}
+                        </span>
                       </td>
                       <td className='px-6 py-2 whitespace-nowrap text-right'>
                         <TableActions
@@ -247,13 +261,15 @@ export function PropertyTable() {
         </div>
       </div>
 
-      <PropertyFormDialog
-        open={isFormOpen}
-        onClose={handleCloseForm}
-        property={editingItem}
-        regions={regions}
-        districts={districts}
-      />
+      {isFormOpen && editingItem && (
+        <UpdatePropertyDialog
+          open={isFormOpen}
+          onClose={handleCloseForm}
+          property={editingItem}
+          regions={regions}
+          districts={districts}
+        />
+      )}
 
       <DeleteDialog
         open={!!deleteId}

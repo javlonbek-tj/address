@@ -1,5 +1,7 @@
 'use client';
 
+import { Loader2Icon } from 'lucide-react';
+
 import { Input } from '@/components/ui/input';
 import {
   Select,
@@ -8,7 +10,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Loader2Icon } from 'lucide-react';
+import { IS_NEW_OPTIONS } from '@/lib';
 
 interface Props {
   search: string;
@@ -28,6 +30,7 @@ interface Props {
   handleFilterChange: (key: string, value: string) => void;
   streets: { id: string; name: string; code: string }[];
   isLoadingStreets: boolean;
+  isNew: string;
 }
 
 export function PropertyTableFilters({
@@ -48,6 +51,7 @@ export function PropertyTableFilters({
   handleFilterChange,
   streets,
   isLoadingStreets,
+  isNew,
 }: Props) {
   return (
     <div className='flex flex-wrap items-center gap-3 p-4 border-gray-100 dark:border-gray-700 border-b'>
@@ -189,6 +193,35 @@ export function PropertyTableFilters({
               className='text-xs 2xl:text-sm'
             >
               {street.name}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+
+      <Select
+        value={isNew}
+        onValueChange={(value) => handleFilterChange('isNew', value)}
+      >
+        <SelectTrigger
+          className='dark:bg-gray-700 shadow-sm w-40 dark:text-white'
+          size='sm'
+        >
+          <SelectValue
+            placeholder='Yangi/Eski'
+            className='text-xs 2xl:text-sm'
+          />
+        </SelectTrigger>
+        <SelectContent className='dark:bg-gray-700 dark:text-white'>
+          <SelectItem value='all' className='text-xs 2xl:text-sm'>
+            Yangi/Eski
+          </SelectItem>
+          {IS_NEW_OPTIONS.map((opt) => (
+            <SelectItem
+              key={opt.id}
+              value={opt.id}
+              className='text-xs 2xl:text-sm'
+            >
+              {opt.name}
             </SelectItem>
           ))}
         </SelectContent>

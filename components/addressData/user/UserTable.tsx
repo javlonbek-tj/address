@@ -1,6 +1,11 @@
 'use client';
 
+import { useSearchParams } from 'next/navigation';
+import { useQueryClient } from '@tanstack/react-query';
+
 import { UserTableFilters } from './UserTableFilters';
+import { CreateUserDialog } from './CreateUserDialog';
+import { UpdateUserDialog } from './UpdateUserDialog';
 import {
   useTableFilters,
   useRegionsList,
@@ -10,20 +15,17 @@ import {
 } from '@/hooks';
 import { useUsersTableData } from '@/hooks/useUsers';
 import { PaginationWrapper, Spinner } from '@/components/shared';
-import { useSearchParams } from 'next/navigation';
 import { TableActions } from '../table';
 import { DeleteDialog } from '@/components/shared/modal';
 import { deleteUser } from '@/app/actions/admin/user-action';
-import { useQueryClient } from '@tanstack/react-query';
-import { UserFormDialog } from './UserFormDialog';
 import { Badge } from '@/components/ui/badge';
-
-const roleLabels: any = {
-  superadmin: 'Superadmin',
-  admin: 'Admin',
-  region_user: 'Viloyat',
-  district_user: 'Tuman',
-};
+import {
+  REGION_USER_POSITION_LABELS,
+  USER_ROLE_LABELS,
+  USER_ROLES,
+  USER_STATUS_LABELS,
+  USER_STATUSES,
+} from '@/lib';
 
 export function UserTable() {
   const searchParams = useSearchParams();
@@ -172,16 +174,18 @@ export function UserTable() {
                       </td>
                       <td className='px-6 py-2 text-gray-600 dark:text-gray-300 text-xs whitespace-nowrap'>
                         <Badge variant='outline' className='font-normal'>
-                          {roleLabels[user.role] || user.role}
+                          {USER_ROLE_LABELS[
+                            user.role as keyof typeof USER_ROLE_LABELS
+                          ] || user.role}
                         </Badge>
                       </td>
                       <td className='px-6 py-2 text-gray-600 dark:text-gray-300 text-xs whitespace-nowrap'>
-                        {user.role === 'region_user'
-                          ? user.position === 'boss'
-                            ? "Sho'ba boshlig'i"
-                            : 'Bosh mutaxassis'
-                          : user.role === 'district_user'
-                            ? 'Tuman xodimi'
+                        {user.role === USER_ROLES.REGION_USER
+                          ? REGION_USER_POSITION_LABELS[
+                              user.position as keyof typeof REGION_USER_POSITION_LABELS
+                            ] || user.position
+                          : user.role === USER_ROLES.DISTRICT_USER
+                            ? USER_ROLE_LABELS[USER_ROLES.DISTRICT_USER]
                             : '-'}
                       </td>
                       <td className='px-6 py-2 text-gray-600 dark:text-gray-300 text-xs whitespace-nowrap'>
@@ -190,13 +194,15 @@ export function UserTable() {
                       <td className='px-6 py-2 text-gray-600 dark:text-gray-300 text-xs whitespace-nowrap'>
                         <Badge
                           variant={
-                            user.status === 'active'
+                            user.status === USER_STATUSES.ACTIVE
                               ? 'secondary'
                               : 'destructive'
                           }
-                          className={`font-normal ${user.status === 'active' ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' : ''}`}
+                          className={`font-normal ${user.status === USER_STATUSES.ACTIVE ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' : ''}`}
                         >
-                          {user.status === 'active' ? 'Faol' : 'Nofaol'}
+                          {USER_STATUS_LABELS[
+                            user.status as keyof typeof USER_STATUS_LABELS
+                          ] || user.status}
                         </Badge>
                       </td>
                       <td className='px-6 py-2 whitespace-nowrap text-right'>
@@ -230,13 +236,20 @@ export function UserTable() {
         </div>
       </div>
 
-      <UserFormDialog
-        open={isFormOpen}
-        onClose={handleCloseForm}
-        user={editingItem}
-        regions={regions}
-        districts={districts}
-      />
+      {editingItem ? (
+        <UpdateUserDialog
+          open={isFormOpen}
+          onClose={handleCloseForm}
+          user={editingItem}
+          regions={regions}
+        />
+      ) : (
+        <CreateUserDialog
+          open={isFormOpen}
+          onClose={handleCloseForm}
+          regions={regions}
+        />
+      )}
 
       <DeleteDialog
         open={!!deleteId}

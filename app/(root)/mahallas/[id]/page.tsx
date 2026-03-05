@@ -15,6 +15,7 @@ import { Spinner } from '@/components/shared';
 import { getMahallaById } from '@/server/data/mahallas';
 import { notFound } from 'next/navigation';
 import { Badge } from '@/components/ui/badge';
+import type { Geometry } from 'geojson';
 
 export default async function MahallaDetailPage(props: {
   params: Promise<{ id: string }>;
@@ -226,7 +227,9 @@ async function MahallaDetailContent({ id }: { id: string }) {
             </CardTitle>
           </CardHeader>
           <CardContent className='flex-1 p-0 relative'>
-            <DetailMapWrapper geometry={mahalla.geometry} />
+            <DetailMapWrapper
+              geometry={mahalla.geometry as unknown as Geometry}
+            />
           </CardContent>
         </Card>
       </div>

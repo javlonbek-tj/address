@@ -1,15 +1,17 @@
 'use client';
 
 import React from 'react';
-import type { Region } from '@/lib/generated/prisma/client';
 import { FilterSelect } from './FilterSelect';
 import { LatLngBounds } from 'leaflet';
 import L from 'leaflet';
 
 import { useMapFilterStore } from '@/store/useMapFilterStore';
-
-import { District } from '@/lib/generated/prisma/client';
-import { MahallaWithRelations, StreetWithMetadata } from '@/types';
+import {
+  District,
+  MahallaWithRelations,
+  Region,
+  StreetWithMetadata,
+} from '@/types';
 
 interface MapFiltersProps {
   regions: Region[];

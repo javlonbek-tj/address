@@ -8,6 +8,7 @@ import { Spinner } from '@/components/shared';
 import { getStreetById } from '@/server/data/streets';
 import { notFound } from 'next/navigation';
 import { Badge } from '@/components/ui/badge';
+import type { Geometry } from 'geojson';
 
 export default async function StreetDetailPage(props: {
   params: Promise<{ id: string }>;
@@ -158,7 +159,9 @@ async function StreetDetailContent({ id }: { id: string }) {
             </CardTitle>
           </CardHeader>
           <CardContent className='flex-1 p-0 relative'>
-            <DetailMapWrapper geometry={street.geometry} />
+            <DetailMapWrapper
+              geometry={street.geometry as unknown as Geometry}
+            />
           </CardContent>
         </Card>
       </div>

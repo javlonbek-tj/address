@@ -1,5 +1,6 @@
+import type { PropertyWhereInput } from '@/lib/generated/prisma/models';
 import { prisma } from '@/server/prisma';
-import { PropertyForForm } from '@/types';
+import type { Property, PropertyTableData } from '@/types';
 
 export async function getPropertiesByMahallaCode(mahallaCode: string) {
   return await prisma.property.findMany({
@@ -31,9 +32,7 @@ export async function getPropertiesByMahallaCode(mahallaCode: string) {
   });
 }
 
-export async function getPropertyById(
-  id: string,
-): Promise<PropertyForForm | null> {
+export async function getPropertyById(id: string): Promise<Property | null> {
   return await prisma.property.findUnique({
     where: {
       id,
@@ -43,7 +42,7 @@ export async function getPropertyById(
       cadNumber: true,
       newCadNumber: true,
       newHouseNumber: true,
-      mahallaId: true,
+      isNew: true,
       mahalla: {
         select: {
           id: true,
@@ -52,7 +51,6 @@ export async function getPropertyById(
         },
       },
       type: true,
-      streetId: true,
       street: {
         select: {
           id: true,
@@ -60,15 +58,16 @@ export async function getPropertyById(
           code: true,
         },
       },
-      districtId: true,
       district: {
         select: {
           id: true,
           name: true,
+          code: true,
           region: {
             select: {
               id: true,
               name: true,
+              code: true,
             },
           },
         },
@@ -86,8 +85,9 @@ export async function getPropertyTableData(
     districtId?: string;
     mahallaId?: string;
     streetId?: string;
+    isNew?: string;
   } = {},
-): Promise<any> {
+) {
   const {
     page = 1,
     limit = 10,
@@ -96,13 +96,14 @@ export async function getPropertyTableData(
     districtId = 'all',
     mahallaId = 'all',
     streetId = 'all',
+    isNew = 'all',
   } = params;
   const skip = (page - 1) * limit;
 
   try {
-    const where: any = {
+    const where: PropertyWhereInput = {
       isActive: true,
-      newCadNumber: { not: null, notIn: [''] }, // Only properties with newCadNumber
+      newCadNumber: { not: null, notIn: [''] },
     };
 
     if (streetId !== 'all') {
@@ -113,6 +114,10 @@ export async function getPropertyTableData(
       where.districtId = districtId;
     } else if (regionId !== 'all') {
       where.district = { regionId };
+    }
+
+    if (isNew !== 'all' && isNew) {
+      where.isNew = isNew === 'true';
     }
 
     if (search) {
@@ -132,6 +137,7 @@ export async function getPropertyTableData(
           newCadNumber: true,
           newHouseNumber: true,
           type: true,
+          isNew: true,
           district: {
             select: {
               id: true,

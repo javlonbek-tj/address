@@ -1,5 +1,7 @@
 'use client';
 
+import { Loader2Icon, Plus } from 'lucide-react';
+
 import { Input } from '@/components/ui/input';
 import {
   Select,
@@ -8,9 +10,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Loader2Icon, Plus } from 'lucide-react';
 import type { District, Region } from '@/types';
 import { Button } from '@/components/ui/button';
+import {
+  USER_ROLE_OPTIONS,
+  USER_STATUS_OPTIONS,
+  USER_ROLES,
+  USER_STATUSES,
+} from '@/lib';
 
 interface UserTableFiltersProps {
   search: string;
@@ -132,18 +139,15 @@ export function UserTableFilters({
           <SelectItem value='all' className='text-xs 2xl:text-sm'>
             Barcha rollar
           </SelectItem>
-          <SelectItem value='superadmin' className='text-xs 2xl:text-sm'>
-            Superadmin
-          </SelectItem>
-          <SelectItem value='admin' className='text-xs 2xl:text-sm'>
-            Admin
-          </SelectItem>
-          <SelectItem value='region_user' className='text-xs 2xl:text-sm'>
-            Viloyat xodimi
-          </SelectItem>
-          <SelectItem value='district_user' className='text-xs 2xl:text-sm'>
-            Tuman xodimi
-          </SelectItem>
+          {USER_ROLE_OPTIONS.map((opt) => (
+            <SelectItem
+              key={opt.id}
+              value={opt.id}
+              className='text-xs 2xl:text-sm'
+            >
+              {opt.name}
+            </SelectItem>
+          ))}
         </SelectContent>
       </Select>
 
@@ -158,12 +162,15 @@ export function UserTableFilters({
           <SelectItem value='all' className='text-xs 2xl:text-sm'>
             Barcha holatlar
           </SelectItem>
-          <SelectItem value='active' className='text-xs 2xl:text-sm'>
-            Faol
-          </SelectItem>
-          <SelectItem value='inactive' className='text-xs 2xl:text-sm'>
-            Nofaol
-          </SelectItem>
+          {USER_STATUS_OPTIONS.map((opt) => (
+            <SelectItem
+              key={opt.id}
+              value={opt.id}
+              className='text-xs 2xl:text-sm'
+            >
+              {opt.name}
+            </SelectItem>
+          ))}
         </SelectContent>
       </Select>
 

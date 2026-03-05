@@ -4,8 +4,7 @@ import {
   fetchRegionsList,
 } from '@/services';
 import { useQuery, keepPreviousData } from '@tanstack/react-query';
-import type { Region } from '@/lib/generated/prisma/client';
-import { RegionTableData } from '@/types';
+import { Region, RegionTableData } from '@/types';
 
 export function useRegions() {
   const { data: regions = [], isPending: isLoadingRegions } = useQuery<

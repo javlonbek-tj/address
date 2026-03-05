@@ -1,11 +1,14 @@
 import { NextRequest } from 'next/server';
 import { prisma } from '@/server';
+import type { MahallaWhereInput } from '@/lib/generated/prisma/models';
 
 export async function GET(request: NextRequest) {
   try {
     const districtId = request.nextUrl.searchParams.get('districtId');
 
-    const where: any = { isActive: true };
+    const where: MahallaWhereInput = {
+      isActive: true,
+    };
     if (districtId) {
       where.districtId = districtId;
     }

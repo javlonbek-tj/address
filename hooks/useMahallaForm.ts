@@ -1,15 +1,15 @@
 'use client';
 
 import { useQueryClient } from '@tanstack/react-query';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import toast from 'react-hot-toast';
+
 import type { MahallaSchemaType } from '@/lib';
 import { mahallaSchema } from '@/lib';
-import { zodResolver } from '@hookform/resolvers/zod';
 import { getFiles, updateMahalla } from '@/app/actions';
-import toast from 'react-hot-toast';
 import type { Mahalla } from '@/types';
-import { useEffect } from 'react';
 
 interface Props {
   mahalla: Mahalla;
@@ -31,24 +31,24 @@ export function useMahallaForm({
   >([]);
 
   const getFormattedValues = (mahalla: Mahalla): MahallaSchemaType => ({
-    name: mahalla?.name || '',
-    code: mahalla?.code || '',
-    uzKadName: mahalla?.uzKadName || '',
-    geoCode: mahalla?.geoCode || '',
-    oneId: mahalla?.oneId || '',
-    regionId: mahalla?.district?.region?.id || '',
-    districtId: mahalla?.district?.id || '',
-    oldName: mahalla?.oldName || null,
-    regulation: mahalla?.regulation || null,
-    regulationUrl: mahalla?.regulationUrl || null,
+    name: mahalla?.name,
+    code: mahalla?.code,
+    uzKadName: mahalla?.uzKadName,
+    geoCode: mahalla?.geoCode,
+    oneId: mahalla?.oneId,
+    regionId: mahalla?.district?.region?.id,
+    districtId: mahalla?.district?.id,
+    oldName: mahalla?.oldName,
+    regulation: mahalla?.regulation,
+    regulationUrl: mahalla?.regulationUrl,
     mergedInto:
-      mahalla?.mergedInto?.map((m) => ({
+      mahalla?.mergedInto.map((m) => ({
         mahallaCode: m.code,
         name: m.name,
       })) || [],
-    isOptimized: mahalla?.isOptimized || false,
+    isOptimized: mahalla?.isOptimized,
     mergingMahallas:
-      mahalla?.mergedMahallas?.map((m) => ({
+      mahalla?.mergedMahallas.map((m) => ({
         mahallaCode: m.code,
         name: m.name,
       })) || [],

@@ -1,5 +1,8 @@
 'use client';
 
+import { useSearchParams, useRouter } from 'next/navigation';
+import { useQueryClient } from '@tanstack/react-query';
+
 import { RegionFormDialog, RegionTableFilters } from './';
 import type { Region } from '@/types';
 import {
@@ -11,8 +14,6 @@ import {
 import { DataTable } from '../table';
 import { DeleteDialog } from '@/components/shared';
 import { deleteRegion } from '@/app/actions';
-import { useSearchParams, useRouter } from 'next/navigation';
-import { useQueryClient } from '@tanstack/react-query';
 
 export function RegionTable() {
   const searchParams = useSearchParams();

@@ -3,6 +3,7 @@ import 'server-only';
 import { prisma } from '../prisma';
 import type { Mahalla } from '@/types';
 import type { MahallaWithRelations } from '@/types';
+import type { MahallaWhereInput } from '@/lib/generated/prisma/models';
 
 export async function getMahallasByDistrictId(
   districtId: string,
@@ -65,7 +66,7 @@ export async function getMahallaTableData(
   const skip = (page - 1) * limit;
 
   try {
-    const where: any = {
+    const where: MahallaWhereInput = {
       isActive: true,
     };
 
@@ -82,15 +83,13 @@ export async function getMahallaTableData(
     }
 
     if (search) {
-      const searchTerms = [];
-      searchTerms.push({ name: { contains: search, mode: 'insensitive' } });
-      searchTerms.push({
-        uzKadName: { contains: search, mode: 'insensitive' },
-      });
-      searchTerms.push({ oneId: { contains: search, mode: 'insensitive' } });
-
-      searchTerms.push({ code: { contains: search, mode: 'insensitive' } });
-      searchTerms.push({ geoCode: { contains: search, mode: 'insensitive' } });
+      const searchTerms: MahallaWhereInput[] = [
+        { name: { contains: search, mode: 'insensitive' } },
+        { uzKadName: { contains: search, mode: 'insensitive' } },
+        { oneId: { contains: search, mode: 'insensitive' } },
+        { code: { contains: search, mode: 'insensitive' } },
+        { geoCode: { contains: search, mode: 'insensitive' } },
+      ];
 
       where.OR = searchTerms;
     }

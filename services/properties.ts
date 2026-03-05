@@ -1,6 +1,6 @@
 import { axiosInstance } from './instance';
 import { ApiRoutes } from './apiRoutes';
-import type { PropertyForForm, PropertyTableData } from '@/types';
+import type { Property, PropertyTableData } from '@/types';
 
 export async function fetchProperties(mahallaCode: string) {
   const { data } = await axiosInstance.get(ApiRoutes.MAP_PROPERTIES, {
@@ -11,7 +11,7 @@ export async function fetchProperties(mahallaCode: string) {
 export async function fetchPropertyById(id: string) {
   const { data } = await axiosInstance.get<{
     success: boolean;
-    data: PropertyForForm;
+    data: Property;
   }>(`${ApiRoutes.PROPERTIES}/${id}`);
   return data.data;
 }
@@ -24,12 +24,22 @@ export const fetchPropertyTableData = async (
   districtId = '',
   mahallaId = '',
   streetId = '',
+  isNew = '',
 ): Promise<PropertyTableData> => {
   const { data } = await axiosInstance.get<{
     success: boolean;
     data: PropertyTableData;
   }>(ApiRoutes.PROPERTIES, {
-    params: { page, limit, search, regionId, districtId, mahallaId, streetId },
+    params: {
+      page,
+      limit,
+      search,
+      regionId,
+      districtId,
+      mahallaId,
+      streetId,
+      isNew,
+    },
   });
   return data?.data;
 };

@@ -7,6 +7,7 @@ import { DetailMapWrapper } from '@/components/map/DetailMapWrapper';
 import { Spinner } from '@/components/shared';
 import { getRegionById } from '@/server/data/regions';
 import { notFound } from 'next/navigation';
+import type { Geometry } from 'geojson';
 
 export default async function RegionDetailPage(props: {
   params: Promise<{ id: string }>;
@@ -103,7 +104,9 @@ async function RegionDetailContent({ id }: { id: string }) {
             </CardTitle>
           </CardHeader>
           <CardContent className='flex-1 p-0 relative'>
-            <DetailMapWrapper geometry={region.geometry} />
+            <DetailMapWrapper
+              geometry={region.geometry as unknown as Geometry}
+            />
           </CardContent>
         </Card>
       </div>

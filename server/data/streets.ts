@@ -2,6 +2,7 @@ import 'server-only';
 
 import { prisma } from '../prisma';
 import type { Street } from '@/types';
+import type { StreetWhereInput } from '@/lib/generated/prisma/models';
 
 export async function getStreetsByDistrictId(districtId: string) {
   if (!districtId) return [];
@@ -119,7 +120,7 @@ export async function getStreetTableData(
   const skip = (page - 1) * limit;
 
   try {
-    const where: any = {
+    const where: StreetWhereInput = {
       isActive: true,
     };
 
@@ -132,13 +133,11 @@ export async function getStreetTableData(
     }
 
     if (search) {
-      const searchTerms = [];
-      searchTerms.push({ name: { contains: search, mode: 'insensitive' } });
-      searchTerms.push({ code: { contains: search, mode: 'insensitive' } });
-      searchTerms.push({
-        uzKadCode: { contains: search, mode: 'insensitive' },
-      });
-      where.OR = searchTerms;
+      where.OR = [
+        { name: { contains: search, mode: 'insensitive' } },
+        { code: { contains: search, mode: 'insensitive' } },
+        { uzKadCode: { contains: search, mode: 'insensitive' } },
+      ] satisfies StreetWhereInput[];
     }
 
     const [streets, total] = await Promise.all([

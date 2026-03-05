@@ -2,13 +2,14 @@
 
 import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import toast from 'react-hot-toast';
+import { useQueryClient } from '@tanstack/react-query';
+
 import type { DistrictSchemaType } from '@/lib';
 import { districtSchema } from '@/lib';
-import { zodResolver } from '@hookform/resolvers/zod';
 import { updateDistrict } from '@/app/actions';
-import toast from 'react-hot-toast';
 import type { District } from '@/types';
-import { useQueryClient } from '@tanstack/react-query';
 
 interface Props {
   district: District;
@@ -21,9 +22,9 @@ export function useDistrictForm({ district, open, onClose }: Props) {
   const [submitting, setIsSubmitting] = useState(false);
 
   const getFormattedValues = (district: District): DistrictSchemaType => ({
-    name: district?.name || '',
-    code: district?.code || '',
-    regionId: district?.regionId || '',
+    name: district?.name,
+    code: district?.code,
+    regionId: district?.regionId,
   });
 
   const form = useForm<DistrictSchemaType>({

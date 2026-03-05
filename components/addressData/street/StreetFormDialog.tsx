@@ -1,6 +1,9 @@
 'use client';
 
 import { FormProvider, useFieldArray } from 'react-hook-form';
+import { Plus, Trash2 } from 'lucide-react';
+import { useState } from 'react';
+
 import {
   FormActions,
   FormInputField,
@@ -16,10 +19,9 @@ import {
 import { FieldLabel } from '@/components/ui/field';
 import { useStreetForm } from '@/hooks';
 import type { Street, Region, District } from '@/types';
-import { Plus, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { fetchMahallaByCode } from '@/services';
-import { useState } from 'react';
+import { STREET_TYPE_OPTIONS } from '@/lib';
 
 interface Props {
   open: boolean;
@@ -119,12 +121,7 @@ export function StreetFormDialog({
                 name='type'
                 label='Turi'
                 placeholder='Tanlang'
-                options={[
-                  { id: "Ko'cha", name: "Ko'cha" },
-                  { id: "Tor ko'cha", name: "Tor ko'cha" },
-                  { id: "Berk ko'cha", name: "Berk ko'cha" },
-                  { id: "Shoh ko'cha", name: "Shoh ko'cha" },
-                ]}
+                options={STREET_TYPE_OPTIONS}
               />
 
               <FormInputField

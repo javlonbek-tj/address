@@ -1,5 +1,5 @@
 import type {
-  PropertyForForm,
+  Property,
   PropertyTableData,
   PropertyWithRelations,
 } from '@/types';
@@ -24,7 +24,7 @@ export function useProperties(mahallaCode: string | null) {
 
 export function useProperty(propertyId: string) {
   const { data: property = null, isLoading: isLoadingProperty } =
-    useQuery<PropertyForForm | null>({
+    useQuery<Property | null>({
       queryKey: ['property', propertyId],
       queryFn: () => fetchPropertyById(propertyId),
       enabled: !!propertyId,
@@ -41,6 +41,7 @@ export function usePropertiesTableData({
   districtId,
   mahallaId,
   streetId,
+  isNew,
 }: {
   page: number;
   limit: number;
@@ -49,6 +50,7 @@ export function usePropertiesTableData({
   districtId: string;
   mahallaId: string;
   streetId: string;
+  isNew: string;
 }) {
   const { data, isPending: isLoadingPropertyTableData } =
     useQuery<PropertyTableData>({
@@ -61,6 +63,7 @@ export function usePropertiesTableData({
         districtId,
         mahallaId,
         streetId,
+        isNew,
       ],
       queryFn: () =>
         fetchPropertyTableData(
@@ -71,6 +74,7 @@ export function usePropertiesTableData({
           districtId,
           mahallaId,
           streetId,
+          isNew,
         ),
       staleTime: Infinity,
       placeholderData: keepPreviousData,
