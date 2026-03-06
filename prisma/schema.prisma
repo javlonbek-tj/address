@@ -9,15 +9,15 @@ datasource db {
 
 model Region {
   id   String @id @default(cuid())
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+
   name String
   code String @unique
-
   geometry Json
   center   Json?
   isActive Boolean @default(true)
 
-  createdAt DateTime   @default(now())
-  updatedAt DateTime   @updatedAt
   districts District[]
   users     User[]
 
@@ -27,16 +27,16 @@ model Region {
 
 model District {
   id       String @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
   regionId String
   name     String
   code     String @unique
-
   geometry Json
   center   Json?
   isActive Boolean @default(true)
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
 
   region   Region    @relation(fields: [regionId], references: [id], onDelete: Cascade)
   mahallas Mahalla[]
@@ -50,27 +50,24 @@ model District {
 
 model Mahalla {
   id   String @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
   name String
   code String @unique
-
   geometry Json
   center   Json?
   isActive Boolean @default(true)
-
   uzKadName String
   geoCode   String
   oneId     String
   isOptimized Boolean @default(false)
-  mergedInto     Mahalla[] @relation("MahallaMerge")
-  mergedMahallas Mahalla[] @relation("MahallaMerge")
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
   oldName       String?
   regulation    String?
   regulationUrl String?
 
+  mergedInto     Mahalla[] @relation("MahallaMerge")
+  mergedMahallas Mahalla[] @relation("MahallaMerge")
   districtId String
   district   District @relation(fields: [districtId], references: [id], onDelete: Cascade)
   streets    Street[]
@@ -82,20 +79,19 @@ model Mahalla {
 
 model Street {
   id   String @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
   name String
   code String @unique
-
   geometry Json
   center   Json?
   isActive Boolean @default(true)
-
   type      String
   oldNameId String?
   oldName   String?
   uzKadCode String?
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
 
   districtId String
   district   District @relation(fields: [districtId], references: [id])
@@ -109,6 +105,9 @@ model Street {
 
 model Property {
   id           String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
   cadNumber    String?   @unique
   newCadNumber String?   @unique
   newHouseNumber String?
@@ -117,22 +116,16 @@ model Property {
   oldMahallaName String?
   type         String   @default("residential")
   isNew        Boolean  @default(false)
-
-  districtId String
-  district   District @relation(fields: [districtId], references: [id], onDelete: Cascade)
-
-  mahallaId String?
-  mahalla   Mahalla?  @relation(fields: [mahallaId], references: [code], onDelete: Cascade)
-
-  streetId String?
-  street   Street?   @relation(fields: [streetId], references: [code], onDelete: Cascade)
-
   geometry Json
   center   Json?
   isActive Boolean @default(true)
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  districtId String
+  district   District @relation(fields: [districtId], references: [id], onDelete: Cascade)
+  mahallaId String?
+  mahalla   Mahalla?  @relation(fields: [mahallaId], references: [code], onDelete: Cascade)
+  streetId String?
+  street   Street?   @relation(fields: [streetId], references: [code], onDelete: Cascade)
 
   @@map("properties")
 }
