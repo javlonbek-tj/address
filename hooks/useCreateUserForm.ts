@@ -67,6 +67,7 @@ export function useCreateUserForm({ open, onClose }: Props) {
       form.setValue('regionId', null);
       form.setValue('districtId', null);
       form.setValue('position', null);
+      form.setValue('status', USER_STATUSES.ACTIVE);
     } else if (selectedRole === USER_ROLES.REGION_USER) {
       form.setValue('districtId', null);
     }

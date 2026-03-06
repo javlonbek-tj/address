@@ -12,7 +12,14 @@ export const userSchema = z
     districtId: z.string().optional().nullable(),
   })
   .superRefine((data, ctx) => {
-    if (data.status === USER_STATUSES.ACTIVE) {
+    const isStaff =
+      data.role === USER_ROLES.REGION_USER ||
+      data.role === USER_ROLES.DISTRICT_USER;
+    const isAdmin =
+      data.role === USER_ROLES.SUPERADMIN || data.role === USER_ROLES.ADMIN;
+
+    // personal fields are required for admins or active staff
+    if (isAdmin || (isStaff && data.status === USER_STATUSES.ACTIVE)) {
       if (!data.fullName || data.fullName.trim().length < 6) {
         ctx.addIssue({
           code: 'custom',

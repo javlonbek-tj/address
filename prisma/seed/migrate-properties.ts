@@ -32,7 +32,7 @@ async function main() {
     const props = feature.properties;
     const geometry = feature.geometry;
 
-    const districtCode = String(props.TUMAN);
+    const districtCode = '1727424'; // YOU SHOULD CHANGE THIS IN EVERY RUN
     const districtId = districtMap.get(districtCode);
 
     if (!districtId) {
@@ -53,6 +53,7 @@ async function main() {
         districtId: districtId,
         isActive: true,
         isNew: false,
+        mahallaId: '1727424017', // YOU SHOULD CHANGE THIS IN EVERY RUN
       };
 
       if (props.KAD_RAQAM) {

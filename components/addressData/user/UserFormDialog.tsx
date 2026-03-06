@@ -58,17 +58,21 @@ export function UserFormDialog({
           <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-6'>
             <div className='grid grid-cols-1 sm:grid-cols-2 gap-4'>
               <FormSelectField
-                name='status'
-                label='Holati'
-                placeholder='Holatni tanlang'
-                options={USER_STATUS_OPTIONS}
-              />
-              <FormSelectField
                 name='role'
                 label='Roli'
                 placeholder='Rolni tanlang'
                 options={USER_ROLE_OPTIONS}
               />
+
+              {(selectedRole === USER_ROLES.REGION_USER ||
+                selectedRole === USER_ROLES.DISTRICT_USER) && (
+                <FormSelectField
+                  name='status'
+                  label='Holati'
+                  placeholder='Holatni tanlang'
+                  options={USER_STATUS_OPTIONS}
+                />
+              )}
 
               {(selectedRole === USER_ROLES.REGION_USER ||
                 selectedRole === USER_ROLES.DISTRICT_USER) && (
@@ -98,7 +102,9 @@ export function UserFormDialog({
                 />
               )}
 
-              {selectedStatus === USER_STATUSES.ACTIVE && (
+              {(selectedRole === USER_ROLES.SUPERADMIN ||
+                selectedRole === USER_ROLES.ADMIN ||
+                (selectedRole && selectedStatus === USER_STATUSES.ACTIVE)) && (
                 <>
                   <FormInputField
                     name='fullName'

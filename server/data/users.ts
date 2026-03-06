@@ -74,7 +74,7 @@ export async function getUserTableData(
             select: { id: true, name: true },
           },
         },
-        orderBy: { updatedAt: 'desc' },
+        orderBy: { status: 'asc' },
         skip,
         take: limit,
       }),
