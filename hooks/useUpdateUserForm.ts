@@ -6,7 +6,12 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import toast from 'react-hot-toast';
 
-import { userSchema, type UserFormValues, USER_ROLES } from '@/lib';
+import {
+  userSchema,
+  type UserFormValues,
+  USER_ROLES,
+  USER_STATUSES,
+} from '@/lib';
 import { updateUser } from '@/app/actions';
 import type { User } from '@/lib/generated/prisma/client';
 
@@ -47,6 +52,14 @@ export function useUpdateUserForm({ user, open, onClose }: Props) {
   }, [user, reset, open, getInitialValues]);
 
   const selectedRole = form.watch('role');
+  const selectedStatus = form.watch('status');
+
+  useEffect(() => {
+    if (selectedStatus === USER_STATUSES.INACTIVE) {
+      form.setValue('fullName', '');
+      form.setValue('phoneNumber', '');
+    }
+  }, [selectedStatus, form]);
 
   useEffect(() => {
     if (

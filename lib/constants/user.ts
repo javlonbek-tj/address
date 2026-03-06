@@ -19,7 +19,7 @@ export const USER_STATUSES = {
 
 export const USER_STATUS_LABELS = {
   [USER_STATUSES.ACTIVE]: 'Faol',
-  [USER_STATUSES.INACTIVE]: 'Nofaol',
+  [USER_STATUSES.INACTIVE]: 'Vakant',
 } as const;
 
 export const USER_ROLE_OPTIONS = [

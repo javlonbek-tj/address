@@ -103,7 +103,6 @@ export async function getPropertyTableData(
   try {
     const where: PropertyWhereInput = {
       isActive: true,
-      newCadNumber: { not: null, notIn: [''] },
     };
 
     if (streetId !== 'all') {

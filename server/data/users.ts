@@ -1,5 +1,6 @@
 import { prisma } from '@/server/prisma';
-import { UserRole, UserStatus } from '@/lib/generated/prisma/enums';
+import type { UserRole, UserStatus } from '@/lib/generated/prisma/enums';
+import type { UserWhereInput } from '@/lib/generated/prisma/models';
 
 export async function getUserTableData(
   params: {
@@ -24,41 +25,43 @@ export async function getUserTableData(
   const skip = (page - 1) * limit;
 
   try {
-    const where: any = {
-      isActive: true,
-    };
+    // 1. Start with a typed array of conditions
+    const conditions: UserWhereInput[] = [
+      { isActive: true }, // Your base filter
+    ];
 
+    // 2. Push simple filters
     if (role !== 'all') {
-      where.role = role as UserRole;
+      conditions.push({ role: role as UserRole });
     }
 
     if (status !== 'all') {
-      where.status = status as UserStatus;
+      conditions.push({ status: status as UserStatus });
     }
 
+    // 3. Push location filters
     if (districtId !== 'all') {
-      where.districtId = districtId;
+      conditions.push({ districtId });
     } else if (regionId !== 'all') {
-      where.OR = [{ regionId: regionId }, { district: { regionId: regionId } }];
+      conditions.push({
+        OR: [{ regionId: regionId }, { district: { regionId: regionId } }],
+      });
     }
 
+    // 4. Push search filters
     if (search) {
-      const searchFilter = {
+      conditions.push({
         OR: [
           { fullName: { contains: search, mode: 'insensitive' } },
           { phoneNumber: { contains: search, mode: 'insensitive' } },
         ],
-      };
-
-      if (where.OR) {
-        // If we already have an OR (from regionId), we need to AND them
-        const previousOR = where.OR;
-        delete where.OR;
-        where.AND = [{ OR: previousOR }, searchFilter];
-      } else {
-        where.OR = searchFilter.OR;
-      }
+      });
     }
+
+    // 5. Finally, combine everything into a single 'where' object
+    const where: UserWhereInput = {
+      AND: conditions,
+    };
 
     const [users, total] = await Promise.all([
       prisma.user.findMany({

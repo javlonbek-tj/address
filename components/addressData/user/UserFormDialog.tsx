@@ -16,6 +16,7 @@ import { Region, District } from '@/types';
 import {
   UserFormValues,
   USER_ROLES,
+  USER_STATUSES,
   USER_ROLE_OPTIONS,
   USER_STATUS_OPTIONS,
   REGION_USER_POSITION_OPTIONS,
@@ -45,6 +46,7 @@ export function UserFormDialog({
   districts,
 }: UserFormDialogProps) {
   const selectedRole = form.watch('role');
+  const selectedStatus = form.watch('status');
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
@@ -55,31 +57,18 @@ export function UserFormDialog({
         <FormProvider {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-6'>
             <div className='grid grid-cols-1 sm:grid-cols-2 gap-4'>
-              <FormInputField
-                name='fullName'
-                label='F.I.SH'
-                placeholder='Foydalanuvchi ismi'
+              <FormSelectField
+                name='status'
+                label='Holati'
+                placeholder='Holatni tanlang'
+                options={USER_STATUS_OPTIONS}
               />
-              <FormInputField
-                name='phoneNumber'
-                label='Telefon raqami'
-                placeholder='Masalan: +998901234567'
-              />
-
               <FormSelectField
                 name='role'
                 label='Roli'
                 placeholder='Rolni tanlang'
                 options={USER_ROLE_OPTIONS}
               />
-              {isEditing && (
-                <FormSelectField
-                  name='status'
-                  label='Holati'
-                  placeholder='Holatni tanlang'
-                  options={USER_STATUS_OPTIONS}
-                />
-              )}
 
               {(selectedRole === USER_ROLES.REGION_USER ||
                 selectedRole === USER_ROLES.DISTRICT_USER) && (
@@ -107,6 +96,21 @@ export function UserFormDialog({
                   placeholder='Lavozimni tanlang'
                   options={REGION_USER_POSITION_OPTIONS}
                 />
+              )}
+
+              {selectedStatus === USER_STATUSES.ACTIVE && (
+                <>
+                  <FormInputField
+                    name='fullName'
+                    label='F.I.SH'
+                    placeholder='Foydalanuvchi ismi'
+                  />
+                  <FormInputField
+                    name='phoneNumber'
+                    label='Telefon raqami'
+                    placeholder='Masalan: +998901234567'
+                  />
+                </>
               )}
             </div>
 

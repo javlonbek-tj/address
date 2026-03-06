@@ -1,6 +1,6 @@
 import React, { Suspense } from 'react';
 import Link from 'next/link';
-import { ArrowLeft, Map, Settings2, Info } from 'lucide-react';
+import { ArrowLeft, Map, Settings2, Info, History } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { DetailMapWrapper } from '@/components/map/DetailMapWrapper';
@@ -101,6 +101,18 @@ async function PropertyDetailContent({ id }: { id: string }) {
               </div>
               <div className='grid grid-cols-3 gap-2 border-b border-gray-100 dark:border-gray-800 pb-2'>
                 <span className='font-medium text-muted-foreground col-span-1'>
+                  Yangi uy raqami:
+                </span>
+                <span className='col-span-2'>
+                  {property.newHouseNumber || (
+                    <span className='text-muted-foreground italic'>
+                      Mavjud emas
+                    </span>
+                  )}
+                </span>
+              </div>
+              <div className='grid grid-cols-3 gap-2 border-b border-gray-100 dark:border-gray-800 pb-2'>
+                <span className='font-medium text-muted-foreground col-span-1'>
                   Turi:
                 </span>
                 <span className='col-span-2'>
@@ -145,15 +157,54 @@ async function PropertyDetailContent({ id }: { id: string }) {
                   Eski kadastr raqami:
                 </span>
                 <span className='col-span-2 font-mono text-xs'>
-                  {property.cadNumber}
+                  {property.cadNumber || (
+                    <span className='italic text-muted-foreground font-sans'>
+                      Mavjud emas
+                    </span>
+                  )}
+                </span>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className='bg-white dark:bg-gray-900 dark:border-white/20 h-fit'>
+            <CardHeader>
+              <CardTitle className='text-base flex items-center gap-2'>
+                <History className='w-4 h-4' />
+                Avvalgi manzil ma'lumotlari
+              </CardTitle>
+            </CardHeader>
+            <CardContent className='space-y-4'>
+              <div className='grid grid-cols-3 gap-2 border-b border-gray-100 dark:border-gray-800 pb-2'>
+                <span className='font-medium text-muted-foreground col-span-1'>
+                  Avvalgi mahalla:
+                </span>
+                <span className='col-span-2'>
+                  {property.oldMahallaName || (
+                    <span className='text-muted-foreground italic'>
+                      Mavjud emas
+                    </span>
+                  )}
                 </span>
               </div>
               <div className='grid grid-cols-3 gap-2 border-b border-gray-100 dark:border-gray-800 pb-2'>
                 <span className='font-medium text-muted-foreground col-span-1'>
-                  Yangi uy raqami:
+                  Avvalgi ko'cha:
                 </span>
                 <span className='col-span-2'>
-                  {property.newHouseNumber || (
+                  {property.oldStreetName || (
+                    <span className='text-muted-foreground italic'>
+                      Mavjud emas
+                    </span>
+                  )}
+                </span>
+              </div>
+              <div className='grid grid-cols-3 gap-2 border-b border-gray-100 dark:border-gray-800 pb-2'>
+                <span className='font-medium text-muted-foreground col-span-1'>
+                  Avvalgi uy raqami:
+                </span>
+                <span className='col-span-2'>
+                  {property.oldHouseNumber || (
                     <span className='text-muted-foreground italic'>
                       Mavjud emas
                     </span>

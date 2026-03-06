@@ -50,6 +50,14 @@ export function useCreateUserForm({ open, onClose }: Props) {
   }, [open, reset, getInitialValues]);
 
   const selectedRole = form.watch('role');
+  const selectedStatus = form.watch('status');
+
+  useEffect(() => {
+    if (selectedStatus === USER_STATUSES.INACTIVE) {
+      form.setValue('fullName', '');
+      form.setValue('phoneNumber', '');
+    }
+  }, [selectedStatus, form]);
 
   useEffect(() => {
     if (

@@ -112,6 +112,9 @@ model Property {
   cadNumber    String?   @unique
   newCadNumber String?   @unique
   newHouseNumber String?
+  oldHouseNumber String?
+  oldStreetName  String?
+  oldMahallaName String?
   type         String   @default("residential")
   isNew        Boolean  @default(false)
 
