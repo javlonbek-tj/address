@@ -1,5 +1,3 @@
-import 'server-only';
-
 import { prisma } from '../prisma';
 import type { Street } from '@/types';
 import type { StreetWhereInput } from '@/lib/generated/prisma/models';
@@ -71,7 +69,6 @@ export const getStreets = async (): Promise<Street[]> => {
     });
     return streets;
   } catch (error) {
-    console.error('Failed to fetch streets:', error);
     return [];
   }
 };
@@ -89,7 +86,6 @@ export const getStreetListByDistrictId = async (districtId: string) => {
     });
     return streets;
   } catch (error) {
-    console.error('Failed to fetch streets:', error);
     return [];
   }
 };
@@ -184,7 +180,6 @@ export async function getStreetTableData(
       limit,
     };
   } catch (error) {
-    console.error('Failed to fetch street table data:', error);
     return {
       data: [],
       total: 0,
@@ -227,7 +222,6 @@ export async function getStreetById(id: string) {
 
     return street;
   } catch (error) {
-    console.error('Failed to fetch street by ID:', error);
     return null;
   }
 }

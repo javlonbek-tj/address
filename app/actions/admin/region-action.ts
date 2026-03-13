@@ -5,11 +5,17 @@ import type { ActionResult } from '@/types';
 import { regionSchema } from '@/lib';
 import { prisma } from '@/server';
 import type { Region } from '@/types';
+import { getServerSession } from '@/lib/auth/session';
+import { assertActive, assertSuperadmin } from '@/lib/auth/authorization';
 
 export async function updateRegion(
   id: string,
   data: RegionSchemaType,
 ): Promise<ActionResult<Region>> {
+  const session = await getServerSession();
+  assertActive(session!.user);
+  assertSuperadmin(session!.user);
+
   const validationResult = regionSchema.safeParse(data);
 
   if (!validationResult.success) {
@@ -51,7 +57,6 @@ export async function updateRegion(
       data: updatedRegion,
     };
   } catch (error) {
-    console.error('[UPDATE_REGION_ERROR]', error);
     return {
       success: false,
       error: 'INTERNAL_SERVER_ERROR',
@@ -60,6 +65,10 @@ export async function updateRegion(
 }
 
 export async function deleteRegion(id: string): Promise<ActionResult<null>> {
+  const session = await getServerSession();
+  assertActive(session!.user);
+  assertSuperadmin(session!.user);
+
   try {
     await prisma.region.update({
       where: { id },
@@ -73,7 +82,6 @@ export async function deleteRegion(id: string): Promise<ActionResult<null>> {
       data: null,
     };
   } catch (error) {
-    console.error('[DELETE_REGION_ERROR]', error);
     return {
       success: false,
       error: 'INTERNAL_SERVER_ERROR',

@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(cd \"C:\\\\Users\\\\j.turdimatov\\\\Desktop\\\\manzillar\" && grep -rl \"UNAUTHORIZED\" app/api/ | xargs sed -i \"s/'UNAUTHORIZED'/'UNAUTHENTICATED'/g\")",
+      "Bash(cd \"C:\\\\Users\\\\j.turdimatov\\\\Desktop\\\\manzillar\" && grep -rl \"console\\\\.\" --include=\"*.ts\" --include=\"*.tsx\" app/ server/ hooks/ components/ | grep -v node_modules | xargs sed -i '/console\\\\.\\\\\\(log\\\\|error\\\\|warn\\\\|info\\\\|debug\\\\\\)/d')",
+      "Bash(cd \"C:\\\\Users\\\\j.turdimatov\\\\Desktop\\\\manzillar\" && grep -rl \"error instanceof Error ? error.message : 'Unknown error'\" --include=\"*.ts\" app/ | xargs sed -i \"s/const message = error instanceof Error ? error\\\\.message : 'Unknown error';\\\\n.*return Response\\\\.json\\({ success: false, error: message }, { status: 500 }\\);/return Response.json\\({ success: false, error: 'INTERNAL_SERVER_ERROR' }, { status: 500 }\\);/g\")",
+      "Bash(cd \"C:\\\\Users\\\\j.turdimatov\\\\Desktop\\\\manzillar\" && python -c \"\nimport os, re\n\npattern = re.compile\\(\n    r\\\\\"    const message = error instanceof Error \\\\? error\\\\.message : 'Unknown error';\\\\n    return Response\\\\.json\\\\\\(\\\\{ success: false, error: message \\\\}, \\\\{ status: 500 \\\\}\\\\\\);\\\\\",\n    re.MULTILINE\n\\)\nreplacement = \\\\\"    return Response.json\\({ success: false, error: 'INTERNAL_SERVER_ERROR' }, { status: 500 }\\);\\\\\"\n\nfor root, dirs, files in os.walk\\('app/api'\\):\n    dirs[:] = [d for d in dirs if d != 'node_modules']\n    for f in files:\n        if f.endswith\\('.ts'\\):\n            path = os.path.join\\(root, f\\)\n            content = open\\(path\\).read\\(\\)\n            new_content = pattern.sub\\(replacement, content\\)\n            if new_content != content:\n                open\\(path, 'w'\\).write\\(new_content\\)\n                print\\('Fixed:', path\\)\n\")"
+    ]
+  }
+}

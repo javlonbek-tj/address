@@ -16,6 +16,7 @@ interface Props {
   regionId: string;
   handleFilterChange: (key: string, value: string) => void;
   regions: Region[];
+  isRegionLocked?: boolean;
 }
 
 export function DistrictTableFilters({
@@ -24,6 +25,7 @@ export function DistrictTableFilters({
   regionId,
   handleFilterChange,
   regions,
+  isRegionLocked = false,
 }: Props) {
   return (
     <div className='flex flex-wrap items-center gap-3 p-4 border-b'>
@@ -35,34 +37,36 @@ export function DistrictTableFilters({
         autoFocus
         autoComplete='off'
       />
-      <Select
-        value={regionId}
-        onValueChange={(value) => handleFilterChange('regionId', value)}
-      >
-        <SelectTrigger
-          className='dark:bg-gray-700 shadow-sm w-52 dark:text-white'
-          size='sm'
+      {!isRegionLocked && (
+        <Select
+          value={regionId}
+          onValueChange={(value) => handleFilterChange('regionId', value)}
         >
-          <SelectValue
-            placeholder="Hudud bo'yicha filter"
-            className='text-xs 2xl:text-sm'
-          />
-        </SelectTrigger>
-        <SelectContent className='dark:bg-gray-700 dark:text-white'>
-          <SelectItem value='all' className='text-xs 2xl:text-sm'>
-            Barcha hududlar
-          </SelectItem>
-          {regions.map((region: Region) => (
-            <SelectItem
-              key={region.id}
-              value={region.id}
+          <SelectTrigger
+            className='dark:bg-gray-700 shadow-sm w-52 dark:text-white'
+            size='sm'
+          >
+            <SelectValue
+              placeholder="Hudud bo'yicha filter"
               className='text-xs 2xl:text-sm'
-            >
-              {region.name}
+            />
+          </SelectTrigger>
+          <SelectContent className='dark:bg-gray-700 dark:text-white'>
+            <SelectItem value='all' className='text-xs 2xl:text-sm'>
+              Barcha hududlar
             </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
+            {regions.map((region: Region) => (
+              <SelectItem
+                key={region.id}
+                value={region.id}
+                className='text-xs 2xl:text-sm'
+              >
+                {region.name}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      )}
     </div>
   );
 }

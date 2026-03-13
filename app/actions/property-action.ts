@@ -8,11 +8,17 @@ import {
   type UpdatePropertySchemaType,
   type CreatePropertySchemaType,
 } from '@/lib';
+import { getServerSession } from '@/lib/auth/session';
+import { assertActive, assertSuperadmin } from '@/lib/auth/authorization';
 
 export async function updateProperty(
   id: string,
   data: UpdatePropertySchemaType,
 ): Promise<ActionResult<PropertyWithRelations>> {
+  const session = await getServerSession();
+  assertActive(session!.user);
+  assertSuperadmin(session!.user);
+
   const validationResult = updatePropertySchema.safeParse(data);
 
   if (!validationResult.success) {
@@ -92,7 +98,6 @@ export async function updateProperty(
 
     return { success: true, data: updatedProperty };
   } catch (error) {
-    console.error('Failed to update property:', error);
     return { success: false, error: 'INTERNAL_SERVER_ERROR' };
   }
 }
@@ -100,6 +105,10 @@ export async function updateProperty(
 export async function createProperty(
   data: CreatePropertySchemaType,
 ): Promise<ActionResult<PropertyWithRelations>> {
+  const session = await getServerSession();
+  assertActive(session!.user);
+  assertSuperadmin(session!.user);
+
   const validationResult = createPropertySchema.safeParse(data);
 
   if (!validationResult.success) {
@@ -181,12 +190,15 @@ export async function createProperty(
 
     return { success: true, data: newProperty };
   } catch (error) {
-    console.error('Failed to create property:', error);
     return { success: false, error: 'INTERNAL_SERVER_ERROR' };
   }
 }
 
 export async function deleteProperty(id: string): Promise<ActionResult<null>> {
+  const session = await getServerSession();
+  assertActive(session!.user);
+  assertSuperadmin(session!.user);
+
   try {
     await prisma.property.update({
       where: { id },
@@ -194,7 +206,6 @@ export async function deleteProperty(id: string): Promise<ActionResult<null>> {
     });
     return { success: true, data: null };
   } catch (error) {
-    console.error('Failed to delete property:', error);
     return { success: false, error: 'INTERNAL_SERVER_ERROR' };
   }
 }

@@ -1,5 +1,3 @@
-import 'server-only';
-
 import { prisma } from '../prisma';
 import type { Mahalla } from '@/types';
 import type { MahallaWithRelations } from '@/types';
@@ -35,7 +33,6 @@ export async function getMahallasByDistrictId(
     });
     return mahallas;
   } catch (error) {
-    console.error('Failed to fetch mahallas:', error);
     return [];
   }
 }
@@ -147,7 +144,6 @@ export async function getMahallaTableData(
       limit,
     };
   } catch (error) {
-    console.error('Failed to fetch mahalla table data:', error);
     return {
       data: [],
       total: 0,
@@ -168,7 +164,6 @@ export const getMahallaByCode = async (code: string) => {
     });
     return mahalla;
   } catch (error) {
-    console.error('Failed to fetch mahalla:', error);
     return null;
   }
 };
@@ -214,7 +209,6 @@ export async function getMahallaById(id: string) {
 
     return mahalla;
   } catch (error) {
-    console.error('Failed to fetch mahalla by ID:', error);
     return null;
   }
 }

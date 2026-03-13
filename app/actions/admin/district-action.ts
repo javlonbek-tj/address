@@ -5,11 +5,18 @@ import type { ActionResult } from '@/types';
 import { districtSchema } from '@/lib';
 import { prisma } from '@/server';
 import type { District } from '@/types';
+import { getServerSession } from '@/lib/auth/session';
+import { assertActive, assertMinRole } from '@/lib/auth/authorization';
+import { UserRole } from '@/lib/generated/prisma/enums';
 
 export async function updateDistrict(
   id: string,
   data: DistrictSchemaType,
 ): Promise<ActionResult<District>> {
+  const session = await getServerSession();
+  assertActive(session!.user);
+  assertMinRole(session!.user, UserRole.region_user);
+
   const validationResult = districtSchema.safeParse(data);
 
   if (!validationResult.success) {
@@ -52,7 +59,6 @@ export async function updateDistrict(
       data: updatedDistrict,
     };
   } catch (error) {
-    console.error('[UPDATE_DISTRICT_ERROR]', error);
     return {
       success: false,
       error: 'INTERNAL_SERVER_ERROR',
@@ -61,6 +67,10 @@ export async function updateDistrict(
 }
 
 export async function deleteDistrict(id: string): Promise<ActionResult<null>> {
+  const session = await getServerSession();
+  assertActive(session!.user);
+  assertMinRole(session!.user, UserRole.region_user);
+
   try {
     await prisma.district.update({
       where: { id },
@@ -74,7 +84,6 @@ export async function deleteDistrict(id: string): Promise<ActionResult<null>> {
       data: null,
     };
   } catch (error) {
-    console.error('[DELETE_DISTRICT_ERROR]', error);
     return {
       success: false,
       error: 'INTERNAL_SERVER_ERROR',

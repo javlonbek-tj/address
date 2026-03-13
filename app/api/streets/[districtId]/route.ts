@@ -15,7 +15,6 @@ export async function GET(
     const streets = await getStreetListByDistrictId(districtId);
     return Response.json({ success: true, data: streets });
   } catch (error) {
-    console.error('[STREETS_BY_DISTRICT_ID_API_ERROR]', error);
     return Response.json(
       { success: false, error: 'Internal server error' },
       { status: 500 },

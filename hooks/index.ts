@@ -37,3 +37,4 @@ export { useUpdatePropertyForm } from './useUpdatePropertyForm';
 export { useStreetForm } from './useStreetForm';
 export { useCreateUserForm } from './useCreateUserForm';
 export { useUpdateUserForm } from './useUpdateUserForm';
+export { useSessionsTableData } from './useSessions';

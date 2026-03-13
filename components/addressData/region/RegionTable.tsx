@@ -15,7 +15,7 @@ import { DataTable } from '../table';
 import { DeleteDialog } from '@/components/shared';
 import { deleteRegion } from '@/app/actions';
 
-export function RegionTable() {
+export function RegionTable({ isSuperadmin = false }: { isSuperadmin?: boolean }) {
   const searchParams = useSearchParams();
   const router = useRouter();
 
@@ -71,6 +71,7 @@ export function RegionTable() {
           onEdit={handleEdit}
           onDelete={setDeleteId}
           onView={(id: string) => router.push(`/regions/${id}`)}
+          showEditDelete={isSuperadmin}
           isLoading={isLoading}
           pagination={{
             currentPage: page,

@@ -16,7 +16,13 @@ import { DataTable } from '../table';
 import { DeleteDialog } from '@/components/shared';
 import { deleteDistrict } from '@/app/actions';
 
-export function DistrictTable() {
+interface DistrictTableProps {
+  isRegionLocked?: boolean;
+  userRegionId?: string | null;
+  isSuperadmin?: boolean;
+}
+
+export function DistrictTable({ isRegionLocked = false, userRegionId = null, isSuperadmin = false }: DistrictTableProps) {
   const searchParams = useSearchParams();
   const router = useRouter();
   const queryClient = useQueryClient();
@@ -24,7 +30,9 @@ export function DistrictTable() {
   const page = Number(searchParams.get('page')) || 1;
   const limit = Number(searchParams.get('limit')) || 10;
   const search = searchParams.get('search') || '';
-  const regionId = searchParams.get('regionId') || 'all';
+  const regionId = isRegionLocked && userRegionId
+    ? userRegionId
+    : searchParams.get('regionId') || 'all';
 
   const { data: districtTableData, isLoadingDistrictTableData } =
     useDistrictTableData(page, limit, search, regionId);
@@ -78,12 +86,14 @@ export function DistrictTable() {
           regionId={regionId}
           handleFilterChange={handleFilterChange}
           regions={regions}
+          isRegionLocked={isRegionLocked}
         />
         <DataTable
           data={districts}
           onEdit={handleEdit}
           onDelete={setDeleteId}
           onView={(id: string) => router.push(`/districts/${id}`)}
+          showEditDelete={isSuperadmin}
           isLoading={isLoading}
           pagination={{
             currentPage: page,

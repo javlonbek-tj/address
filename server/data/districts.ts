@@ -1,5 +1,3 @@
-import 'server-only';
-
 import { prisma } from '../prisma';
 import type { District as DistrictModel } from '@/lib/generated/prisma/client';
 import type { District } from '@/types';
@@ -16,7 +14,6 @@ export async function getDistrictsByRegionId(
 
     return districts;
   } catch (error) {
-    console.error('Failed to fetch districts:', error);
     return [];
   }
 }
@@ -84,7 +81,6 @@ export async function getDistrictTableData(
       limit,
     };
   } catch (error) {
-    console.error('Failed to fetch districts:', error);
     return {
       data: [],
       total: 0,
@@ -113,7 +109,6 @@ export async function getDistrictsList(regionId: string): Promise<District[]> {
 
     return districts;
   } catch (error) {
-    console.error('Failed to fetch districts list:', error);
     return [];
   }
 }
@@ -148,7 +143,6 @@ export async function getDistrictById(id: string) {
       },
     };
   } catch (error) {
-    console.error('Failed to fetch district by ID:', error);
     return null;
   }
 }

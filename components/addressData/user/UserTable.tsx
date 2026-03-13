@@ -26,8 +26,23 @@ import {
   USER_STATUS_LABELS,
   USER_STATUSES,
 } from '@/lib';
+import type { User } from '@/types/user';
 
-export function UserTable() {
+interface UserTableProps {
+  isRegionLocked?: boolean;
+  isDistrictLocked?: boolean;
+  userRegionId?: string | null;
+  userDistrictId?: string | null;
+  isSuperadmin?: boolean;
+}
+
+export function UserTable({
+  isRegionLocked = false,
+  isDistrictLocked = false,
+  userRegionId = null,
+  userDistrictId = null,
+  isSuperadmin = false,
+}: UserTableProps) {
   const searchParams = useSearchParams();
   const queryClient = useQueryClient();
 
@@ -36,8 +51,14 @@ export function UserTable() {
   const search = searchParams.get('search') || '';
   const role = searchParams.get('role') || 'all';
   const status = searchParams.get('status') || 'all';
-  const regionId = searchParams.get('regionId') || 'all';
-  const districtId = searchParams.get('districtId') || 'all';
+  const regionId =
+    isDistrictLocked || isRegionLocked
+      ? (userRegionId ?? 'all')
+      : searchParams.get('regionId') || 'all';
+  const districtId =
+    isDistrictLocked && userDistrictId
+      ? userDistrictId
+      : searchParams.get('districtId') || 'all';
 
   const { data: userTableData, isLoading: isLoadingUsers } = useUsersTableData({
     page,
@@ -68,7 +89,7 @@ export function UserTable() {
     deleteId,
     setDeleteId,
     handleCloseDelete,
-  } = useTableActions<any>();
+  } = useTableActions<User>();
 
   const { handleDelete, isDeleting } = useDelete(deleteUser, {
     onSuccess: () => {
@@ -106,11 +127,13 @@ export function UserTable() {
           regionId={regionId}
           onRegionChange={onRegionChange}
           regions={regions}
+          isRegionLocked={isRegionLocked || isDistrictLocked}
+          isDistrictLocked={isDistrictLocked}
           districtId={districtId}
           onDistrictChange={(val) => handleFilterChange({ districtId: val })}
           districts={districts}
           isLoadingDistricts={isLoadingDistricts}
-          onAddClick={handleCreate}
+          onAddClick={isSuperadmin ? handleCreate : undefined}
         />
 
         <div className='p-4 overflow-hidden'>
@@ -140,9 +163,11 @@ export function UserTable() {
                   <th className='px-6 py-3 font-bold text-[10px] text-gray-800 dark:text-gray-300 3xl:text-xs text-left uppercase leading-none tracking-widest'>
                     Holati
                   </th>
-                  <th className='px-6 py-3 pr-8 2xl:pr-10 font-bold text-[10px] text-gray-800 dark:text-gray-300 3xl:text-xs text-right uppercase leading-none tracking-widest'>
-                    Amallar
-                  </th>
+                  {isSuperadmin && (
+                    <th className='px-6 py-3 pr-8 2xl:pr-10 font-bold text-[10px] text-gray-800 dark:text-gray-300 3xl:text-xs text-right uppercase leading-none tracking-widest'>
+                      Amallar
+                    </th>
+                  )}
                 </tr>
               </thead>
               <tbody
@@ -151,14 +176,14 @@ export function UserTable() {
                 {users.length === 0 && !isLoading ? (
                   <tr>
                     <td
-                      colSpan={8}
+                      colSpan={isSuperadmin ? 8 : 7}
                       className='px-6 py-12 font-medium text-gray-800 dark:text-gray-400 text-sm text-center'
                     >
                       Ma&apos;lumot topilmadi
                     </td>
                   </tr>
                 ) : (
-                  users.map((user: any, index: number) => (
+                  users.map((user: User, index: number) => (
                     <tr
                       key={user.id}
                       className='group hover:bg-blue-50/30 dark:hover:bg-blue-900/10 dark:even:bg-gray-700/20 dark:odd:bg-gray-800 even:bg-gray-50/50 odd:bg-white transition-all duration-200'
@@ -205,13 +230,15 @@ export function UserTable() {
                           ] || user.status}
                         </Badge>
                       </td>
-                      <td className='px-6 py-2 whitespace-nowrap text-right'>
-                        <TableActions
-                          id={user.id}
-                          onEdit={() => handleEdit(user)}
-                          onDelete={() => setDeleteId(user.id)}
-                        />
-                      </td>
+                      {isSuperadmin && (
+                        <td className='px-6 py-2 whitespace-nowrap text-right'>
+                          <TableActions
+                            id={user.id}
+                            onEdit={() => handleEdit(user)}
+                            onDelete={() => setDeleteId(user.id)}
+                          />
+                        </td>
+                      )}
                     </tr>
                   ))
                 )}

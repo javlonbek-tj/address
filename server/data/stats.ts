@@ -1,5 +1,3 @@
-import 'server-only';
-
 import { prisma } from '../prisma';
 
 export async function getGlobalStatistics() {
@@ -13,7 +11,6 @@ export async function getGlobalStatistics() {
 
     return { regions, districts, mahallas, streets };
   } catch (error) {
-    console.error('Failed to fetch global statistics:', error);
     return { regions: 0, districts: 0, mahallas: 0, streets: 0 };
   }
 }
@@ -33,7 +30,6 @@ export async function getRegionStatistics(regionId: string) {
 
     return { districts, mahallas, streets };
   } catch (error) {
-    console.error('Failed to fetch region statistics:', error);
     return { districts: 0, mahallas: 0, streets: 0 };
   }
 }
@@ -48,7 +44,6 @@ export async function getDistrictStatistics(districtId: string) {
 
     return { mahallas, streets };
   } catch (error) {
-    console.error('Failed to fetch district statistics:', error);
     return { mahallas: 0, streets: 0 };
   }
 }
@@ -124,7 +119,6 @@ export async function getDashboardAnalytics() {
       },
     };
   } catch (error) {
-    console.error('Failed to fetch dashboard analytics:', error);
     return null;
   }
 }

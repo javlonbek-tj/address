@@ -4,17 +4,13 @@ import { UserFormDialog } from './UserFormDialog';
 import { useCreateUserForm, useDistrictsList } from '@/hooks';
 import { Region } from '@/types';
 
-interface CreateUserDialogProps {
+interface Props {
   open: boolean;
   onClose: () => void;
   regions: Region[];
 }
 
-export function CreateUserDialog({
-  open,
-  onClose,
-  regions,
-}: CreateUserDialogProps) {
+export function CreateUserDialog({ open, onClose, regions }: Props) {
   const { form, isSubmitting, onSubmit } = useCreateUserForm({ open, onClose });
   const selectedRegionId = form.watch('regionId');
   const { districts } = useDistrictsList(selectedRegionId || '');

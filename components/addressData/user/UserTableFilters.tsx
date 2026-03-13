@@ -29,11 +29,13 @@ interface UserTableFiltersProps {
   regionId: string;
   onRegionChange: (value: string) => void;
   regions: Region[];
+  isRegionLocked?: boolean;
+  isDistrictLocked?: boolean;
   districtId: string;
   onDistrictChange: (value: string) => void;
   districts: District[];
   isLoadingDistricts?: boolean;
-  onAddClick: () => void;
+  onAddClick?: () => void;
 }
 
 export function UserTableFilters({
@@ -46,6 +48,8 @@ export function UserTableFilters({
   regionId,
   onRegionChange,
   regions,
+  isRegionLocked = false,
+  isDistrictLocked = false,
   districtId,
   onDistrictChange,
   districts,
@@ -63,67 +67,71 @@ export function UserTableFilters({
         autoComplete='off'
       />
 
-      <Select value={regionId} onValueChange={onRegionChange}>
-        <SelectTrigger
-          className='dark:bg-gray-700 shadow-sm w-52 dark:text-white'
-          size='sm'
-        >
-          <SelectValue
-            placeholder="Viloyat bo'yicha filter"
-            className='text-xs 2xl:text-sm'
-          />
-        </SelectTrigger>
-        <SelectContent className='dark:bg-gray-700 dark:text-white'>
-          <SelectItem value='all' className='text-xs 2xl:text-sm'>
-            Barcha viloyatlar
-          </SelectItem>
-          {regions.map((region: Region) => (
-            <SelectItem
-              key={region.id}
-              value={region.id}
+      {!isRegionLocked && (
+        <Select value={regionId} onValueChange={onRegionChange}>
+          <SelectTrigger
+            className='dark:bg-gray-700 shadow-sm w-52 dark:text-white'
+            size='sm'
+          >
+            <SelectValue
+              placeholder="Viloyat bo'yicha filter"
               className='text-xs 2xl:text-sm'
-            >
-              {region.name}
+            />
+          </SelectTrigger>
+          <SelectContent className='dark:bg-gray-700 dark:text-white'>
+            <SelectItem value='all' className='text-xs 2xl:text-sm'>
+              Barcha viloyatlar
             </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
+            {regions.map((region: Region) => (
+              <SelectItem
+                key={region.id}
+                value={region.id}
+                className='text-xs 2xl:text-sm'
+              >
+                {region.name}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      )}
 
-      <Select
-        value={districtId}
-        onValueChange={onDistrictChange}
-        disabled={regionId === 'all' || isLoadingDistricts}
-      >
-        <SelectTrigger
-          className='dark:bg-gray-700 shadow-sm w-52 dark:text-white'
-          size='sm'
+      {!isDistrictLocked && (
+        <Select
+          value={districtId}
+          onValueChange={onDistrictChange}
+          disabled={regionId === 'all' || isLoadingDistricts}
         >
-          <SelectValue
-            placeholder={
-              isLoadingDistricts ? (
-                <Loader2Icon className='animate-spin' />
-              ) : (
-                "Tuman bo'yicha filter"
-              )
-            }
-            className='text-xs 2xl:text-sm'
-          />
-        </SelectTrigger>
-        <SelectContent className='dark:bg-gray-700 dark:text-white'>
-          <SelectItem value='all' className='text-xs 2xl:text-sm'>
-            Barcha tumanlar
-          </SelectItem>
-          {districts.map((district: District) => (
-            <SelectItem
-              key={district.id}
-              value={district.id}
+          <SelectTrigger
+            className='dark:bg-gray-700 shadow-sm w-52 dark:text-white'
+            size='sm'
+          >
+            <SelectValue
+              placeholder={
+                isLoadingDistricts ? (
+                  <Loader2Icon className='animate-spin' />
+                ) : (
+                  "Tuman bo'yicha filter"
+                )
+              }
               className='text-xs 2xl:text-sm'
-            >
-              {district.name}
+            />
+          </SelectTrigger>
+          <SelectContent className='dark:bg-gray-700 dark:text-white'>
+            <SelectItem value='all' className='text-xs 2xl:text-sm'>
+              Barcha tumanlar
             </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
+            {districts.map((district: District) => (
+              <SelectItem
+                key={district.id}
+                value={district.id}
+                className='text-xs 2xl:text-sm'
+              >
+                {district.name}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      )}
 
       <Select value={role} onValueChange={onRoleChange}>
         <SelectTrigger
@@ -176,6 +184,7 @@ export function UserTableFilters({
 
       <div className='flex-1' />
 
+      {onAddClick && (
       <Button
         onClick={onAddClick}
         size='sm'
@@ -184,6 +193,7 @@ export function UserTableFilters({
         <Plus className='w-4 h-4' />
         <span>Qo&apos;shish</span>
       </Button>
+      )}
     </div>
   );
 }

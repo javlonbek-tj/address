@@ -75,7 +75,6 @@ export function useMapFeatures({
         },
       };
     } catch (error) {
-      console.error('Error calculating street metadata:', error);
       return street;
     }
   }, [streets, selectedStreet]);

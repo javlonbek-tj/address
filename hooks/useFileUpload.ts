@@ -56,7 +56,6 @@ export function useFileUpload(
       try {
         await removeFile(uploadedImageUrl);
       } catch (error) {
-        console.error('Failed to delete orphaned image:', error);
       }
     }
   };

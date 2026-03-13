@@ -25,7 +25,6 @@ export async function GET(request: NextRequest) {
 
     return Response.json({ success: true, data: mahallas });
   } catch (error) {
-    const message = error instanceof Error ? error.message : 'Unknown error';
-    return Response.json({ success: false, error: message }, { status: 500 });
+    return Response.json({ success: false, error: 'INTERNAL_SERVER_ERROR' }, { status: 500 });
   }
 }

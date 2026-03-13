@@ -48,11 +48,11 @@ export function FormSelectField({
             {requiredSymbol && <RequiredSymbol />}
           </FieldLabel>
           <Select
-            value={field.value}
+            value={field.value || undefined}
             onValueChange={field.onChange}
             disabled={disabled}
           >
-            <SelectTrigger className='w-full h-10'>
+            <SelectTrigger className='w-full data-[size=default]:h-10' aria-invalid={fieldState.invalid}>
               <SelectValue placeholder={placeholder} />
             </SelectTrigger>
             <SelectContent>

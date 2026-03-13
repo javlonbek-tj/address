@@ -5,11 +5,17 @@ import type { ActionResult } from '@/types';
 import type { MahallaSchemaType } from '@/lib';
 import type { Mahalla } from '@/types';
 import { mahallaSchema } from '@/lib';
+import { getServerSession } from '@/lib/auth/session';
+import { assertActive, assertSuperadmin } from '@/lib/auth/authorization';
 
 export async function updateMahalla(
   id: string,
   data: MahallaSchemaType,
 ): Promise<ActionResult<Mahalla>> {
+  const session = await getServerSession();
+  assertActive(session!.user);
+  assertSuperadmin(session!.user);
+
   const validationResult = mahallaSchema.safeParse(data);
 
   if (!validationResult.success) {
@@ -139,12 +145,15 @@ export async function updateMahalla(
 
     return { success: true, data: updatedMahalla };
   } catch (error) {
-    console.error('Failed to update mahalla:', error);
     return { success: false, error: 'INTERNAL_SERVER_ERROR' };
   }
 }
 
 export async function deleteMahalla(id: string): Promise<ActionResult<null>> {
+  const session = await getServerSession();
+  assertActive(session!.user);
+  assertSuperadmin(session!.user);
+
   try {
     await prisma.mahalla.update({
       where: { id },
@@ -153,7 +162,6 @@ export async function deleteMahalla(id: string): Promise<ActionResult<null>> {
 
     return { success: true, data: null };
   } catch (error) {
-    console.error('Failed to delete mahalla:', error);
     return { success: false, error: 'INTERNAL_SERVER_ERROR' };
   }
 }

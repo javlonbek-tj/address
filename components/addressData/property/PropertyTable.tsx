@@ -21,7 +21,21 @@ import { TableActions } from '../table';
 import { DeleteDialog } from '@/components/shared/modal';
 import { deleteProperty } from '@/app/actions';
 
-export function PropertyTable() {
+interface PropertyTableProps {
+  isSuperadmin?: boolean;
+  isRegionLocked?: boolean;
+  isDistrictLocked?: boolean;
+  userRegionId?: string | null;
+  userDistrictId?: string | null;
+}
+
+export function PropertyTable({
+  isSuperadmin = false,
+  isRegionLocked = false,
+  isDistrictLocked = false,
+  userRegionId = null,
+  userDistrictId = null,
+}: PropertyTableProps) {
   const searchParams = useSearchParams();
   const router = useRouter();
   const queryClient = useQueryClient();
@@ -29,8 +43,12 @@ export function PropertyTable() {
   const page = Number(searchParams.get('page')) || 1;
   const limit = Number(searchParams.get('limit')) || 10;
   const search = searchParams.get('search') || '';
-  const regionId = searchParams.get('regionId') || 'all';
-  const districtId = searchParams.get('districtId') || 'all';
+  const regionId = isDistrictLocked || isRegionLocked
+    ? (userRegionId ?? 'all')
+    : searchParams.get('regionId') || 'all';
+  const districtId = isDistrictLocked && userDistrictId
+    ? userDistrictId
+    : searchParams.get('districtId') || 'all';
   const mahallaId = searchParams.get('mahallaId') || 'all';
   const streetId = searchParams.get('streetId') || 'all';
   const isNew = searchParams.get('isNew') || 'all';
@@ -138,6 +156,8 @@ export function PropertyTable() {
           streets={streets}
           isLoadingStreets={isLoadingStreets}
           isNew={isNew}
+          isRegionLocked={isRegionLocked}
+          isDistrictLocked={isDistrictLocked}
         />
 
         <div className='p-4 overflow-hidden'>
@@ -149,12 +169,16 @@ export function PropertyTable() {
                   <th className='px-6 py-3 font-bold text-[10px] text-gray-800 dark:text-gray-300 3xl:text-xs text-left uppercase leading-none tracking-widest'>
                     T/R
                   </th>
-                  <th className='px-6 py-3 font-bold text-[10px] text-gray-800 dark:text-gray-300 3xl:text-xs text-left uppercase leading-none tracking-widest'>
-                    Viloyat
-                  </th>
-                  <th className='px-6 py-3 font-bold text-[10px] text-gray-800 dark:text-gray-300 3xl:text-xs text-left uppercase leading-none tracking-widest'>
-                    Tuman
-                  </th>
+                  {!isRegionLocked && !isDistrictLocked && (
+                    <th className='px-6 py-3 font-bold text-[10px] text-gray-800 dark:text-gray-300 3xl:text-xs text-left uppercase leading-none tracking-widest'>
+                      Viloyat
+                    </th>
+                  )}
+                  {!isDistrictLocked && (
+                    <th className='px-6 py-3 font-bold text-[10px] text-gray-800 dark:text-gray-300 3xl:text-xs text-left uppercase leading-none tracking-widest'>
+                      Tuman
+                    </th>
+                  )}
                   <th className='px-6 py-3 font-bold text-[10px] text-gray-800 dark:text-gray-300 3xl:text-xs text-left uppercase leading-none tracking-widest'>
                     Mahalla
                   </th>
@@ -183,10 +207,14 @@ export function PropertyTable() {
               >
                 {properties.length === 0 && !isLoading ? (
                   <tr>
-                    <td
-                      colSpan={10}
-                      className='px-6 py-12 font-medium text-gray-800 dark:text-gray-400 text-sm text-center'
-                    >
+                      <td
+                        colSpan={
+                          10 -
+                          (isRegionLocked || isDistrictLocked ? 1 : 0) -
+                          (isDistrictLocked ? 1 : 0)
+                        }
+                        className='px-6 py-12 font-medium text-gray-800 dark:text-gray-400 text-sm text-center'
+                      >
                       Ma&apos;lumot topilmadi
                     </td>
                   </tr>
@@ -199,12 +227,16 @@ export function PropertyTable() {
                       <td className='px-6 py-2 font-bold text-gray-600 dark:text-gray-300 text-xs whitespace-nowrap'>
                         {actualStartIndex + index + 1}
                       </td>
-                      <td className='px-6 py-2 font-bold text-gray-600 dark:text-gray-300 text-xs whitespace-nowrap'>
-                        {property.district.region.name}
-                      </td>
-                      <td className='px-6 py-2 font-bold text-gray-600 dark:text-gray-300 text-xs whitespace-nowrap'>
-                        {property.district.name}
-                      </td>
+                      {!isRegionLocked && !isDistrictLocked && (
+                        <td className='px-6 py-2 font-bold text-gray-600 dark:text-gray-300 text-xs whitespace-nowrap'>
+                          {property.district.region.name}
+                        </td>
+                      )}
+                      {!isDistrictLocked && (
+                        <td className='px-6 py-2 font-bold text-gray-600 dark:text-gray-300 text-xs whitespace-nowrap'>
+                          {property.district.name}
+                        </td>
+                      )}
                       <td className='px-6 py-2 font-bold text-gray-600 dark:text-gray-300 text-xs whitespace-nowrap'>
                         {property.mahalla?.name}
                       </td>
@@ -235,6 +267,7 @@ export function PropertyTable() {
                           onView={() =>
                             router.push(`/properties/${property.id}`)
                           }
+                          showEditDelete={isSuperadmin}
                         />
                       </td>
                     </tr>

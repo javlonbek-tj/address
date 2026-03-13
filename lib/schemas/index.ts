@@ -4,3 +4,5 @@ export * from './district-schema';
 export * from './mahalla-schema';
 export * from './street-schema';
 export * from './user-schema';
+export * from './login-schema';
+export * from './change-password-schema';

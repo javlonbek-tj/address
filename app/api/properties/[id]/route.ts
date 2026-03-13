@@ -15,7 +15,6 @@ export async function GET(
     const property = await getPropertyById(id);
     return Response.json({ success: true, data: property });
   } catch (error) {
-    console.error('[PROPERTY_BY_ID_API_ERROR]', error);
     return Response.json(
       { success: false, error: 'Internal server error' },
       { status: 500 },

@@ -178,7 +178,6 @@ export async function getPropertyTableData(
       limit,
     };
   } catch (error) {
-    console.error('Failed to fetch property table data:', error);
     return {
       data: [],
       total: 0,
@@ -224,7 +223,6 @@ export async function getPropertyDetailById(id: string) {
 
     return property;
   } catch (error) {
-    console.error('Failed to fetch property by ID:', error);
     return null;
   }
 }

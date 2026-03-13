@@ -74,7 +74,6 @@ export async function removeFile(imageUrl: string) {
       await unlink(filepath);
     }
   } catch (error) {
-    console.error('[IMAGE_DELETE_ERROR]', error);
   }
 }
 
@@ -94,7 +93,6 @@ export async function getFiles(folderName: string) {
     }));
     return fileData;
   } catch (error) {
-    console.error('[GET_FILES_ERROR]', error);
     return [];
   }
 }

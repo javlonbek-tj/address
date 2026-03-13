@@ -3,11 +3,17 @@
 import { prisma } from '@/server/prisma';
 import type { ActionResult, Street } from '@/types';
 import { streetSchema, type StreetSchemaType } from '@/lib';
+import { getServerSession } from '@/lib/auth/session';
+import { assertActive, assertSuperadmin } from '@/lib/auth/authorization';
 
 export async function updateStreet(
   id: string,
   data: StreetSchemaType,
 ): Promise<ActionResult<Street>> {
+  const session = await getServerSession();
+  assertActive(session!.user);
+  assertSuperadmin(session!.user);
+
   const validationResult = streetSchema.safeParse(data);
 
   if (!validationResult.success) {
@@ -77,12 +83,15 @@ export async function updateStreet(
 
     return { success: true, data: updatedStreet as unknown as Street };
   } catch (error) {
-    console.error('Failed to update street:', error);
     return { success: false, error: 'INTERNAL_SERVER_ERROR' };
   }
 }
 
 export async function deleteStreet(id: string): Promise<ActionResult<null>> {
+  const session = await getServerSession();
+  assertActive(session!.user);
+  assertSuperadmin(session!.user);
+
   try {
     await prisma.street.update({
       where: { id },
@@ -91,7 +100,6 @@ export async function deleteStreet(id: string): Promise<ActionResult<null>> {
 
     return { success: true, data: null };
   } catch (error) {
-    console.error('Failed to delete street:', error);
     return { success: false, error: 'INTERNAL_SERVER_ERROR' };
   }
 }

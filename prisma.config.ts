@@ -5,7 +5,7 @@ export default defineConfig({
   schema: 'prisma/schema.prisma',
   migrations: {
     path: 'prisma/migrations',
-    seed: `tsx prisma/seed/migrate-properties.ts`,
+    seed: `tsx prisma/seed/migrate-auth-users.ts`,
   },
   datasource: {
     url: process.env['DATABASE_URL'],

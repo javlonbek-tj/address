@@ -18,7 +18,21 @@ import { TableActions } from '../table';
 import { DeleteDialog } from '@/components/shared/modal';
 import { deleteMahalla } from '@/app/actions/admin';
 
-export function MahallaTable() {
+interface MahallaTableProps {
+  isSuperadmin?: boolean;
+  isRegionLocked?: boolean;
+  isDistrictLocked?: boolean;
+  userRegionId?: string | null;
+  userDistrictId?: string | null;
+}
+
+export function MahallaTable({
+  isSuperadmin = false,
+  isRegionLocked = false,
+  isDistrictLocked = false,
+  userRegionId = null,
+  userDistrictId = null,
+}: MahallaTableProps) {
   const searchParams = useSearchParams();
   const router = useRouter();
   const queryClient = useQueryClient();
@@ -26,8 +40,12 @@ export function MahallaTable() {
   const page = Number(searchParams.get('page')) || 1;
   const limit = Number(searchParams.get('limit')) || 10;
   const search = searchParams.get('search') || '';
-  const regionId = searchParams.get('regionId') || 'all';
-  const districtId = searchParams.get('districtId') || 'all';
+  const regionId = isDistrictLocked || isRegionLocked
+    ? (userRegionId ?? 'all')
+    : searchParams.get('regionId') || 'all';
+  const districtId = isDistrictLocked && userDistrictId
+    ? userDistrictId
+    : searchParams.get('districtId') || 'all';
   const isOptimized = searchParams.get('isOptimized') || 'all';
 
   const { data: mahallaTableData, isLoadingMahallaTableData } =
@@ -104,6 +122,8 @@ export function MahallaTable() {
           districts={districts}
           isLoadingDistricts={isLoadingDistricts}
           isOptimized={isOptimized}
+          isRegionLocked={isRegionLocked}
+          isDistrictLocked={isDistrictLocked}
         />
 
         <div className='p-4 overflow-hidden'>
@@ -115,12 +135,16 @@ export function MahallaTable() {
                   <th className='px-6 py-3 font-bold text-[10px] text-gray-800 dark:text-gray-300 3xl:text-xs text-left uppercase leading-none tracking-widest'>
                     T/R
                   </th>
-                  <th className='px-6 py-3 font-bold text-[10px] text-gray-800 dark:text-gray-300 3xl:text-xs text-left uppercase leading-none tracking-widest'>
-                    Viloyat
-                  </th>
-                  <th className='px-6 py-3 font-bold text-[10px] text-gray-800 dark:text-gray-300 3xl:text-xs text-left uppercase leading-none tracking-widest'>
-                    Tuman
-                  </th>
+                  {!isRegionLocked && !isDistrictLocked && (
+                    <th className='px-6 py-3 font-bold text-[10px] text-gray-800 dark:text-gray-300 3xl:text-xs text-left uppercase leading-none tracking-widest'>
+                      Viloyat
+                    </th>
+                  )}
+                  {!isDistrictLocked && (
+                    <th className='px-6 py-3 font-bold text-[10px] text-gray-800 dark:text-gray-300 3xl:text-xs text-left uppercase leading-none tracking-widest'>
+                      Tuman
+                    </th>
+                  )}
                   <th className='px-6 py-3 font-bold text-[10px] text-gray-800 dark:text-gray-300 3xl:text-xs text-left uppercase leading-none tracking-widest'>
                     Uzkad Nomi
                   </th>
@@ -146,10 +170,14 @@ export function MahallaTable() {
               >
                 {mahallas.length === 0 && !isLoading ? (
                   <tr>
-                    <td
-                      colSpan={11}
-                      className='px-6 py-12 font-medium text-gray-800 dark:text-gray-400 text-sm text-center'
-                    >
+                      <td
+                        colSpan={
+                          11 -
+                          (isRegionLocked || isDistrictLocked ? 1 : 0) -
+                          (isDistrictLocked ? 1 : 0)
+                        }
+                        className='px-6 py-12 font-medium text-gray-800 dark:text-gray-400 text-sm text-center'
+                      >
                       Ma&apos;lumot topilmadi
                     </td>
                   </tr>
@@ -162,12 +190,16 @@ export function MahallaTable() {
                       <td className='px-6 py-1 2xl:py-1.5 font-bold text-gray-600 dark:text-gray-300 text-xs whitespace-nowrap'>
                         {actualStartIndex + index + 1}
                       </td>
-                      <td className='px-6 py-1 2xl:py-1.5 font-bold text-gray-600 dark:text-gray-300 text-xs whitespace-nowrap'>
-                        {mahalla.district.region.name}
-                      </td>
-                      <td className='px-6 py-1 2xl:py-1.5 font-bold text-gray-600 dark:text-gray-300 text-xs whitespace-nowrap'>
-                        {mahalla.district.name}
-                      </td>
+                      {!isRegionLocked && !isDistrictLocked && (
+                        <td className='px-6 py-1 2xl:py-1.5 font-bold text-gray-600 dark:text-gray-300 text-xs whitespace-nowrap'>
+                          {mahalla.district.region.name}
+                        </td>
+                      )}
+                      {!isDistrictLocked && (
+                        <td className='px-6 py-1 2xl:py-1.5 font-bold text-gray-600 dark:text-gray-300 text-xs whitespace-nowrap'>
+                          {mahalla.district.name}
+                        </td>
+                      )}
                       <td className='px-6 py-1 2xl:py-1.5 font-bold text-gray-600 dark:text-gray-300 text-xs whitespace-nowrap'>
                         {mahalla.uzKadName}
                       </td>
@@ -209,6 +241,7 @@ export function MahallaTable() {
                           onEdit={() => handleEdit(mahalla)}
                           onDelete={() => setDeleteId(mahalla.id)}
                           onView={() => router.push(`/mahallas/${mahalla.id}`)}
+                          showEditDelete={isSuperadmin}
                         />
                       </td>
                     </tr>

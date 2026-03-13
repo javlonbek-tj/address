@@ -19,7 +19,7 @@ model Region {
   isActive Boolean @default(true)
 
   districts District[]
-  users     User[]
+  users     AppUser[]
 
   @@index([name])
   @@map("regions")
@@ -41,7 +41,7 @@ model District {
   region   Region    @relation(fields: [regionId], references: [id], onDelete: Cascade)
   mahallas Mahalla[]
   streets  Street[]
-  users    User[]
+  users    AppUser[]
   properties Property[]
 
   @@index([name])
@@ -130,26 +130,76 @@ model Property {
   @@map("properties")
 }
 
-model User {
+model user {
+  id            String    @id @default(cuid())
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  username      String?   @unique
+  displayUsername String?
+
+  sessions      session[]
+  accounts      account[]
+
+  appUser       AppUser?
+
+  @@map("auth_identities")
+}
+
+model session {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  expiresAt DateTime
+  token     String   @unique
+  ipAddress String?
+  userAgent String?
+
+  userId    String
+  user      user     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("auth_sessions")
+}
+
+model account {
+  id                    String    @id @default(cuid())
+  accountId             String
+  providerId            String
+  userId                String
+  user                  user      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accessToken           String?
+  refreshToken          String?
+  idToken               String?
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  password              String?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  @@map("auth_accounts")
+}
+
+
+model AppUser {
   id          String  @id @default(cuid())
   fullName    String?
   phoneNumber String?
 
-  role   UserRole  @default(district_user)
-  status UserStatus @default(active)
-  isActive Boolean @default(true)
+  role     UserRole   @default(district_user)
+  status   UserStatus @default(active)
+  isActive Boolean    @default(true)
 
-  // Region-specific
+  authId String? @unique
+  auth   user?   @relation(fields: [authId], references: [id], onDelete: Cascade)
+
   regionId String?
   region   Region?             @relation(fields: [regionId], references: [id], onDelete: Cascade)
   position RegionUserPosition?
 
-  // District-specific
   districtId String?
-  district   District? @relation(fields: [districtId], references: [id], onDelete: Cascade)
-
-  // Auth relations
-  auth AuthUser?
+  district   District?         @relation(fields: [districtId], references: [id], onDelete: Cascade)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -159,21 +209,6 @@ model User {
   @@index([regionId])
   @@index([districtId])
   @@map("users")
-}
-
-model AuthUser {
-  id              String @id @default(cuid())
-  userId          String @unique
-  username        String @unique
-  displayUsername String
-  passwordHash    String
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@map("auth_users")
 }
 
 enum UserRole {

@@ -6,7 +6,6 @@ export async function GET(request: NextRequest) {
     const data = await getRegionsList();
     return Response.json({ success: true, data });
   } catch (error) {
-    const message = error instanceof Error ? error.message : 'Unknown error';
-    return Response.json({ success: false, error: message }, { status: 500 });
+    return Response.json({ success: false, error: 'INTERNAL_SERVER_ERROR' }, { status: 500 });
   }
 }

@@ -12,6 +12,8 @@ import {
   Region,
   StreetWithMetadata,
 } from '@/types';
+import { useSession } from '@/lib/auth/auth-client';
+import { UserRole } from '@/lib/generated/prisma/enums';
 
 interface MapFiltersProps {
   regions: Region[];
@@ -29,6 +31,7 @@ export function MapFilters({
   filterState,
   setMapBounds,
 }: MapFiltersProps) {
+  const { data: session } = useSession();
   const {
     selectedRegion,
     setSelectedRegion,
@@ -39,6 +42,30 @@ export function MapFilters({
     selectedStreet,
     setSelectedStreet,
   } = useMapFilterStore();
+
+  const user = session?.user;
+  const isDistrictUser = user?.role === UserRole.district_user;
+  const isRegionUser = user?.role === UserRole.region_user;
+
+  const visibleFiltersCount = [
+    !isRegionUser && !isDistrictUser,
+    !isDistrictUser,
+    true, // Mahalla
+    true, // Street
+  ].filter(Boolean).length;
+
+  const getGridColsClass = () => {
+    switch (visibleFiltersCount) {
+      case 4:
+        return 'grid-cols-1 sm:grid-cols-2 2xl:grid-cols-4';
+      case 3:
+        return 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3';
+      case 2:
+        return 'grid-cols-1 sm:grid-cols-2';
+      default:
+        return 'grid-cols-1';
+    }
+  };
 
   const { districts, mahallas, streets, isLoading } = filterState;
 
@@ -91,27 +118,31 @@ export function MapFilters({
   };
 
   return (
-    <div className='top-3 left-1/2 z-(--z-map-ui) absolute w-full max-w-[95%] -translate-x-1/2 px-4 md:px-0 md:w-fit'>
+    <div className='top-3 left-1/2 z-(--z-map-ui) absolute w-full max-w-[95%] -translate-x-1/2 px-4 transition-all duration-300 md:w-fit md:left-14 md:translate-x-0 2xl:left-1/2 2xl:-translate-x-1/2 md:px-0'>
       <div
-        className={`grid grid-cols-2 xl:grid-cols-4 gap-2 p-1 md:p-1.5 bg-background/95 backdrop-blur-md border rounded-lg shadow-lg transition-opacity duration-200 ${
+        className={`grid ${getGridColsClass()} gap-2.5 p-2 bg-background/95 backdrop-blur-md border rounded-xl shadow-lg transition-opacity duration-200 ${
           isLoading ? 'opacity-70 pointer-events-none' : 'opacity-100'
         }`}
       >
-        <FilterSelect
-          value={selectedRegion}
-          onValueChange={handleRegionChange}
-          placeholder='Viloyat'
-          options={regions}
-          onClear={(e) => clearFilter('region', e)}
-        />
-        <FilterSelect
-          value={selectedDistrict}
-          onValueChange={handleDistrictChange}
-          placeholder='Tuman/Shahar'
-          disabled={!selectedRegion}
-          options={districts}
-          onClear={(e) => clearFilter('district', e)}
-        />
+        {!isRegionUser && !isDistrictUser && (
+          <FilterSelect
+            value={selectedRegion}
+            onValueChange={handleRegionChange}
+            placeholder='Viloyat'
+            options={regions}
+            onClear={(e) => clearFilter('region', e)}
+          />
+        )}
+        {!isDistrictUser && (
+          <FilterSelect
+            value={selectedDistrict}
+            onValueChange={handleDistrictChange}
+            placeholder='Tuman/Shahar'
+            disabled={!selectedRegion}
+            options={districts}
+            onClear={(e) => clearFilter('district', e)}
+          />
+        )}
         <FilterSelect
           value={selectedMahalla}
           onValueChange={handleMahallaChange}

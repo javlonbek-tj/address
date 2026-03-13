@@ -3,7 +3,12 @@ import { twMerge } from 'tailwind-merge';
 import { Map as MapIcon, Navigation, Home, Waypoints } from 'lucide-react';
 import type { Statistics } from '@/types';
 import { StatItem } from '@/components/map/MapStatistics';
-import { MAX_UPLOAD_SIZE } from './constants';
+import {
+  MAX_UPLOAD_SIZE,
+  USER_ROLE_LABELS,
+  REGION_USER_POSITION_LABELS,
+  USER_ROLES,
+} from './constants';
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -72,6 +77,69 @@ export const validateFile = (
   return null;
 };
 
+export function getUserInitials(fullName: string | null): string {
+  if (!fullName) return '?';
+  return fullName
+    .trim()
+    .split(/\s+/)
+    .slice(0, 2)
+    .map((p) => p[0]?.toUpperCase() ?? '')
+    .join('');
+}
+
+export function getUserDisplayName(fullName: string | null): string {
+  if (!fullName) return '';
+  return fullName.trim().split(/\s+/).slice(0, 2).join(' ');
+}
+
+export function getUserSubtitle(user: {
+  role: string | null;
+  position: string | null;
+  regionName: string | null;
+  districtName: string | null;
+}): string {
+  const { role, position, regionName, districtName } = user;
+
+  if (role === USER_ROLES.REGION_USER) {
+    const posLabel = position
+      ? REGION_USER_POSITION_LABELS[
+          position as keyof typeof REGION_USER_POSITION_LABELS
+        ]
+      : null;
+    return [regionName, posLabel].filter(Boolean).join(' • ');
+  }
+
+  if (role === USER_ROLES.DISTRICT_USER) {
+    return [districtName, 'Tuman xodimi'].filter(Boolean).join(' • ');
+  }
+
+  return role
+    ? (USER_ROLE_LABELS[role as keyof typeof USER_ROLE_LABELS] ?? '')
+    : '';
+}
+
+export function parseUserAgent(ua: string | null): string {
+  if (!ua) return "Noma'lum";
+
+  let browser = "Noma'lum";
+  if (ua.includes('Edg/') || ua.includes('Edge/')) browser = 'Edge';
+  else if (ua.includes('OPR/') || ua.includes('Opera/')) browser = 'Opera';
+  else if (ua.includes('Chrome/')) browser = 'Chrome';
+  else if (ua.includes('Firefox/')) browser = 'Firefox';
+  else if (ua.includes('Safari/')) browser = 'Safari';
+
+  let os = "Noma'lum";
+  if (ua.includes('Windows NT 10')) os = 'Windows 10';
+  else if (ua.includes('Windows NT 11')) os = 'Windows 11';
+  else if (ua.includes('Windows')) os = 'Windows';
+  else if (ua.includes('Mac OS X')) os = 'macOS';
+  else if (ua.includes('Android')) os = 'Android';
+  else if (ua.includes('iPhone') || ua.includes('iPad')) os = 'iOS';
+  else if (ua.includes('Linux')) os = 'Linux';
+
+  return `${browser}, ${os}`;
+}
+
 export const formatCadastralNumber = (raw: string): string => {
   const cleaned = raw.replace(/[^\d/]/g, '');
   const [mainPart, suffixPart] = cleaned.split('/');
@@ -98,4 +166,16 @@ export const formatCadastralNumber = (raw: string): string => {
   }
 
   return result;
+};
+
+export const formatDate = (dateStr: string) => {
+  const d = new Date(dateStr);
+  return d.toLocaleString('ru-RU', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+  });
 };

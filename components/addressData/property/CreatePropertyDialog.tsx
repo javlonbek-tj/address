@@ -57,7 +57,6 @@ export function CreatePropertyDialog({
           }
         }
       } catch (error) {
-        console.error('Error auto-detecting location:', error);
       }
     }
   }, [open, geometry, regions, districts, form]);

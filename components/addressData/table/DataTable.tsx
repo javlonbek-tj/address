@@ -14,6 +14,7 @@ interface Props<T extends BaseEntity> {
   onEdit: (item: T) => void;
   onDelete: (id: string) => void;
   onView?: (id: string) => void;
+  showEditDelete?: boolean;
   startIndex?: number;
   isLoading?: boolean;
   pagination?: {
@@ -30,6 +31,7 @@ export function DataTable<T extends BaseEntity>({
   onEdit,
   onDelete,
   onView,
+  showEditDelete = true,
   startIndex,
   isLoading,
   pagination,
@@ -53,8 +55,10 @@ export function DataTable<T extends BaseEntity>({
               <th className='px-6 py-3 font-bold text-[10px] text-gray-800 dark:text-gray-300 3xl:text-xs text-left uppercase leading-none tracking-widest'>
                 Soato kodi
               </th>
-              <th className='px-6 py-3 pr-8 2xl:pr-10 font-bold text-[10px] text-gray-800 dark:text-gray-300 3xl:text-xs text-right uppercase leading-none tracking-widest'>
-                Amallar
+              <th
+                className={`px-6 py-3 pr-8 2xl:pr-10 font-bold text-[10px] text-gray-800 dark:text-gray-300 3xl:text-xs uppercase leading-none tracking-widest ${showEditDelete ? 'text-right' : 'text-right'}`}
+              >
+                {showEditDelete ? 'Amallar' : "Ko'rish"}
               </th>
             </tr>
           </thead>
@@ -101,6 +105,7 @@ export function DataTable<T extends BaseEntity>({
                         onEdit={() => onEdit(item)}
                         onDelete={() => onDelete(item.id)}
                         onView={onView ? () => onView(item.id) : undefined}
+                        showEditDelete={showEditDelete}
                       />
                     </td>
                   </tr>

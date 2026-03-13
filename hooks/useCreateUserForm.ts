@@ -25,6 +25,7 @@ export function useCreateUserForm({ open, onClose }: Props) {
 
   const getInitialValues = useCallback(
     (): UserFormValues => ({
+      username: '',
       fullName: '',
       phoneNumber: '',
       role: '',
@@ -32,6 +33,7 @@ export function useCreateUserForm({ open, onClose }: Props) {
       position: null,
       regionId: null,
       districtId: null,
+      password: '',
     }),
     [],
   );
@@ -56,6 +58,8 @@ export function useCreateUserForm({ open, onClose }: Props) {
     if (selectedStatus === USER_STATUSES.INACTIVE) {
       form.setValue('fullName', '');
       form.setValue('phoneNumber', '');
+      form.setValue('username', '');
+      form.setValue('password', '');
     }
   }, [selectedStatus, form]);
 
@@ -76,7 +80,7 @@ export function useCreateUserForm({ open, onClose }: Props) {
   const onSubmit = async (values: UserFormValues) => {
     setIsSubmitting(true);
     try {
-      const result = await createUser(values as any);
+      const result = await createUser(values);
       if (result.success) {
         toast.success('Foydalanuvchi yaratildi');
         queryClient.invalidateQueries({ queryKey: ['users-table'] });

@@ -1,8 +1,15 @@
 import { NextRequest } from 'next/server';
 import { getMahallasByDistrictId } from '@/server/data/mahallas';
+import { getServerSession } from '@/lib/auth/session';
+import { canAccessDistrict } from '@/lib/auth/authorization';
 
 export async function GET(request: NextRequest) {
   try {
+    const session = await getServerSession();
+    if (!session) {
+      return Response.json({ success: false, error: 'UNAUTHENTICATED' }, { status: 401 });
+    }
+
     const districtId = request.nextUrl.searchParams.get('districtId');
     if (!districtId) {
       return Response.json(
@@ -11,10 +18,13 @@ export async function GET(request: NextRequest) {
       );
     }
 
+    if (!await canAccessDistrict(session.user, districtId)) {
+      return Response.json({ success: false, error: 'FORBIDDEN' }, { status: 403 });
+    }
+
     const data = await getMahallasByDistrictId(districtId);
     return Response.json({ success: true, data });
   } catch (error) {
-    const message = error instanceof Error ? error.message : 'Unknown error';
-    return Response.json({ success: false, error: message }, { status: 500 });
+    return Response.json({ success: false, error: 'INTERNAL_SERVER_ERROR' }, { status: 500 });
   }
 }

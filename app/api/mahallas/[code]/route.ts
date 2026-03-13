@@ -22,7 +22,6 @@ export async function GET(
     }
     return Response.json({ success: true, data: mahalla });
   } catch (error) {
-    console.error('[MAHALLA_BY_CODE_API_ERROR]', error);
     return Response.json(
       { success: false, error: 'Internal server error' },
       { status: 500 },

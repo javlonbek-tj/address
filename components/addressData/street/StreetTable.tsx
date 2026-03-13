@@ -19,7 +19,21 @@ import { TableActions } from '../table';
 import { DeleteDialog } from '@/components/shared/modal';
 import { deleteStreet } from '@/app/actions';
 
-export function StreetTable() {
+interface StreetTableProps {
+  isSuperadmin?: boolean;
+  isRegionLocked?: boolean;
+  isDistrictLocked?: boolean;
+  userRegionId?: string | null;
+  userDistrictId?: string | null;
+}
+
+export function StreetTable({
+  isSuperadmin = false,
+  isRegionLocked = false,
+  isDistrictLocked = false,
+  userRegionId = null,
+  userDistrictId = null,
+}: StreetTableProps) {
   const searchParams = useSearchParams();
   const router = useRouter();
   const queryClient = useQueryClient();
@@ -27,8 +41,12 @@ export function StreetTable() {
   const page = Number(searchParams.get('page')) || 1;
   const limit = Number(searchParams.get('limit')) || 10;
   const search = searchParams.get('search') || '';
-  const regionId = searchParams.get('regionId') || 'all';
-  const districtId = searchParams.get('districtId') || 'all';
+  const regionId = isDistrictLocked || isRegionLocked
+    ? (userRegionId ?? 'all')
+    : searchParams.get('regionId') || 'all';
+  const districtId = isDistrictLocked && userDistrictId
+    ? userDistrictId
+    : searchParams.get('districtId') || 'all';
   const mahallaId = searchParams.get('mahallaId') || 'all';
 
   const { data: streetTableData, isLoadingStreetTableData } =
@@ -118,6 +136,8 @@ export function StreetTable() {
           handleFilterChange={handleFilterChange}
           mahallas={mahallas}
           isLoadingMahallas={isLoadingMahallas}
+          isRegionLocked={isRegionLocked}
+          isDistrictLocked={isDistrictLocked}
         />
 
         <div className='p-4 overflow-hidden'>
@@ -129,12 +149,16 @@ export function StreetTable() {
                   <th className='px-6 py-3 font-bold text-[10px] text-gray-800 dark:text-gray-300 3xl:text-xs text-left uppercase leading-none tracking-widest'>
                     T/R
                   </th>
-                  <th className='px-6 py-3 font-bold text-[10px] text-gray-800 dark:text-gray-300 3xl:text-xs text-left uppercase leading-none tracking-widest'>
-                    Viloyat
-                  </th>
-                  <th className='px-6 py-3 font-bold text-[10px] text-gray-800 dark:text-gray-300 3xl:text-xs text-left uppercase leading-none tracking-widest'>
-                    Tuman
-                  </th>
+                  {!isRegionLocked && !isDistrictLocked && (
+                    <th className='px-6 py-3 font-bold text-[10px] text-gray-800 dark:text-gray-300 3xl:text-xs text-left uppercase leading-none tracking-widest'>
+                      Viloyat
+                    </th>
+                  )}
+                  {!isDistrictLocked && (
+                    <th className='px-6 py-3 font-bold text-[10px] text-gray-800 dark:text-gray-300 3xl:text-xs text-left uppercase leading-none tracking-widest'>
+                      Tuman
+                    </th>
+                  )}
                   <th className='px-6 py-3 font-bold text-[10px] text-gray-800 dark:text-gray-300 3xl:text-xs text-left uppercase leading-none tracking-widest'>
                     Nomi
                   </th>
@@ -160,10 +184,14 @@ export function StreetTable() {
               >
                 {streets.length === 0 && !isLoading ? (
                   <tr>
-                    <td
-                      colSpan={9}
-                      className='px-6 py-12 font-medium text-gray-800 dark:text-gray-400 text-sm text-center'
-                    >
+                      <td
+                        colSpan={
+                          9 -
+                          (isRegionLocked || isDistrictLocked ? 1 : 0) -
+                          (isDistrictLocked ? 1 : 0)
+                        }
+                        className='px-6 py-12 font-medium text-gray-800 dark:text-gray-400 text-sm text-center'
+                      >
                       Ma&apos;lumot topilmadi
                     </td>
                   </tr>
@@ -176,12 +204,16 @@ export function StreetTable() {
                       <td className='px-6 py-2 font-bold text-gray-600 dark:text-gray-300 text-xs whitespace-nowrap'>
                         {actualStartIndex + index + 1}
                       </td>
-                      <td className='px-6 py-2 font-bold text-gray-600 dark:text-gray-300 text-xs whitespace-nowrap'>
-                        {street.district.region.name}
-                      </td>
-                      <td className='px-6 py-2 font-bold text-gray-600 dark:text-gray-300 text-xs whitespace-nowrap'>
-                        {street.district.name}
-                      </td>
+                      {!isRegionLocked && !isDistrictLocked && (
+                        <td className='px-6 py-2 font-bold text-gray-600 dark:text-gray-300 text-xs whitespace-nowrap'>
+                          {street.district.region.name}
+                        </td>
+                      )}
+                      {!isDistrictLocked && (
+                        <td className='px-6 py-2 font-bold text-gray-600 dark:text-gray-300 text-xs whitespace-nowrap'>
+                          {street.district.name}
+                        </td>
+                      )}
                       <td className='px-6 py-2 font-bold text-gray-600 dark:text-gray-300 text-xs whitespace-nowrap'>
                         {street.name}
                       </td>
@@ -203,6 +235,7 @@ export function StreetTable() {
                           onEdit={() => handleEdit(street)}
                           onDelete={() => setDeleteId(street.id)}
                           onView={() => router.push(`/streets/${street.id}`)}
+                          showEditDelete={isSuperadmin}
                         />
                       </td>
                     </tr>
@@ -229,7 +262,6 @@ export function StreetTable() {
         </div>
       </div>
 
-      {/* StreetFormDialog will be implemented later if needed */}
       <StreetFormDialog
         open={isFormOpen}
         onClose={handleCloseForm}

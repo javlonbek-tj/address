@@ -1,5 +1,3 @@
-import 'server-only';
-
 import { prisma } from '../prisma';
 import type { Region as RegionModel } from '@/lib/generated/prisma/client';
 import type { Region } from '@/types';
@@ -15,7 +13,6 @@ export async function getRegions(): Promise<RegionModel[]> {
 
     return regions;
   } catch (error) {
-    console.error('Failed to fetch regions:', error);
     return [];
   }
 }
@@ -75,7 +72,6 @@ export async function getRegionTableData(
       limit,
     };
   } catch (error) {
-    console.error('Failed to fetch regions:', error);
     return {
       data: [],
       total: 0,
@@ -100,7 +96,6 @@ export async function getRegionsList(): Promise<Region[]> {
 
     return regions;
   } catch (error) {
-    console.error('Failed to fetch regions list:', error);
     return [];
   }
 }
@@ -138,7 +133,6 @@ export async function getRegionById(id: string) {
       },
     };
   } catch (error) {
-    console.error('Failed to fetch region by ID:', error);
     return null;
   }
 }

@@ -28,14 +28,18 @@ import {
 } from './';
 import { Spinner } from '../shared';
 import { useMapHandlers } from '@/hooks/useMapHandlers';
+import { useMapAuthSync } from '@/hooks/useMapAuthSync';
 
 interface UzbekistanMapProps {
   regions: Region[];
 }
 import { useMapFilterStore } from '@/store/useMapFilterStore';
 import { District, Property, Region } from '@/types';
+import { useSession } from '@/lib/auth/auth-client';
+import { UserRole } from '@/lib/generated/prisma/enums';
 
 export default function UzbekistanMap({ regions }: UzbekistanMapProps) {
+  const { data: session } = useSession();
   const { districts, mahallas, streets, properties, isLoading } =
     useMapFilters();
 
@@ -85,6 +89,14 @@ export default function UzbekistanMap({ regions }: UzbekistanMapProps) {
   }, [resetFilters]);
 
   const [mapBounds, setMapBounds] = useState<LatLngBounds | null>(null);
+
+  // Synchronization with session (Authorization & Auto-initialization)
+  useMapAuthSync({
+    regions,
+    districts,
+    mapBounds,
+    setMapBounds,
+  });
 
   const {
     onEachRegion,
@@ -139,6 +151,13 @@ export default function UzbekistanMap({ regions }: UzbekistanMapProps) {
   );
 
   const handleBackToRegions = () => {
+    if (
+      session?.user?.role === UserRole.district_user ||
+      session?.user?.role === UserRole.region_user
+    ) {
+      // Restricted users shouldn't reset their primary filters
+      return;
+    }
     setSelectedRegion('');
     setSelectedDistrict('');
     setSelectedMahalla('');

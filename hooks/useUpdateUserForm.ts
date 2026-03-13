@@ -7,13 +7,13 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import toast from 'react-hot-toast';
 
 import {
-  userSchema,
-  type UserFormValues,
+  updateUserSchema,
+  type UpdateUserFormValues,
   USER_ROLES,
   USER_STATUSES,
 } from '@/lib';
 import { updateUser } from '@/app/actions';
-import type { User } from '@/lib/generated/prisma/client';
+import type { User } from '@/types/user';
 
 interface Props {
   user: User;
@@ -26,20 +26,20 @@ export function useUpdateUserForm({ user, open, onClose }: Props) {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const getInitialValues = useCallback(
-    (u: User): UserFormValues => ({
-      fullName: u.fullName || '',
-      phoneNumber: u.phoneNumber || '',
-      role: u.role,
-      status: u.status,
-      position: (u.position as string) || null,
-      regionId: u.regionId || null,
-      districtId: u.districtId || null,
+    (user: User): UpdateUserFormValues => ({
+      fullName: user.fullName || '',
+      phoneNumber: user.phoneNumber || '',
+      role: user.role,
+      status: user.status,
+      position: (user.position as string) || null,
+      regionId: user.region?.id || null,
+      districtId: user.district?.id || null,
     }),
     [],
   );
 
-  const form = useForm<UserFormValues>({
-    resolver: zodResolver(userSchema),
+  const form = useForm<UpdateUserFormValues>({
+    resolver: zodResolver(updateUserSchema),
     defaultValues: getInitialValues(user),
   });
 
@@ -75,10 +75,10 @@ export function useUpdateUserForm({ user, open, onClose }: Props) {
     }
   }, [selectedRole, form]);
 
-  const onSubmit = async (values: UserFormValues) => {
+  const onSubmit = async (values: UpdateUserFormValues) => {
     setIsSubmitting(true);
     try {
-      const result = await updateUser(user.id, values as any);
+      const result = await updateUser(user.id, values);
       if (result.success) {
         toast.success('Foydalanuvchi yangilandi');
         queryClient.invalidateQueries({ queryKey: ['users-table'] });

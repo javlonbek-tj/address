@@ -12,7 +12,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from '@/components/ui/sidebar';
-import { menuItems } from '@/lib';
+import { menuItems, ROLE_HIERARCHY } from '@/lib';
 import {
   Collapsible,
   CollapsibleContent,
@@ -20,23 +20,17 @@ import {
 } from '../ui/collapsible';
 import { MapPin, Building2, Home, Route } from 'lucide-react';
 
-export function AppSidebar() {
+export function AppSidebar({ userRole }: { userRole: string | null }) {
   const pathname = usePathname();
-  // const router = useRouter();
-  // const [isLoggingOut, setIsLoggingOut] = useState(false);
-
-  // const handleLogout = async () => {
-  //   setIsLoggingOut(true);
-  //   try {
-  //     await fetch('/api/auth/logout', { method: 'POST' });
-  //     router.push('/login');
-  //     router.refresh();
-  //   } catch (error) {
-  //     console.error('Logout failed:', error);
-  //   } finally {
-  //     setIsLoggingOut(false);
-  //   }
-  // };
+  const userLevel =
+    ROLE_HIERARCHY[userRole as keyof typeof ROLE_HIERARCHY] ?? 0;
+  const visibleItems = menuItems.filter((item) => {
+    if (!item.minRole) return true;
+    return (
+      userLevel >=
+      (ROLE_HIERARCHY[item.minRole as keyof typeof ROLE_HIERARCHY] ?? 0)
+    );
+  });
 
   return (
     <Sidebar collapsible='icon' className=''>
@@ -53,7 +47,7 @@ export function AppSidebar() {
       <SidebarContent>
         <SidebarGroup>
           <SidebarMenu className='gap-0'>
-            {menuItems
+            {visibleItems
               .filter((item) => item.title !== 'Manzil tuzilmasi')
               .map((item) => (
                 <SidebarMenuItem
@@ -91,37 +85,61 @@ export function AppSidebar() {
                 <CollapsibleContent>
                   <SidebarMenu className='gap-0'>
                     {[
-                      { title: 'Hududlar', icon: MapPin, href: '/regions' },
+                      {
+                        title: 'Hududlar',
+                        icon: MapPin,
+                        href: '/regions',
+                        minRole: 'admin',
+                      },
                       {
                         title: 'Tumanlar',
                         icon: Building2,
                         href: '/districts',
+                        minRole: 'region_user',
                       },
-                      { title: 'Mahallalar', icon: Home, href: '/mahallas' },
-                      { title: "Ko'chalar", icon: Route, href: '/streets' },
+                      {
+                        title: 'Mahallalar',
+                        icon: Home,
+                        href: '/mahallas',
+                        minRole: null,
+                      },
+                      {
+                        title: "Ko'chalar",
+                        icon: Route,
+                        href: '/streets',
+                        minRole: null,
+                      },
                       {
                         title: "Ko'chmas mulklar",
                         icon: Building2,
                         href: '/properties',
+                        minRole: null,
                       },
-                    ].map((subItem) => (
-                      <SidebarMenuItem key={subItem.href}>
-                        <SidebarMenuButton
-                          asChild
-                          isActive={pathname === subItem.href}
-                          tooltip={subItem.title}
-                          size='sm'
-                          className='data-[active=true]:bg-blue-500/10 px-8 group-data-[state=collapsed]:px-3 border-transparent data-[active=true]:border-blue-500 border-l-2 group-data-[state=collapsed]:border-l-0 rounded-none h-10'
-                        >
-                          <Link href={subItem.href} className='gap-3'>
-                            <subItem.icon className='shrink-0' />
-                            <span className='group-data-[state=collapsed]:hidden font-medium'>
-                              {subItem.title}
-                            </span>
-                          </Link>
-                        </SidebarMenuButton>
-                      </SidebarMenuItem>
-                    ))}
+                    ]
+                      .filter((subItem) => {
+                        if (!subItem.minRole) return true;
+                        return (
+                          userLevel >= (ROLE_HIERARCHY[subItem.minRole] ?? 0)
+                        );
+                      })
+                      .map((subItem) => (
+                        <SidebarMenuItem key={subItem.href}>
+                          <SidebarMenuButton
+                            asChild
+                            isActive={pathname === subItem.href}
+                            tooltip={subItem.title}
+                            size='sm'
+                            className='data-[active=true]:bg-blue-500/10 px-8 group-data-[state=collapsed]:px-3 border-transparent data-[active=true]:border-blue-500 border-l-2 group-data-[state=collapsed]:border-l-0 rounded-none h-10'
+                          >
+                            <Link href={subItem.href} className='gap-3'>
+                              <subItem.icon className='shrink-0' />
+                              <span className='group-data-[state=collapsed]:hidden font-medium'>
+                                {subItem.title}
+                              </span>
+                            </Link>
+                          </SidebarMenuButton>
+                        </SidebarMenuItem>
+                      ))}
                   </SidebarMenu>
                 </CollapsibleContent>
               </SidebarMenuItem>
@@ -129,19 +147,6 @@ export function AppSidebar() {
           </SidebarMenu>
         </SidebarGroup>
       </SidebarContent>
-      {/* <SidebarFooter className='p-4 border-t'>
-        <Button
-          variant='outline'
-          className='justify-start gap-3 w-full'
-          onClick={handleLogout}
-          disabled={isLoggingOut}
-        >
-          <LogOut className='w-5 h-5' />
-          <span className='font-medium'>
-            {isLoggingOut ? 'Chiqilmoqda...' : 'Chiqish'}
-          </span>
-        </Button>
-      </SidebarFooter> */}
     </Sidebar>
   );
 }

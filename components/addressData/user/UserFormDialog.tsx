@@ -105,18 +105,38 @@ export function UserFormDialog({
               {(selectedRole === USER_ROLES.SUPERADMIN ||
                 selectedRole === USER_ROLES.ADMIN ||
                 (selectedRole && selectedStatus === USER_STATUSES.ACTIVE)) && (
-                <>
-                  <FormInputField
-                    name='fullName'
-                    label='F.I.SH'
-                    placeholder='Foydalanuvchi ismi'
-                  />
+                <FormInputField
+                  name='fullName'
+                  label='F.I.SH'
+                  placeholder='Foydalanuvchi ismi'
+                />
+              )}
+
+              {(selectedRole === USER_ROLES.REGION_USER ||
+                selectedRole === USER_ROLES.DISTRICT_USER) &&
+                selectedStatus === USER_STATUSES.ACTIVE && (
                   <FormInputField
                     name='phoneNumber'
                     label='Telefon raqami'
-                    placeholder='Masalan: +998901234567'
+                    placeholder='Masalan: 998-90-123-45-67'
                   />
-                </>
+                )}
+
+              {!isEditing && selectedStatus === USER_STATUSES.ACTIVE && (
+                <FormInputField
+                  name='username'
+                  label='Login'
+                  placeholder='Login'
+                />
+              )}
+
+              {!isEditing && selectedStatus === USER_STATUSES.ACTIVE && (
+                <FormInputField
+                  name='password'
+                  label='Parol'
+                  placeholder='Kamida 6 ta belgi'
+                  type='password'
+                />
               )}
             </div>
 

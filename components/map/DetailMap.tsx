@@ -34,7 +34,6 @@ export default function DetailMap({ geometry }: DetailMapProps) {
           map.fitBounds(bounds, { padding: [20, 20] });
         }
       } catch (e) {
-        console.error('Error fitting bounds:', e);
       }
     }
   }, [map, geoData]);

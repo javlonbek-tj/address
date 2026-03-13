@@ -1,6 +1,6 @@
 import { prisma } from '@/server/prisma';
 import type { UserRole, UserStatus } from '@/lib/generated/prisma/enums';
-import type { UserWhereInput } from '@/lib/generated/prisma/models';
+import type { AppUserWhereInput } from '@/lib/generated/prisma/models';
 
 export async function getUserTableData(
   params: {
@@ -26,7 +26,7 @@ export async function getUserTableData(
 
   try {
     // 1. Start with a typed array of conditions
-    const conditions: UserWhereInput[] = [
+    const conditions: AppUserWhereInput[] = [
       { isActive: true }, // Your base filter
     ];
 
@@ -59,12 +59,12 @@ export async function getUserTableData(
     }
 
     // 5. Finally, combine everything into a single 'where' object
-    const where: UserWhereInput = {
+    const where: AppUserWhereInput = {
       AND: conditions,
     };
 
     const [users, total] = await Promise.all([
-      prisma.user.findMany({
+      prisma.appUser.findMany({
         where,
         include: {
           region: {
@@ -78,7 +78,7 @@ export async function getUserTableData(
         skip,
         take: limit,
       }),
-      prisma.user.count({ where }),
+      prisma.appUser.count({ where }),
     ]);
 
     return {
@@ -88,7 +88,6 @@ export async function getUserTableData(
       limit,
     };
   } catch (error) {
-    console.error('Failed to fetch user table data:', error);
     return {
       data: [],
       total: 0,
@@ -100,7 +99,7 @@ export async function getUserTableData(
 
 export async function getUserById(id: string) {
   try {
-    return await prisma.user.findUnique({
+    return await prisma.appUser.findUnique({
       where: { id },
       include: {
         region: true,
@@ -108,7 +107,6 @@ export async function getUserById(id: string) {
       },
     });
   } catch (error) {
-    console.error('Failed to fetch user by ID:', error);
     return null;
   }
 }

@@ -18,7 +18,7 @@ import { useMahallasList, useStreetsByDistrictId } from '@/hooks';
 import type { Region, District } from '@/types';
 import { PROPERTY_TYPE_OPTIONS } from '@/lib';
 
-interface PropertyFormDialogProps {
+interface Props {
   open: boolean;
   onClose: () => void;
   title: string;
@@ -42,7 +42,7 @@ export function PropertyFormDialog({
   regions,
   districts,
   isEditing = false,
-}: PropertyFormDialogProps) {
+}: Props) {
   const districtId = form.watch('districtId');
   const { mahallas = [] } = useMahallasList(districtId || 'all');
   const { streets = [] } = useStreetsByDistrictId(districtId || 'all');
