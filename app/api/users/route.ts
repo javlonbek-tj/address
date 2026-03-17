@@ -20,13 +20,19 @@ export async function GET(request: Request) {
   const search = searchParams.get('search') || '';
   const role = searchParams.get('role') || 'all';
   const status = searchParams.get('status') || 'all';
-  const districtId = searchParams.get('districtId') || 'all';
+
+  const isAdmin = hasMinRole(user, UserRole.admin);
+  const isDistrictUser = user.role === UserRole.district_user;
 
   // region_user can only see their own region's users
-  const isAdmin = hasMinRole(user, UserRole.admin);
   const regionId = isAdmin
     ? searchParams.get('regionId') || 'all'
     : (user.regionId ?? 'all');
+
+  // district_user can only see users in their own district
+  const districtId = isDistrictUser
+    ? (user.districtId ?? 'all')
+    : searchParams.get('districtId') || 'all';
 
   try {
     const data = await getUserTableData({
