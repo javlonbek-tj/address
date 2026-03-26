@@ -3,7 +3,7 @@
 import { UserFormDialog } from './UserFormDialog';
 import { useUpdateUserForm, useDistrictsList } from '@/hooks';
 import { Region } from '@/types';
-import type { User } from '@/lib/generated/prisma/client';
+import type { User } from '@/types/user';
 
 interface UpdateUserDialogProps {
   user: User;

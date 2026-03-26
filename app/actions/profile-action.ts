@@ -5,13 +5,15 @@ import { prisma } from '@/server/prisma';
 import { changePasswordSchema, type ChangePasswordFormValues } from '@/lib';
 import type { ActionResult } from '@/types';
 import { getServerSession } from '@/lib/auth/session';
-import { assertActive } from '@/lib/auth/authorization';
+import { assertActive, isSuperuser } from '@/lib/auth/authorization';
+import { SUPERUSER_DENIED_MESSAGE } from '@/lib/constants/user';
 
 export async function changePassword(
   data: ChangePasswordFormValues,
 ): Promise<ActionResult> {
   const session = await getServerSession();
   assertActive(session!.user);
+  if (isSuperuser(session!.user)) return { success: false, message: SUPERUSER_DENIED_MESSAGE };
 
   const validation = changePasswordSchema.safeParse(data);
   if (!validation.success) {

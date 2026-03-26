@@ -1,15 +1,16 @@
 import { NextRequest } from 'next/server';
 import { getDistrictTableData } from '@/server';
 import { getServerSession } from '@/lib/auth/session';
-import { hasMinRole } from '@/lib/auth/authorization';
-import { UserRole } from '@/lib/generated/prisma/enums';
 import { USER_ROLES } from '@/lib';
 import { prisma } from '@/server/prisma';
 
 export async function GET(request: NextRequest) {
   const session = await getServerSession();
   if (!session) {
-    return Response.json({ success: false, error: 'Unauthorized' }, { status: 401 });
+    return Response.json(
+      { success: false, error: 'Unauthorized' },
+      { status: 401 },
+    );
   }
 
   const { user } = session;
@@ -24,7 +25,10 @@ export async function GET(request: NextRequest) {
     // district_user can only see their own district
     if (isDistrictUser) {
       if (!user.districtId) {
-        return Response.json({ success: true, data: { data: [], total: 0, page, limit } });
+        return Response.json({
+          success: true,
+          data: { data: [], total: 0, page, limit },
+        });
       }
       const district = await prisma.district.findUnique({
         where: { id: user.districtId, isActive: true },
@@ -32,7 +36,12 @@ export async function GET(request: NextRequest) {
       });
       return Response.json({
         success: true,
-        data: { data: district ? [district] : [], total: district ? 1 : 0, page, limit },
+        data: {
+          data: district ? [district] : [],
+          total: district ? 1 : 0,
+          page,
+          limit,
+        },
       });
     }
 
@@ -40,11 +49,16 @@ export async function GET(request: NextRequest) {
     const rawRegionId = request.nextUrl.searchParams.get('regionId') || '';
     const regionId = isRegionUser
       ? (user.regionId ?? '')
-      : rawRegionId === 'all' ? undefined : rawRegionId;
+      : rawRegionId === 'all'
+        ? undefined
+        : rawRegionId;
 
     const data = await getDistrictTableData({ page, limit, search, regionId });
     return Response.json({ success: true, data });
   } catch (error) {
-    return Response.json({ success: false, error: 'INTERNAL_SERVER_ERROR' }, { status: 500 });
+    return Response.json(
+      { success: false, error: 'INTERNAL_SERVER_ERROR' },
+      { status: 500 },
+    );
   }
 }

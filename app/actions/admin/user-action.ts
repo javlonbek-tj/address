@@ -16,11 +16,18 @@ import {
 } from '@/lib';
 import type { ActionResult } from '@/types';
 import { getServerSession } from '@/lib/auth/session';
-import { assertActive, assertSuperadmin } from '@/lib/auth/authorization';
+import {
+  assertActive,
+  assertSuperadmin,
+  isSuperuser,
+} from '@/lib/auth/authorization';
+import { SUPERUSER_DENIED_MESSAGE } from '@/lib/constants/user';
 
 export async function createUser(data: UserFormValues): Promise<ActionResult> {
   const session = await getServerSession();
   assertActive(session!.user);
+  if (isSuperuser(session!.user))
+    return { success: false, message: SUPERUSER_DENIED_MESSAGE };
   assertSuperadmin(session!.user);
 
   const validation = userSchema.safeParse(data);
@@ -112,6 +119,8 @@ export async function updateUser(
 ): Promise<ActionResult> {
   const session = await getServerSession();
   assertActive(session!.user);
+  if (isSuperuser(session!.user))
+    return { success: false, message: SUPERUSER_DENIED_MESSAGE };
   assertSuperadmin(session!.user);
 
   const validation = updateUserSchema.safeParse(data);
@@ -153,6 +162,8 @@ export async function updateUser(
 export async function deleteUser(id: string): Promise<ActionResult> {
   const session = await getServerSession();
   assertActive(session!.user);
+  if (isSuperuser(session!.user))
+    return { success: false, message: SUPERUSER_DENIED_MESSAGE };
   assertSuperadmin(session!.user);
 
   try {

@@ -13,7 +13,7 @@ export default async function DistrictsPage() {
   const userRole = session!.user.role as string;
   const isRegionLocked = userRole === USER_ROLES.REGION_USER;
   const userRegionId = session!.user.regionId ?? null;
-  const isSuperadmin = userRole === USER_ROLES.SUPERADMIN;
+  const isSuperadmin = userRole === USER_ROLES.SUPERADMIN || userRole === USER_ROLES.SUPERUSER;
 
   return (
     <Suspense fallback={<Spinner />}>

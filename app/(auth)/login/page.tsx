@@ -3,7 +3,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import toast from 'react-hot-toast';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { loginAction } from '@/app/actions';
 import { loginSchema, LoginSchemaType } from '@/lib';
 import { FieldGroup } from '@/components/shared';
@@ -11,6 +11,7 @@ import { FieldGroup } from '@/components/shared';
 export default function LoginPage() {
   const [isPending, setIsPending] = useState(false);
   const router = useRouter();
+  const searchParams = useSearchParams();
 
   const {
     register,
@@ -29,7 +30,8 @@ export default function LoginPage() {
     } else if (!result.success && result.error) {
       toast.error('Xatolik yuz berdi.');
     } else {
-      window.location.href = '/';
+      const callbackUrl = searchParams.get('callbackUrl') || '/';
+      window.location.href = callbackUrl;
     }
     setIsPending(false);
   };

@@ -212,6 +212,7 @@ model AppUser {
 }
 
 enum UserRole {
+  superuser
   superadmin
   admin
   region_user

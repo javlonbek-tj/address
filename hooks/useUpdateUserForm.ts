@@ -84,7 +84,7 @@ export function useUpdateUserForm({ user, open, onClose }: Props) {
         queryClient.invalidateQueries({ queryKey: ['users-table'] });
         onClose();
       } else {
-        toast.error(result.error || 'Xatolik yuz berdi');
+        toast.error(result.message || 'Xatolik yuz berdi');
       }
     } catch (error) {
       toast.error('Xatolik yuz berdi');

@@ -10,7 +10,7 @@ export default async function RegionsPage() {
   const session = await getServerSession();
   assertMinRole(session!.user, UserRole.admin);
 
-  const isSuperadmin = session!.user.role === USER_ROLES.SUPERADMIN;
+  const isSuperadmin = session!.user.role === USER_ROLES.SUPERADMIN || session!.user.role === USER_ROLES.SUPERUSER;
 
   return (
     <Suspense fallback={<Spinner />}>

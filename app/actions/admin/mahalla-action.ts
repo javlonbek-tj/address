@@ -6,7 +6,8 @@ import type { MahallaSchemaType } from '@/lib';
 import type { Mahalla } from '@/types';
 import { mahallaSchema } from '@/lib';
 import { getServerSession } from '@/lib/auth/session';
-import { assertActive, assertSuperadmin } from '@/lib/auth/authorization';
+import { assertActive, assertSuperadmin, isSuperuser } from '@/lib/auth/authorization';
+import { SUPERUSER_DENIED_MESSAGE } from '@/lib/constants/user';
 
 export async function updateMahalla(
   id: string,
@@ -14,6 +15,7 @@ export async function updateMahalla(
 ): Promise<ActionResult<Mahalla>> {
   const session = await getServerSession();
   assertActive(session!.user);
+  if (isSuperuser(session!.user)) return { success: false, message: SUPERUSER_DENIED_MESSAGE };
   assertSuperadmin(session!.user);
 
   const validationResult = mahallaSchema.safeParse(data);
@@ -152,6 +154,7 @@ export async function updateMahalla(
 export async function deleteMahalla(id: string): Promise<ActionResult<null>> {
   const session = await getServerSession();
   assertActive(session!.user);
+  if (isSuperuser(session!.user)) return { success: false, message: SUPERUSER_DENIED_MESSAGE };
   assertSuperadmin(session!.user);
 
   try {

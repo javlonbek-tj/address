@@ -9,7 +9,8 @@ import {
   type CreatePropertySchemaType,
 } from '@/lib';
 import { getServerSession } from '@/lib/auth/session';
-import { assertActive, assertSuperadmin } from '@/lib/auth/authorization';
+import { assertActive, assertSuperadmin, isSuperuser } from '@/lib/auth/authorization';
+import { SUPERUSER_DENIED_MESSAGE } from '@/lib/constants/user';
 
 export async function updateProperty(
   id: string,
@@ -17,6 +18,7 @@ export async function updateProperty(
 ): Promise<ActionResult<PropertyWithRelations>> {
   const session = await getServerSession();
   assertActive(session!.user);
+  if (isSuperuser(session!.user)) return { success: false, message: SUPERUSER_DENIED_MESSAGE };
   assertSuperadmin(session!.user);
 
   const validationResult = updatePropertySchema.safeParse(data);
@@ -107,6 +109,7 @@ export async function createProperty(
 ): Promise<ActionResult<PropertyWithRelations>> {
   const session = await getServerSession();
   assertActive(session!.user);
+  if (isSuperuser(session!.user)) return { success: false, message: SUPERUSER_DENIED_MESSAGE };
   assertSuperadmin(session!.user);
 
   const validationResult = createPropertySchema.safeParse(data);
@@ -197,6 +200,7 @@ export async function createProperty(
 export async function deleteProperty(id: string): Promise<ActionResult<null>> {
   const session = await getServerSession();
   assertActive(session!.user);
+  if (isSuperuser(session!.user)) return { success: false, message: SUPERUSER_DENIED_MESSAGE };
   assertSuperadmin(session!.user);
 
   try {

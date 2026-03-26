@@ -13,7 +13,7 @@ export default async function UsersPage() {
   const userRole = session!.user.role as string;
   const isRegionLocked = userRole === USER_ROLES.REGION_USER;
   const userRegionId = session!.user.regionId ?? null;
-  const isSuperadmin = userRole === USER_ROLES.SUPERADMIN;
+  const isSuperadmin = userRole === USER_ROLES.SUPERADMIN || userRole === USER_ROLES.SUPERUSER;
 
   return (
     <div className='flex flex-col h-full bg-gray-50/50 dark:bg-gray-900/50'>

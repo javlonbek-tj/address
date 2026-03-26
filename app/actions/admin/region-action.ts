@@ -6,7 +6,8 @@ import { regionSchema } from '@/lib';
 import { prisma } from '@/server';
 import type { Region } from '@/types';
 import { getServerSession } from '@/lib/auth/session';
-import { assertActive, assertSuperadmin } from '@/lib/auth/authorization';
+import { assertActive, assertSuperadmin, isSuperuser } from '@/lib/auth/authorization';
+import { SUPERUSER_DENIED_MESSAGE } from '@/lib/constants/user';
 
 export async function updateRegion(
   id: string,
@@ -14,6 +15,7 @@ export async function updateRegion(
 ): Promise<ActionResult<Region>> {
   const session = await getServerSession();
   assertActive(session!.user);
+  if (isSuperuser(session!.user)) return { success: false, message: SUPERUSER_DENIED_MESSAGE };
   assertSuperadmin(session!.user);
 
   const validationResult = regionSchema.safeParse(data);
@@ -67,6 +69,7 @@ export async function updateRegion(
 export async function deleteRegion(id: string): Promise<ActionResult<null>> {
   const session = await getServerSession();
   assertActive(session!.user);
+  if (isSuperuser(session!.user)) return { success: false, message: SUPERUSER_DENIED_MESSAGE };
   assertSuperadmin(session!.user);
 
   try {

@@ -4,7 +4,8 @@ import { prisma } from '@/server/prisma';
 import type { ActionResult, Street } from '@/types';
 import { streetSchema, type StreetSchemaType } from '@/lib';
 import { getServerSession } from '@/lib/auth/session';
-import { assertActive, assertSuperadmin } from '@/lib/auth/authorization';
+import { assertActive, assertSuperadmin, isSuperuser } from '@/lib/auth/authorization';
+import { SUPERUSER_DENIED_MESSAGE } from '@/lib/constants/user';
 
 export async function updateStreet(
   id: string,
@@ -12,6 +13,7 @@ export async function updateStreet(
 ): Promise<ActionResult<Street>> {
   const session = await getServerSession();
   assertActive(session!.user);
+  if (isSuperuser(session!.user)) return { success: false, message: SUPERUSER_DENIED_MESSAGE };
   assertSuperadmin(session!.user);
 
   const validationResult = streetSchema.safeParse(data);
@@ -90,6 +92,7 @@ export async function updateStreet(
 export async function deleteStreet(id: string): Promise<ActionResult<null>> {
   const session = await getServerSession();
   assertActive(session!.user);
+  if (isSuperuser(session!.user)) return { success: false, message: SUPERUSER_DENIED_MESSAGE };
   assertSuperadmin(session!.user);
 
   try {

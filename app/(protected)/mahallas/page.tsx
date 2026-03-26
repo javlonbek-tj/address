@@ -11,7 +11,7 @@ export default async function MahallasPage() {
   assertMinRole(session!.user, UserRole.district_user);
 
   const userRole = session!.user.role as string;
-  const isSuperadmin = userRole === USER_ROLES.SUPERADMIN;
+  const isSuperadmin = userRole === USER_ROLES.SUPERADMIN || userRole === USER_ROLES.SUPERUSER;
   const isRegionLocked = userRole === USER_ROLES.REGION_USER;
   const isDistrictLocked = userRole === USER_ROLES.DISTRICT_USER;
   const userRegionId = session!.user.regionId ?? null;

@@ -6,8 +6,9 @@ import { districtSchema } from '@/lib';
 import { prisma } from '@/server';
 import type { District } from '@/types';
 import { getServerSession } from '@/lib/auth/session';
-import { assertActive, assertMinRole } from '@/lib/auth/authorization';
+import { assertActive, assertMinRole, isSuperuser } from '@/lib/auth/authorization';
 import { UserRole } from '@/lib/generated/prisma/enums';
+import { SUPERUSER_DENIED_MESSAGE } from '@/lib/constants/user';
 
 export async function updateDistrict(
   id: string,
@@ -15,6 +16,7 @@ export async function updateDistrict(
 ): Promise<ActionResult<District>> {
   const session = await getServerSession();
   assertActive(session!.user);
+  if (isSuperuser(session!.user)) return { success: false, message: SUPERUSER_DENIED_MESSAGE };
   assertMinRole(session!.user, UserRole.region_user);
 
   const validationResult = districtSchema.safeParse(data);
@@ -69,6 +71,7 @@ export async function updateDistrict(
 export async function deleteDistrict(id: string): Promise<ActionResult<null>> {
   const session = await getServerSession();
   assertActive(session!.user);
+  if (isSuperuser(session!.user)) return { success: false, message: SUPERUSER_DENIED_MESSAGE };
   assertMinRole(session!.user, UserRole.region_user);
 
   try {

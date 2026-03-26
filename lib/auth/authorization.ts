@@ -87,9 +87,13 @@ export function assertDistrictAccess(
   if (!canAccessDistrict(user, districtId)) redirect(redirectTo);
 }
 
+export function isSuperuser(user: SessionUser): boolean {
+  return user.role === UserRole.superuser;
+}
+
 export function assertSuperadmin(
   user: SessionUser,
   redirectTo = '/unauthorized',
 ) {
-  if (!hasRole(user, UserRole.superadmin)) redirect(redirectTo);
+  if (!hasRole(user, UserRole.superadmin, UserRole.superuser)) redirect(redirectTo);
 }
