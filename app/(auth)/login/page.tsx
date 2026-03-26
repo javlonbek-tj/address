@@ -1,16 +1,15 @@
 'use client';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useState } from 'react';
+import { useState, Suspense } from 'react';
 import { useForm } from 'react-hook-form';
 import toast from 'react-hot-toast';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
 import { loginAction } from '@/app/actions';
 import { loginSchema, LoginSchemaType } from '@/lib';
 import { FieldGroup } from '@/components/shared';
 
-export default function LoginPage() {
+function LoginForm() {
   const [isPending, setIsPending] = useState(false);
-  const router = useRouter();
   const searchParams = useSearchParams();
 
   const {
@@ -106,5 +105,13 @@ export default function LoginPage() {
         </form>
       </div>
     </main>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense>
+      <LoginForm />
+    </Suspense>
   );
 }
