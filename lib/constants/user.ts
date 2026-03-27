@@ -7,7 +7,7 @@ export const USER_ROLES = {
 } as const;
 
 export const USER_ROLE_LABELS = {
-  [USER_ROLES.SUPERUSER]: 'Super foydalanuvchi',
+  [USER_ROLES.SUPERUSER]: 'Superuser',
   [USER_ROLES.SUPERADMIN]: 'Superadmin',
   [USER_ROLES.ADMIN]: 'Admin',
   [USER_ROLES.REGION_USER]: 'Viloyat xodimi',

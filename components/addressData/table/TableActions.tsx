@@ -28,24 +28,26 @@ export function TableActions({
   return (
     <TooltipProvider delayDuration={200}>
       <div className='flex items-center gap-1 justify-end'>
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Button
-              variant='ghost'
-              size='icon-xs'
-              onClick={onView}
-              className={cn(
-                'hover:bg-blue-50 dark:hover:bg-blue-900/40 text-blue-600 dark:text-blue-400 active:scale-95 transition-all cursor-pointer',
-                !showEditDelete && 'pr-10',
-              )}
-            >
-              <Eye />
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent className='**:data-[slot=tooltip-arrow]:hidden bg-gray-900 dark:bg-white shadow-xl px-2 py-1 border-none text-[10px] text-white dark:text-gray-900'>
-            Ko&apos;rish
-          </TooltipContent>
-        </Tooltip>
+        {onView && (
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                variant='ghost'
+                size='icon-xs'
+                onClick={onView}
+                className={cn(
+                  'hover:bg-blue-50 dark:hover:bg-blue-900/40 text-blue-600 dark:text-blue-400 active:scale-95 transition-all cursor-pointer',
+                  !showEditDelete && 'pr-10',
+                )}
+              >
+                <Eye />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent className='**:data-[slot=tooltip-arrow]:hidden bg-gray-900 dark:bg-white shadow-xl px-2 py-1 border-none text-[10px] text-white dark:text-gray-900'>
+              Ko&apos;rish
+            </TooltipContent>
+          </Tooltip>
+        )}
 
         {showEditDelete && (
           <>
