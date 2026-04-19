@@ -19,7 +19,7 @@ export async function proxy(request: NextRequest) {
     if (pathname.startsWith('/api/')) {
       return Response.json(
         { success: false, error: 'UNAUTHENTICATED' },
-        { status: 401 },
+        { status: 401 }
       );
     }
 

@@ -108,14 +108,15 @@ export async function createUser(data: UserFormValues): Promise<ActionResult> {
 
     revalidatePath('/users');
     return { success: true };
-  } catch {
+  } catch (error) {
+    console.log(error);
     return { success: false, error: 'INTERNAL_SERVER_ERROR' };
   }
 }
 
 export async function updateUser(
   id: string,
-  data: UpdateUserFormValues,
+  data: UpdateUserFormValues
 ): Promise<ActionResult> {
   const session = await getServerSession();
   assertActive(session!.user);
