@@ -7,8 +7,18 @@ export const mahallaSchema = z
       .trim()
       .min(1, 'Majburiy maydon')
       .max(255, 'Maksimal 255 ta belgi')
-      .transform((val) => val.toLowerCase())
-      .transform((val) => val.charAt(0).toUpperCase() + val.slice(1)),
+      .transform((val) =>
+        val
+          .split(/\s+/)
+          .map((word) => {
+            if (word.length > 1 && word === word.toUpperCase() && /[A-Z]/.test(word)) {
+              return word;
+            }
+            const lower = word.toLowerCase();
+            return lower.charAt(0).toUpperCase() + lower.slice(1);
+          })
+          .join(' '),
+      ),
 
     code: z
       .string()
@@ -22,8 +32,18 @@ export const mahallaSchema = z
       .trim()
       .min(1, 'Majburiy maydon')
       .max(255, 'Maksimal 255 ta belgi')
-      .transform((val) => val.toLowerCase())
-      .transform((val) => val.charAt(0).toUpperCase() + val.slice(1)),
+      .transform((val) =>
+        val
+          .split(/\s+/)
+          .map((word) => {
+            if (word.length > 1 && word === word.toUpperCase() && /[A-Z]/.test(word)) {
+              return word;
+            }
+            const lower = word.toLowerCase();
+            return lower.charAt(0).toUpperCase() + lower.slice(1);
+          })
+          .join(' '),
+      ),
 
     geoCode: z
       .string()

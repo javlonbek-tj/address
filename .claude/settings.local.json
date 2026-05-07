@@ -3,7 +3,10 @@
     "allow": [
       "Bash(ls:*)",
       "Bash(xargs grep:*)",
-      "Bash(git -C \"C:/Users/User/Desktop/Projects/address\" show HEAD --name-only)"
+      "Bash(git -C \"C:/Users/User/Desktop/Projects/address\" show HEAD --name-only)",
+      "Bash(Get-ChildItem -Path \"C:\\\\Users\\\\j.turdimatov\\\\Desktop\\\\Projects\\\\Projects\\\\address\" -Recurse -Force)",
+      "Bash(Select-Object -First 30)",
+      "Bash(Format-Table Name, PSIsContainer)"
     ]
   }
 }

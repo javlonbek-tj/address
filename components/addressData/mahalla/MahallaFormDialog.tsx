@@ -26,7 +26,7 @@ import {
 } from '@/components/ui/dialog';
 import { Field, FieldError, FieldLabel } from '@/components/ui/field';
 import { Checkbox } from '@/components/ui/checkbox';
-import { useFileUpload, useMahallaForm } from '@/hooks';
+import { useDistrictsList, useFileUpload, useMahallaForm } from '@/hooks';
 import type { District, Mahalla, Region } from '@/types';
 import { Button } from '@/components/ui/button';
 import { ACCEPTED_DOCUMENT_TYPES } from '@/lib';
@@ -69,6 +69,10 @@ export function MahallaFormDialog({
     onClose,
     markAsSubmitted,
   });
+
+  const { districts: formDistricts } = useDistrictsList(
+    form.watch('regionId') || '',
+  );
 
   const {
     fields: mergingFields,
@@ -168,9 +172,7 @@ export function MahallaFormDialog({
               <FormSelectField
                 name='districtId'
                 label='Tuman'
-                options={districts.filter(
-                  (district) => district.regionId === form.watch('regionId'),
-                )}
+                options={formDistricts}
                 placeholder='Tumanni tanlang'
               />
 
