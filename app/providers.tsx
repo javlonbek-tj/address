@@ -9,6 +9,7 @@ import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { useState } from 'react';
 import toast, { Toaster } from 'react-hot-toast';
 import { TooltipProvider } from '@/components/ui/tooltip';
+import NextTopLoader from 'nextjs-toploader';
 
 export function Providers({ children }: { children: React.ReactNode }) {
   const [queryClient] = useState(
@@ -25,6 +26,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
+        <NextTopLoader showSpinner={false} />
         {children}
         <Toaster
           toastOptions={{
