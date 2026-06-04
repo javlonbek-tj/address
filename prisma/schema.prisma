@@ -90,8 +90,8 @@ model Street {
   type      String
   oldNameId String?
   oldName   String?
-  uzKadCode String?
-
+  uzKadCode       String?
+  uzKadUpdatedAt  DateTime?
 
   districtId String
   district   District @relation(fields: [districtId], references: [id])

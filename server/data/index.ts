@@ -4,3 +4,4 @@ export * from './mahallas';
 export * from './streets';
 export * from './stats';
 export * from './properties';
+export * from './reports';

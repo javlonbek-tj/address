@@ -1,6 +1,6 @@
 'use client';
 
-import { ChevronDown, Map } from 'lucide-react';
+import { ChevronDown, Map, BarChart3 } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import {
@@ -67,6 +67,20 @@ export function AppSidebar({ userRole }: { userRole: string | null }) {
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}
+
+            <SidebarMenuItem className='border-sidebar-border/50 border-b last:border-b-0'>
+              <SidebarMenuButton
+                asChild
+                isActive={pathname === '/reports'}
+                tooltip='Hisobotlar'
+                className='data-[active=true]:bg-blue-500/10 px-5 group-data-[state=collapsed]:px-3 border-transparent data-[active=true]:border-blue-500 border-l-2 group-data-[state=collapsed]:border-l-0 rounded-none h-12'
+              >
+                <Link href='/reports' className='gap-3'>
+                  <BarChart3 className='shrink-0' />
+                  <span className='font-medium'>Hisobotlar</span>
+                </Link>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
 
             <Collapsible className='group/collapsible'>
               <SidebarMenuItem className='border-sidebar-border/50 border-b last:border-b-0'>

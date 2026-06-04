@@ -15,4 +15,5 @@ export enum ApiRoutes {
   LIST_MAHALLAS = '/mahallas/list',
   USERS = '/users',
   SESSIONS = '/sessions',
+  REPORTS_STREETS = '/reports/streets',
 }

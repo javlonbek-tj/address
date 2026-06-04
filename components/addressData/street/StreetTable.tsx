@@ -3,7 +3,7 @@
 import { useSearchParams, useRouter } from 'next/navigation';
 import { useQueryClient } from '@tanstack/react-query';
 
-import { StreetTableFilters, StreetFormDialog } from './';
+import { StreetTableFilters, StreetFormDialog, InlineUzKadCodeCell } from './';
 import type { Street } from '@/types';
 import {
   useTableActions,
@@ -224,10 +224,17 @@ export function StreetTable({
                         <CopyableCode code={street.code} />
                       </td>
                       <td className='px-6 py-2 font-bold text-gray-600 dark:text-gray-300 text-xs whitespace-nowrap'>
-                        {street.mahalla?.map((m) => m.name).join(', ')}
+                        {(() => {
+                          const names = street.mahalla?.map((m) => m.name) ?? [];
+                          if (names.length <= 2) return names.join(', ');
+                          return `${names.slice(0, 2).join(', ')} ... +${names.length - 2} ta`;
+                        })()}
                       </td>
-                      <td className='px-6 py-2 font-bold text-gray-600 dark:text-gray-300 text-xs whitespace-nowrap'>
-                        <CopyableCode code={street.uzKadCode || ''} />
+                      <td className='px-6 py-2 text-xs whitespace-nowrap'>
+                        <InlineUzKadCodeCell
+                          streetId={street.id}
+                          initialValue={street.uzKadCode}
+                        />
                       </td>
                       <td className='px-6 py-2 whitespace-nowrap'>
                         <TableActions

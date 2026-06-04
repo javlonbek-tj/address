@@ -89,6 +89,29 @@ export async function updateStreet(
   }
 }
 
+export async function updateStreetUzKadCode(
+  id: string,
+  uzKadCode: string | null,
+): Promise<ActionResult<null>> {
+  const session = await getServerSession();
+  assertActive(session!.user);
+  if (isSuperuser(session!.user)) return { success: false, message: SUPERUSER_DENIED_MESSAGE };
+
+  try {
+    await prisma.street.update({
+      where: { id },
+      data: {
+        uzKadCode: uzKadCode || null,
+        uzKadUpdatedAt: uzKadCode ? new Date() : null,
+      },
+    });
+
+    return { success: true, data: null };
+  } catch {
+    return { success: false, error: 'INTERNAL_SERVER_ERROR' };
+  }
+}
+
 export async function deleteStreet(id: string): Promise<ActionResult<null>> {
   const session = await getServerSession();
   assertActive(session!.user);
