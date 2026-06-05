@@ -126,27 +126,6 @@ async function StreetDetailContent({ id }: { id: string }) {
                   )}
                 </span>
               </div>
-              <div className='grid grid-cols-1 gap-2 border-b border-gray-100 dark:border-gray-800 pb-2'>
-                <span className='font-medium text-muted-foreground'>
-                  Bog'langan mahallalar:
-                </span>
-                <div className='flex flex-wrap gap-2 mt-1'>
-                  {street.mahalla.map((m) => (
-                    <Badge
-                      key={m.id}
-                      variant='secondary'
-                      className='bg-slate-100 dark:bg-slate-800'
-                    >
-                      {m.name}
-                    </Badge>
-                  ))}
-                  {street.mahalla.length === 0 && (
-                    <span className='text-muted-foreground italic text-sm'>
-                      Bog'langan mahallalar mavjud emas
-                    </span>
-                  )}
-                </div>
-              </div>
             </CardContent>
           </Card>
         </div>

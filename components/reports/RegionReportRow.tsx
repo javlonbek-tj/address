@@ -1,11 +1,12 @@
 'use client';
 
-import type { DistrictReport } from '@/types';
+import type { RegionReport } from '@/types';
+import { ChevronRight } from 'lucide-react';
 
 interface Props {
-  row: DistrictReport;
+  row: RegionReport;
   index: number;
-  showRegion: boolean;
+  onSelect: (regionId: string) => void;
 }
 
 function StatCell({ count, percent, color }: { count: number; percent: number; color: string }) {
@@ -33,14 +34,19 @@ function CountCell({ value, color }: { value: number; color: string }) {
   );
 }
 
-export function DistrictReportRow({ row, index, showRegion }: Props) {
+export function RegionReportRow({ row, index, onSelect }: Props) {
   return (
-    <tr className='group hover:bg-blue-50/30 dark:hover:bg-blue-900/10 dark:even:bg-gray-700/20 dark:odd:bg-gray-800 even:bg-gray-50/50 odd:bg-white transition-all duration-200'>
+    <tr
+      onClick={() => onSelect(row.regionId)}
+      className='group cursor-pointer hover:bg-blue-50/50 dark:hover:bg-blue-900/15 dark:even:bg-gray-700/20 dark:odd:bg-gray-800 even:bg-gray-50/50 odd:bg-white transition-all duration-200'
+    >
       <td className='px-6 py-2 text-xs font-bold text-gray-500 dark:text-gray-400 whitespace-nowrap'>{index + 1}</td>
-      {showRegion && (
-        <td className='px-6 py-2 text-xs font-semibold text-gray-700 dark:text-gray-300 whitespace-nowrap'>{row.regionName}</td>
-      )}
-      <td className='px-6 py-2 text-xs font-semibold text-gray-800 dark:text-gray-200 whitespace-nowrap'>{row.districtName}</td>
+      <td className='px-6 py-2 text-xs font-semibold text-gray-800 dark:text-gray-200 whitespace-nowrap'>
+        <span className='flex items-center gap-1.5'>
+          {row.regionName}
+          <ChevronRight className='w-3.5 h-3.5 text-blue-400 opacity-0 group-hover:opacity-100 transition-opacity' />
+        </span>
+      </td>
       <td className='px-6 py-2 text-xs font-bold text-gray-700 dark:text-gray-300 whitespace-nowrap'>{row.totalStreets.toLocaleString()}</td>
       <StatCell count={row.filledCount} percent={row.filledPercent} color='text-emerald-600 dark:text-emerald-400' />
       <StatCell count={row.emptyCount} percent={row.remainingPercent} color='text-red-500 dark:text-red-400' />

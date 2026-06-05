@@ -169,9 +169,6 @@ export function StreetTable({
                     Kodi
                   </th>
                   <th className='px-6 py-3 font-bold text-[10px] text-gray-800 dark:text-gray-300 3xl:text-xs text-left uppercase leading-none tracking-widest'>
-                    Mahalla bog&apos;lanish
-                  </th>
-                  <th className='px-6 py-3 font-bold text-[10px] text-gray-800 dark:text-gray-300 3xl:text-xs text-left uppercase leading-none tracking-widest'>
                     Uzkad kodi
                   </th>
                   <th className='px-6 py-3 pr-8 2xl:pr-10 font-bold text-[10px] text-gray-800 dark:text-gray-300 3xl:text-xs text-right uppercase leading-none tracking-widest'>
@@ -186,7 +183,7 @@ export function StreetTable({
                   <tr>
                       <td
                         colSpan={
-                          9 -
+                          8 -
                           (isRegionLocked || isDistrictLocked ? 1 : 0) -
                           (isDistrictLocked ? 1 : 0)
                         }
@@ -222,13 +219,6 @@ export function StreetTable({
                       </td>
                       <td className='px-6 py-2 font-bold text-gray-600 dark:text-gray-300 text-xs whitespace-nowrap'>
                         <CopyableCode code={street.code} />
-                      </td>
-                      <td className='px-6 py-2 font-bold text-gray-600 dark:text-gray-300 text-xs whitespace-nowrap'>
-                        {(() => {
-                          const names = street.mahalla?.map((m) => m.name) ?? [];
-                          if (names.length <= 2) return names.join(', ');
-                          return `${names.slice(0, 2).join(', ')} ... +${names.length - 2} ta`;
-                        })()}
                       </td>
                       <td className='px-6 py-2 text-xs whitespace-nowrap'>
                         <InlineUzKadCodeCell

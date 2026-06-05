@@ -11,7 +11,7 @@ export default async function ReportsPage() {
   assertMinRole(session!.user, UserRole.district_user);
 
   const role = session!.user.role as string;
-  const isAdminOrAbove =
+  const isAdmin =
     role === USER_ROLES.SUPERADMIN ||
     role === USER_ROLES.SUPERUSER ||
     role === USER_ROLES.ADMIN;
@@ -19,23 +19,18 @@ export default async function ReportsPage() {
   const isDistrictUser = role === USER_ROLES.DISTRICT_USER;
 
   return (
-    <div>
-      <div className='px-8 pt-8 pb-2'>
-        <h1 className='text-xl font-bold text-gray-900 dark:text-gray-100'>
-          Hisobotlar
-        </h1>
-        <p className='text-sm text-gray-500 dark:text-gray-400 mt-1'>
-          Ko&apos;chalarga UzKad kodi qo&apos;yilishi bo&apos;yicha kunlik va umumiy hisobot
-        </p>
-      </div>
-
-      <Suspense fallback={<Spinner />}>
-        <ReportsTable
-          showRegionFilter={isAdminOrAbove}
-          lockedRegionId={isRegionUser || isDistrictUser ? (session!.user.regionId ?? null) : null}
-          lockedDistrictId={isDistrictUser ? (session!.user.districtId ?? null) : null}
-        />
-      </Suspense>
-    </div>
+    <Suspense fallback={<Spinner />}>
+      <ReportsTable
+        isAdmin={isAdmin}
+        lockedRegionId={
+          isRegionUser || isDistrictUser
+            ? (session!.user.regionId ?? null)
+            : null
+        }
+        lockedDistrictId={
+          isDistrictUser ? (session!.user.districtId ?? null) : null
+        }
+      />
+    </Suspense>
   );
 }

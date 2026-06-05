@@ -13,14 +13,13 @@ export async function GET(request: NextRequest) {
   const isDistrictUser = user.role === USER_ROLES.DISTRICT_USER;
   const isRegionUser = user.role === USER_ROLES.REGION_USER;
 
-  // Force scope based on role — ignore query params for lower roles
-  const regionId = isDistrictUser || isRegionUser
-    ? (user.regionId ?? undefined)
-    : request.nextUrl.searchParams.get('regionId') || undefined;
+  const districtId = isDistrictUser ? (user.districtId ?? undefined) : undefined;
 
-  const districtId = isDistrictUser
-    ? (user.districtId ?? undefined)
-    : request.nextUrl.searchParams.get('districtId') || undefined;
+  const regionId = isDistrictUser
+    ? undefined
+    : isRegionUser
+      ? (user.regionId ?? undefined)
+      : request.nextUrl.searchParams.get('regionId') || undefined;
 
   try {
     const data = await getStreetsReport({ regionId, districtId });

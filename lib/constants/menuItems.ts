@@ -1,4 +1,4 @@
-import { Map, LayoutDashboard, MapPin, Users, History } from 'lucide-react';
+import { Map, LayoutDashboard, MapPin, Users, History, BarChart3 } from 'lucide-react';
 
 export const menuItems = [
   { title: 'Ochiq xarita', icon: Map, href: '/', minRole: null },
@@ -16,4 +16,5 @@ export const menuItems = [
   },
   { title: 'Foydalanuvchilar', icon: Users, href: '/users', minRole: 'region_user' },
   { title: 'Seanslar tarixi', icon: History, href: '/sessions', minRole: 'superadmin' },
+  { title: 'Hisobotlar', icon: BarChart3, href: '/reports', minRole: null },
 ];
