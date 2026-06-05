@@ -98,6 +98,7 @@ export async function getStreetTableData(
     regionId?: string;
     districtId?: string;
     mahallaId?: string;
+    streetType?: string;
   } = {},
 ): Promise<{
   data: Street[];
@@ -112,6 +113,7 @@ export async function getStreetTableData(
     regionId = 'all',
     districtId = 'all',
     mahallaId = 'all',
+    streetType = 'all',
   } = params;
   const skip = (page - 1) * limit;
 
@@ -126,6 +128,10 @@ export async function getStreetTableData(
       where.districtId = districtId;
     } else if (regionId !== 'all') {
       where.district = { regionId };
+    }
+
+    if (streetType !== 'all' && streetType) {
+      where.type = streetType;
     }
 
     if (search) {
@@ -188,6 +194,30 @@ export async function getStreetTableData(
     };
   }
 }
+export async function getStreetTypes(): Promise<string[]> {
+  const rows = await prisma.street.findMany({
+    where: { isActive: true },
+    select: { type: true },
+    distinct: ['type'],
+    orderBy: { type: 'asc' },
+  });
+  return rows.map((r) => r.type).filter(Boolean);
+}
+
+export async function getStreetTableDataWithType(
+  params: {
+    page?: number;
+    limit?: number;
+    search?: string;
+    regionId?: string;
+    districtId?: string;
+    mahallaId?: string;
+    streetType?: string;
+  } = {},
+) {
+  return getStreetTableData({ ...params });
+}
+
 export async function getStreetById(id: string) {
   try {
     const street = await prisma.street.findUnique({

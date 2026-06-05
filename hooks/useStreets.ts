@@ -2,6 +2,7 @@ import type { StreetTableData, StreetWithMetadata } from '@/types';
 import {
   fetchStreetListByDistrictId,
   fetchStreetTableData,
+  fetchStreetTypes,
   fetchStreets,
 } from '@/services';
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
@@ -43,6 +44,7 @@ export function useStreetsTableData({
   regionId,
   districtId,
   mahallaId,
+  streetType,
 }: {
   page: number;
   limit: number;
@@ -50,6 +52,7 @@ export function useStreetsTableData({
   regionId: string;
   districtId: string;
   mahallaId: string;
+  streetType: string;
 }) {
   const { data, isPending: isLoadingStreetTableData } =
     useQuery<StreetTableData>({
@@ -61,6 +64,7 @@ export function useStreetsTableData({
         regionId,
         districtId,
         mahallaId,
+        streetType,
       ],
       queryFn: () =>
         fetchStreetTableData(
@@ -70,10 +74,20 @@ export function useStreetsTableData({
           regionId,
           districtId,
           mahallaId,
+          streetType,
         ),
       staleTime: Infinity,
       placeholderData: keepPreviousData,
     });
 
   return { data, isLoadingStreetTableData };
+}
+
+export function useStreetTypes() {
+  const { data: streetTypes = [], isLoading: isLoadingStreetTypes } = useQuery<string[]>({
+    queryKey: ['street-types'],
+    queryFn: fetchStreetTypes,
+    staleTime: Infinity,
+  });
+  return { streetTypes, isLoadingStreetTypes };
 }

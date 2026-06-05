@@ -25,12 +25,20 @@ export const fetchStreetTableData = async (
   regionId = '',
   districtId = '',
   mahallaId = '',
+  streetType = 'all',
 ) => {
   const { data } = await axiosInstance.get<{
     success: boolean;
     data: StreetTableData;
   }>(ApiRoutes.STREETS, {
-    params: { page, limit, search, regionId, districtId, mahallaId },
+    params: { page, limit, search, regionId, districtId, mahallaId, streetType },
   });
   return data?.data;
+};
+
+export const fetchStreetTypes = async (): Promise<string[]> => {
+  const { data } = await axiosInstance.get<{ success: boolean; data: string[] }>(
+    ApiRoutes.STREET_TYPES,
+  );
+  return data?.data ?? [];
 };

@@ -5,10 +5,20 @@ import { HeaderActions } from './HeaderActions';
 import { menuItems } from '@/lib';
 import { SidebarTrigger } from '../ui/sidebar';
 
+const PAGE_TITLES: Record<string, string> = {
+  '/regions': 'Hududlar',
+  '/districts': 'Tumanlar',
+  '/mahallas': 'Mahallalar',
+  '/streets': "Ko'chalar",
+  '/properties': "Ko'chmas mulklar",
+};
+
 export function Header() {
   const pathname = usePathname();
   const title =
-    menuItems.find((item) => item.href === pathname)?.title ?? 'Ochiq Xarita';
+    menuItems.find((item) => item.href === pathname)?.title ??
+    PAGE_TITLES[pathname] ??
+    'Ochiq Xarita';
   return (
     <header
       className={

@@ -17,6 +17,7 @@ export async function GET(request: NextRequest) {
   const limit = Number(request.nextUrl.searchParams.get('limit')) || 10;
   const search = request.nextUrl.searchParams.get('search') || '';
   const mahallaId = request.nextUrl.searchParams.get('mahallaId') || '';
+  const streetType = request.nextUrl.searchParams.get('streetType') || 'all';
 
   const rawRegionId = request.nextUrl.searchParams.get('regionId') || '';
   const rawDistrictId = request.nextUrl.searchParams.get('districtId') || '';
@@ -37,6 +38,7 @@ export async function GET(request: NextRequest) {
       regionId,
       districtId,
       mahallaId,
+      streetType,
     });
 
     return Response.json({ success: true, data });

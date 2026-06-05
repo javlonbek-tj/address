@@ -10,6 +10,7 @@ import {
   useDelete,
   useTableFilters,
   useStreetsTableData,
+  useStreetTypes,
   useRegionsList,
   useDistrictsList,
   useMahallasList,
@@ -48,6 +49,7 @@ export function StreetTable({
     ? userDistrictId
     : searchParams.get('districtId') || 'all';
   const mahallaId = searchParams.get('mahallaId') || 'all';
+  const streetType = searchParams.get('streetType') || 'all';
 
   const { data: streetTableData, isLoadingStreetTableData } =
     useStreetsTableData({
@@ -57,7 +59,10 @@ export function StreetTable({
       regionId,
       districtId,
       mahallaId,
+      streetType,
     });
+
+  const { streetTypes } = useStreetTypes();
 
   const { regions, isLoadingRegions } = useRegionsList();
   const { districts, isLoadingDistricts } = useDistrictsList(regionId);
@@ -136,6 +141,8 @@ export function StreetTable({
           handleFilterChange={handleFilterChange}
           mahallas={mahallas}
           isLoadingMahallas={isLoadingMahallas}
+          streetType={streetType}
+          streetTypes={streetTypes}
           isRegionLocked={isRegionLocked}
           isDistrictLocked={isDistrictLocked}
         />

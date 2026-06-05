@@ -23,9 +23,11 @@ interface Props {
   districts: District[];
   isLoadingDistricts: boolean;
   mahallaId: string;
-  handleFilterChange: (key: string, value: string) => void;
+  handleFilterChange: (keyOrFilters: string | Record<string, string>, value?: string) => void;
   mahallas: { id: string; name: string; code: string }[];
   isLoadingMahallas: boolean;
+  streetType: string;
+  streetTypes: string[];
   isRegionLocked?: boolean;
   isDistrictLocked?: boolean;
 }
@@ -44,6 +46,8 @@ export function StreetTableFilters({
   handleFilterChange,
   mahallas,
   isLoadingMahallas,
+  streetType,
+  streetTypes,
   isRegionLocked = false,
   isDistrictLocked = false,
 }: Props) {
@@ -126,7 +130,7 @@ export function StreetTableFilters({
 
       <Select
         value={mahallaId}
-        onValueChange={(value) => handleFilterChange('mahallaId', value)}
+        onValueChange={(value) => handleFilterChange({ mahallaId: value })}
         disabled={districtId === 'all' || isLoadingMahallas}
       >
         <SelectTrigger
@@ -155,6 +159,25 @@ export function StreetTableFilters({
               className='text-xs 2xl:text-sm'
             >
               {mahalla.name}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+
+      <Select
+        value={streetType}
+        onValueChange={(value) => handleFilterChange({ streetType: value })}
+      >
+        <SelectTrigger className='dark:bg-gray-700 shadow-sm w-52 dark:text-white' size='sm'>
+          <SelectValue placeholder="Ko'cha turi" className='text-xs 2xl:text-sm' />
+        </SelectTrigger>
+        <SelectContent className='dark:bg-gray-700 dark:text-white'>
+          <SelectItem value='all' className='text-xs 2xl:text-sm'>
+            Barcha turlar
+          </SelectItem>
+          {streetTypes.map((type) => (
+            <SelectItem key={type} value={type} className='text-xs 2xl:text-sm'>
+              {type}
             </SelectItem>
           ))}
         </SelectContent>

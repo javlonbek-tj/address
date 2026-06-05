@@ -14,6 +14,7 @@ export {
   useStreets,
   useStreetsTableData,
   useStreetsByDistrictId,
+  useStreetTypes,
 } from './useStreets';
 export * from './useStats';
 export { useTableActions } from './useTableActions';
