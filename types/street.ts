@@ -26,6 +26,9 @@ export type Street = {
   uzKadCode: string | null;
   type: string;
   oldName: string | null;
+  uzKadStreet: {
+    name: string;
+  } | null;
   district: {
     id: string;
     name: string;

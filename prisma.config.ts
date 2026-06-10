@@ -5,7 +5,7 @@ export default defineConfig({
   schema: 'prisma/schema.prisma',
   migrations: {
     path: 'prisma/migrations',
-    seed: `tsx prisma/seed/create-streets/seed.ts`,
+    seed: `tsx prisma/seed/seed-uzkad-streets/seed.ts`,
   },
   datasource: {
     url: process.env['DATABASE_URL'],

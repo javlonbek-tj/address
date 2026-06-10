@@ -41,6 +41,7 @@ model District {
   region   Region    @relation(fields: [regionId], references: [id], onDelete: Cascade)
   mahallas Mahalla[]
   streets  Street[]
+  uzKadStreets  UzKadStreet[]
   users    AppUser[]
   properties Property[]
 
@@ -90,8 +91,9 @@ model Street {
   type      String
   oldNameId String?
   oldName   String?
-  uzKadCode       String?
+  uzKadCode       String?  @unique
   uzKadUpdatedAt  DateTime?
+  uzKadStreet     UzKadStreet? @relation(fields: [uzKadCode], references: [code])
 
   districtId String
   district   District @relation(fields: [districtId], references: [id])
@@ -101,6 +103,18 @@ model Street {
 
   @@index([name])
   @@map("streets")
+}
+
+model UzKadStreet {
+  id         String   @id @default(cuid())
+  code       String   @unique
+  name       String
+  type       String?
+  districtId String
+  district   District @relation(fields: [districtId], references: [id], onDelete: Cascade)
+  street     Street?
+
+  @@map("uzkad_streets")
 }
 
 model Property {

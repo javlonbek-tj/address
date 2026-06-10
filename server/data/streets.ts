@@ -152,6 +152,9 @@ export async function getStreetTableData(
           uzKadCode: true,
           type: true,
           oldName: true,
+          uzKadStreet: {
+            select: { name: true },
+          },
           district: {
             select: {
               id: true,

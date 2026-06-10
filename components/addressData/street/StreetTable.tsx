@@ -178,6 +178,9 @@ export function StreetTable({
                   <th className='px-6 py-3 font-bold text-[10px] text-gray-800 dark:text-gray-300 3xl:text-xs text-left uppercase leading-none tracking-widest'>
                     Uzkad kodi
                   </th>
+                  <th className='px-6 py-3 font-bold text-[10px] text-gray-800 dark:text-gray-300 3xl:text-xs text-left uppercase leading-none tracking-widest'>
+                    Uzkad ko&apos;cha nomi
+                  </th>
                   <th className='px-6 py-3 pr-8 2xl:pr-10 font-bold text-[10px] text-gray-800 dark:text-gray-300 3xl:text-xs text-right uppercase leading-none tracking-widest'>
                     Amallar
                   </th>
@@ -190,7 +193,7 @@ export function StreetTable({
                   <tr>
                       <td
                         colSpan={
-                          8 -
+                          9 -
                           (isRegionLocked || isDistrictLocked ? 1 : 0) -
                           (isDistrictLocked ? 1 : 0)
                         }
@@ -232,6 +235,9 @@ export function StreetTable({
                           streetId={street.id}
                           initialValue={street.uzKadCode}
                         />
+                      </td>
+                      <td className='px-6 py-2 font-medium text-gray-600 dark:text-gray-300 text-xs whitespace-nowrap'>
+                        {street.uzKadStreet?.name ?? '—'}
                       </td>
                       <td className='px-6 py-2 whitespace-nowrap'>
                         <TableActions

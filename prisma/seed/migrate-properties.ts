@@ -19,11 +19,15 @@ async function main() {
 
   console.log(`Found ${features.length} properties. Migrating...`);
 
-  // Cache districts to avoid repeated queries
   const districts = await prisma.district.findMany({
     select: { id: true, code: true },
   });
   const districtMap = new Map(districts.map((d) => [d.code, d.id]));
+
+  const mahallas = await prisma.mahalla.findMany({
+    select: { id: true, code: true },
+  });
+  const mahallaMap = new Map(mahallas.map((m) => [m.code, m.id]));
 
   let count = 0;
   let skipped = 0;
@@ -32,15 +36,25 @@ async function main() {
     const props = feature.properties;
     const geometry = feature.geometry;
 
-    const districtCode = '1727424'; // YOU SHOULD CHANGE THIS IN EVERY RUN
-    const districtId = districtMap.get(districtCode);
+    const districtCode = String(props.DISTRICT_CODE || '');
+    const mahallaCode = String(props.MAHALLA_CODE || '');
 
-    if (!districtId) {
-      console.warn(
-        `District with code ${districtCode} not found for property ${props.KAD_RAQAM}. Skipping...`,
-      );
+    if (!districtCode) {
+      console.warn(`Missing DISTRICT_CODE for property ${props.KAD_RAQAM}. Skipping...`);
       skipped++;
       continue;
+    }
+
+    const districtId = districtMap.get(districtCode);
+    if (!districtId) {
+      console.warn(`District "${districtCode}" not found for property ${props.KAD_RAQAM}. Skipping...`);
+      skipped++;
+      continue;
+    }
+
+    const mahallaId = mahallaCode ? mahallaMap.get(mahallaCode) : undefined;
+    if (mahallaCode && !mahallaId) {
+      console.warn(`Mahalla "${mahallaCode}" not found for property ${props.KAD_RAQAM}. Using null.`);
     }
 
     try {
@@ -50,10 +64,10 @@ async function main() {
         oldMahallaName: String(props.MFY || ''),
         type: String(props.Turi || 'residential').toLowerCase(),
         geometry: geometry as any,
-        districtId: districtId,
+        districtId,
         isActive: true,
         isNew: false,
-        mahallaId: '1727424017', // YOU SHOULD CHANGE THIS IN EVERY RUN
+        ...(mahallaId ? { mahallaId } : {}),
       };
 
       if (props.KAD_RAQAM) {
