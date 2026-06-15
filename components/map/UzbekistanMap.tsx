@@ -311,7 +311,13 @@ export default function UzbekistanMap({ regions }: UzbekistanMapProps) {
             data={
               {
                 type: 'FeatureCollection',
-                features: streetFeatures,
+                features: streetFeatures.filter(
+                  (f) =>
+                    f?.geometry &&
+                    'coordinates' in f.geometry &&
+                    Array.isArray(f.geometry.coordinates) &&
+                    f.geometry.coordinates.length > 0,
+                ),
               } as FeatureCollection
             }
             pane='streetsPane'
