@@ -75,7 +75,11 @@ export const userSchema = sharedUserFields
 
     if (data.status === USER_STATUSES.ACTIVE) {
       if (!data.username || data.username.trim().length < 1) {
-        ctx.addIssue({ code: 'custom', message: 'Majburiy maydon', path: ['username'] });
+        ctx.addIssue({
+          code: 'custom',
+          message: 'Majburiy maydon',
+          path: ['username'],
+        });
       }
       if (!data.password || data.password.trim().length < 6) {
         ctx.addIssue({
@@ -87,7 +91,22 @@ export const userSchema = sharedUserFields
     }
   });
 
-export const updateUserSchema = sharedUserFields.superRefine(userRefinement);
+export const updateUserSchema = sharedUserFields
+  .extend({
+    username: z.string().optional(),
+  })
+  .superRefine((data, ctx) => {
+    userRefinement(data, ctx);
+    if (data.status === USER_STATUSES.ACTIVE) {
+      if (!data.username || data.username.trim().length < 1) {
+        ctx.addIssue({
+          code: 'custom',
+          message: 'Majburiy maydon',
+          path: ['username'],
+        });
+      }
+    }
+  });
 
 export type UserFormValues = z.infer<typeof userSchema>;
 export type UpdateUserFormValues = z.infer<typeof updateUserSchema>;

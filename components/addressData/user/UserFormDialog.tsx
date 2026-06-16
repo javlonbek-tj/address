@@ -122,7 +122,7 @@ export function UserFormDialog({
                   />
                 )}
 
-              {!isEditing && selectedStatus === USER_STATUSES.ACTIVE && (
+              {selectedStatus === USER_STATUSES.ACTIVE && (
                 <FormInputField
                   name='username'
                   label='Login'

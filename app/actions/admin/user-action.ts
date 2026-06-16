@@ -116,7 +116,7 @@ export async function createUser(data: UserFormValues): Promise<ActionResult> {
 
 export async function updateUser(
   id: string,
-  data: UpdateUserFormValues
+  data: UpdateUserFormValues,
 ): Promise<ActionResult> {
   const session = await getServerSession();
   assertActive(session!.user);
@@ -137,21 +137,40 @@ export async function updateUser(
     position,
     regionId,
     districtId,
+    username,
   } = validation.data;
 
   try {
-    await prisma.appUser.update({
+    const appUser = await prisma.appUser.findUnique({
       where: { id },
-      data: {
-        fullName,
-        phoneNumber,
-        role: role as UserRole,
-        status: status as UserStatus,
-        position: position as RegionUserPosition,
-        regionId: regionId ?? null,
-        districtId: districtId ?? null,
-      },
+      select: { authId: true },
     });
+
+    await prisma.$transaction([
+      prisma.appUser.update({
+        where: { id },
+        data: {
+          fullName,
+          phoneNumber,
+          role: role as UserRole,
+          status: status as UserStatus,
+          position: position as RegionUserPosition,
+          regionId: regionId ?? null,
+          districtId: districtId ?? null,
+        },
+      }),
+      ...(appUser?.authId
+        ? [
+            prisma.user.update({
+              where: { id: appUser.authId },
+              data: {
+                username: username ?? null,
+                displayUsername: username ?? null,
+              },
+            }),
+          ]
+        : []),
+    ]);
 
     revalidatePath('/users');
     return { success: true };
