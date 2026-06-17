@@ -22,7 +22,6 @@ export async function proxy(request: NextRequest) {
         { status: 401 },
       );
     }
-    console.log('[PATHNAME]', pathname);
 
     const loginUrl = new URL('/login', request.url);
     if (pathname !== '/') {

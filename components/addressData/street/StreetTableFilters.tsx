@@ -23,13 +23,17 @@ interface Props {
   districts: District[];
   isLoadingDistricts: boolean;
   mahallaId: string;
-  handleFilterChange: (keyOrFilters: string | Record<string, string>, value?: string) => void;
+  handleFilterChange: (
+    keyOrFilters: string | Record<string, string>,
+    value?: string,
+  ) => void;
   mahallas: { id: string; name: string; code: string }[];
   isLoadingMahallas: boolean;
   streetType: string;
   streetTypes: string[];
   isRegionLocked?: boolean;
   isDistrictLocked?: boolean;
+  uzKadFilter: string;
 }
 
 export function StreetTableFilters({
@@ -50,6 +54,7 @@ export function StreetTableFilters({
   streetTypes,
   isRegionLocked = false,
   isDistrictLocked = false,
+  uzKadFilter,
 }: Props) {
   return (
     <div className='flex flex-wrap items-center gap-3 p-4 border-gray-100 dark:border-gray-700 border-b'>
@@ -168,8 +173,14 @@ export function StreetTableFilters({
         value={streetType}
         onValueChange={(value) => handleFilterChange({ streetType: value })}
       >
-        <SelectTrigger className='dark:bg-gray-700 shadow-sm w-52 dark:text-white' size='sm'>
-          <SelectValue placeholder="Ko'cha turi" className='text-xs 2xl:text-sm' />
+        <SelectTrigger
+          className='dark:bg-gray-700 shadow-sm w-52 dark:text-white'
+          size='sm'
+        >
+          <SelectValue
+            placeholder="Ko'cha turi"
+            className='text-xs 2xl:text-sm'
+          />
         </SelectTrigger>
         <SelectContent className='dark:bg-gray-700 dark:text-white'>
           <SelectItem value='all' className='text-xs 2xl:text-sm'>
@@ -180,6 +191,32 @@ export function StreetTableFilters({
               {type}
             </SelectItem>
           ))}
+        </SelectContent>
+      </Select>
+
+      <Select
+        value={uzKadFilter}
+        onValueChange={(value) => handleFilterChange({ uzKadFilter: value })}
+      >
+        <SelectTrigger
+          className='dark:bg-gray-700 shadow-sm w-52 dark:text-white'
+          size='sm'
+        >
+          <SelectValue
+            placeholder='UzKad kodi'
+            className='text-xs 2xl:text-sm'
+          />
+        </SelectTrigger>
+        <SelectContent className='dark:bg-gray-700 dark:text-white'>
+          <SelectItem value='all' className='text-xs 2xl:text-sm'>
+            Barchasi
+          </SelectItem>
+          <SelectItem value='filled' className='text-xs 2xl:text-sm'>
+            Kodi mavjud
+          </SelectItem>
+          <SelectItem value='empty' className='text-xs 2xl:text-sm'>
+            Kodi yo'q
+          </SelectItem>
         </SelectContent>
       </Select>
     </div>

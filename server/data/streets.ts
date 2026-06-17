@@ -34,7 +34,7 @@ export async function getStreetsByDistrictId(districtId: string) {
   return streets;
 }
 
-export const getStreets = async (): Promise<Street[]> => {
+export const getStreets = async () => {
   try {
     const streets = await prisma.street.findMany({
       where: { isActive: true },
@@ -99,6 +99,7 @@ export async function getStreetTableData(
     districtId?: string;
     mahallaId?: string;
     streetType?: string;
+    uzKadFilter?: string;
   } = {},
 ): Promise<{
   data: Street[];
@@ -114,6 +115,7 @@ export async function getStreetTableData(
     districtId = 'all',
     mahallaId = 'all',
     streetType = 'all',
+    uzKadFilter = 'all',
   } = params;
   const skip = (page - 1) * limit;
 
@@ -132,6 +134,12 @@ export async function getStreetTableData(
 
     if (streetType !== 'all' && streetType) {
       where.type = streetType;
+    }
+
+    if (uzKadFilter === 'filled') {
+      where.uzKadCode = { not: null };
+    } else if (uzKadFilter === 'empty') {
+      where.uzKadCode = null;
     }
 
     if (search) {

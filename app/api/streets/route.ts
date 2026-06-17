@@ -6,7 +6,10 @@ import { USER_ROLES } from '@/lib';
 export async function GET(request: NextRequest) {
   const session = await getServerSession();
   if (!session) {
-    return Response.json({ success: false, error: 'Unauthorized' }, { status: 401 });
+    return Response.json(
+      { success: false, error: 'Unauthorized' },
+      { status: 401 },
+    );
   }
 
   const { user } = session;
@@ -21,14 +24,20 @@ export async function GET(request: NextRequest) {
 
   const rawRegionId = request.nextUrl.searchParams.get('regionId') || '';
   const rawDistrictId = request.nextUrl.searchParams.get('districtId') || '';
+  const uzKadFilter = request.nextUrl.searchParams.get('uzKadFilter') || 'all';
 
-  const regionId = (isRegionUser || isDistrictUser)
-    ? (user.regionId ?? '')
-    : rawRegionId === 'all' ? undefined : rawRegionId;
+  const regionId =
+    isRegionUser || isDistrictUser
+      ? (user.regionId ?? '')
+      : rawRegionId === 'all'
+        ? undefined
+        : rawRegionId;
 
   const districtId = isDistrictUser
     ? (user.districtId ?? '')
-    : rawDistrictId === 'all' ? undefined : rawDistrictId;
+    : rawDistrictId === 'all'
+      ? undefined
+      : rawDistrictId;
 
   try {
     const data = await getStreetTableData({
@@ -39,10 +48,14 @@ export async function GET(request: NextRequest) {
       districtId,
       mahallaId,
       streetType,
+      uzKadFilter,
     });
 
     return Response.json({ success: true, data });
   } catch (error) {
-    return Response.json({ success: false, error: 'INTERNAL_SERVER_ERROR' }, { status: 500 });
+    return Response.json(
+      { success: false, error: 'INTERNAL_SERVER_ERROR' },
+      { status: 500 },
+    );
   }
 }

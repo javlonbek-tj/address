@@ -45,6 +45,7 @@ export function useStreetsTableData({
   districtId,
   mahallaId,
   streetType,
+  uzKadFilter,
 }: {
   page: number;
   limit: number;
@@ -53,6 +54,7 @@ export function useStreetsTableData({
   districtId: string;
   mahallaId: string;
   streetType: string;
+  uzKadFilter: string;
 }) {
   const { data, isPending: isLoadingStreetTableData } =
     useQuery<StreetTableData>({
@@ -65,6 +67,7 @@ export function useStreetsTableData({
         districtId,
         mahallaId,
         streetType,
+        uzKadFilter,
       ],
       queryFn: () =>
         fetchStreetTableData(
@@ -75,6 +78,7 @@ export function useStreetsTableData({
           districtId,
           mahallaId,
           streetType,
+          uzKadFilter,
         ),
       staleTime: Infinity,
       placeholderData: keepPreviousData,
@@ -84,7 +88,9 @@ export function useStreetsTableData({
 }
 
 export function useStreetTypes() {
-  const { data: streetTypes = [], isLoading: isLoadingStreetTypes } = useQuery<string[]>({
+  const { data: streetTypes = [], isLoading: isLoadingStreetTypes } = useQuery<
+    string[]
+  >({
     queryKey: ['street-types'],
     queryFn: fetchStreetTypes,
     staleTime: Infinity,

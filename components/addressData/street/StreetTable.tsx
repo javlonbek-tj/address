@@ -42,14 +42,17 @@ export function StreetTable({
   const page = Number(searchParams.get('page')) || 1;
   const limit = Number(searchParams.get('limit')) || 10;
   const search = searchParams.get('search') || '';
-  const regionId = isDistrictLocked || isRegionLocked
-    ? (userRegionId ?? 'all')
-    : searchParams.get('regionId') || 'all';
-  const districtId = isDistrictLocked && userDistrictId
-    ? userDistrictId
-    : searchParams.get('districtId') || 'all';
+  const regionId =
+    isDistrictLocked || isRegionLocked
+      ? (userRegionId ?? 'all')
+      : searchParams.get('regionId') || 'all';
+  const districtId =
+    isDistrictLocked && userDistrictId
+      ? userDistrictId
+      : searchParams.get('districtId') || 'all';
   const mahallaId = searchParams.get('mahallaId') || 'all';
   const streetType = searchParams.get('streetType') || 'all';
+  const uzKadFilter = searchParams.get('uzKadFilter') || 'all';
 
   const { data: streetTableData, isLoadingStreetTableData } =
     useStreetsTableData({
@@ -60,6 +63,7 @@ export function StreetTable({
       districtId,
       mahallaId,
       streetType,
+      uzKadFilter,
     });
 
   const { streetTypes } = useStreetTypes();
@@ -145,6 +149,7 @@ export function StreetTable({
           streetTypes={streetTypes}
           isRegionLocked={isRegionLocked}
           isDistrictLocked={isDistrictLocked}
+          uzKadFilter={uzKadFilter}
         />
 
         <div className='p-4 overflow-hidden'>
@@ -191,14 +196,14 @@ export function StreetTable({
               >
                 {streets.length === 0 && !isLoading ? (
                   <tr>
-                      <td
-                        colSpan={
-                          9 -
-                          (isRegionLocked || isDistrictLocked ? 1 : 0) -
-                          (isDistrictLocked ? 1 : 0)
-                        }
-                        className='px-6 py-12 font-medium text-gray-800 dark:text-gray-400 text-sm text-center'
-                      >
+                    <td
+                      colSpan={
+                        9 -
+                        (isRegionLocked || isDistrictLocked ? 1 : 0) -
+                        (isDistrictLocked ? 1 : 0)
+                      }
+                      className='px-6 py-12 font-medium text-gray-800 dark:text-gray-400 text-sm text-center'
+                    >
                       Ma&apos;lumot topilmadi
                     </td>
                   </tr>

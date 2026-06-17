@@ -108,8 +108,7 @@ export async function createUser(data: UserFormValues): Promise<ActionResult> {
 
     revalidatePath('/users');
     return { success: true };
-  } catch (error) {
-    console.log(error);
+  } catch {
     return { success: false, error: 'INTERNAL_SERVER_ERROR' };
   }
 }
