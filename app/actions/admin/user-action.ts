@@ -64,7 +64,7 @@ export async function createUser(data: UserFormValues): Promise<ActionResult> {
         const authIdentity = await tx.user.create({
           data: {
             username,
-            displayUsername: fullName ?? username,
+            displayUsername: fullName || username,
             accounts: {
               create: {
                 accountId: username,
@@ -159,13 +159,22 @@ export async function updateUser(
           districtId: districtId ?? null,
         },
       }),
-      ...(appUser?.authId
+      ...(appUser?.authId && username
         ? [
             prisma.user.update({
               where: { id: appUser.authId },
               data: {
-                username: username ?? null,
-                displayUsername: username ?? null,
+                username: username,
+                displayUsername: fullName || username,
+              },
+            }),
+            prisma.account.updateMany({
+              where: {
+                userId: appUser.authId,
+                providerId: 'credential',
+              },
+              data: {
+                accountId: username,
               },
             }),
           ]
