@@ -53,3 +53,29 @@ export const fetchStreetTypes = async (): Promise<string[]> => {
   }>(ApiRoutes.STREET_TYPES);
   return data?.data ?? [];
 };
+
+export const fetchStreetsForExport = async (
+  search = '',
+  regionId = '',
+  districtId = '',
+  mahallaId = '',
+  streetType = 'all',
+  uzKadFilter = 'all',
+) => {
+  const { data } = await axiosInstance.get<{
+    success: boolean;
+    data: StreetTableData;
+  }>(ApiRoutes.STREETS, {
+    params: {
+      page: 1,
+      limit: 99999,
+      search,
+      regionId,
+      districtId,
+      mahallaId,
+      streetType,
+      uzKadFilter,
+    },
+  });
+  return data?.data?.data ?? [];
+};

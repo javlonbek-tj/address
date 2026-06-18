@@ -1,6 +1,6 @@
 'use client';
 
-import { Loader2Icon } from 'lucide-react';
+import { Download, Loader2Icon } from 'lucide-react';
 
 import { Input } from '@/components/ui/input';
 import {
@@ -10,7 +10,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { Button } from '@/components/ui/button';
 import type { District, Region } from '@/types';
+import { useExportStreets } from '@/hooks';
 
 interface Props {
   search: string;
@@ -56,6 +58,7 @@ export function StreetTableFilters({
   isDistrictLocked = false,
   uzKadFilter,
 }: Props) {
+  const { exportToExcel, isExporting } = useExportStreets();
   return (
     <div className='flex flex-wrap items-center gap-3 p-4 border-gray-100 dark:border-gray-700 border-b'>
       <Input
@@ -219,6 +222,33 @@ export function StreetTableFilters({
           </SelectItem>
         </SelectContent>
       </Select>
+
+      <Button
+        size='sm'
+        variant='outline'
+        disabled={isExporting}
+        onClick={() =>
+          exportToExcel(
+            {
+              search,
+              regionId,
+              districtId,
+              mahallaId,
+              streetType,
+              uzKadFilter,
+            },
+            isRegionLocked,
+            isDistrictLocked,
+          )
+        }
+      >
+        {isExporting ? (
+          <Loader2Icon className='animate-spin size-4' />
+        ) : (
+          <Download className='size-4' />
+        )}
+        Excel
+      </Button>
     </div>
   );
 }
