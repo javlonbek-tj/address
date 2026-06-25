@@ -35,6 +35,7 @@ export function useExportStreets() {
           : {}),
         ...(!isDistrictLocked ? { Tuman: street.district.name } : {}),
         Nomi: street.name,
+        'Tarixiy nomi': street.oldName ?? '',
         Turi: street.type,
         Kodi: street.code,
         'UzKad kodi': street.uzKadCode ?? '',
