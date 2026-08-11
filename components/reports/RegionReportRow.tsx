@@ -26,14 +26,6 @@ function StatCell({ count, percent, color }: { count: number; percent: number; c
   );
 }
 
-function CountCell({ value, color }: { value: number; color: string }) {
-  return (
-    <td className={`px-6 py-2 text-xs font-bold whitespace-nowrap ${color}`}>
-      {value > 0 ? `+${value.toLocaleString()}` : '—'}
-    </td>
-  );
-}
-
 export function RegionReportRow({ row, index, onSelect }: Props) {
   return (
     <tr
@@ -50,9 +42,6 @@ export function RegionReportRow({ row, index, onSelect }: Props) {
       <td className='px-6 py-2 text-xs font-bold text-gray-700 dark:text-gray-300 whitespace-nowrap'>{row.totalStreets.toLocaleString()}</td>
       <StatCell count={row.filledCount} percent={row.filledPercent} color='text-emerald-600 dark:text-emerald-400' />
       <StatCell count={row.emptyCount} percent={row.remainingPercent} color='text-red-500 dark:text-red-400' />
-      <CountCell value={row.dailyFilled} color='text-blue-600 dark:text-blue-400' />
-      <CountCell value={row.weeklyFilled} color='text-violet-600 dark:text-violet-400' />
-      <CountCell value={row.monthlyFilled} color='text-orange-600 dark:text-orange-400' />
     </tr>
   );
 }

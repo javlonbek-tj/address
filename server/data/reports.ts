@@ -14,9 +14,6 @@ interface RawDistrictRow {
   totalStreets: bigint;
   filledCount: bigint;
   emptyCount: bigint;
-  dailyFilled: bigint;
-  weeklyFilled: bigint;
-  monthlyFilled: bigint;
 }
 
 interface RawRegionRow {
@@ -25,28 +22,11 @@ interface RawRegionRow {
   totalStreets: bigint;
   filledCount: bigint;
   emptyCount: bigint;
-  dailyFilled: bigint;
-  weeklyFilled: bigint;
-  monthlyFilled: bigint;
 }
 
 interface ReportParams {
   regionId?: string;
   districtId?: string;
-}
-
-function getDateBounds() {
-  const todayStart = new Date();
-  todayStart.setHours(0, 0, 0, 0);
-
-  const weekStart = new Date(todayStart);
-  const day = weekStart.getDay();
-  weekStart.setDate(weekStart.getDate() - (day === 0 ? 6 : day - 1));
-
-  const monthStart = new Date(todayStart);
-  monthStart.setDate(1);
-
-  return { todayStart, weekStart, monthStart };
 }
 
 function buildSummary(items: (RegionReport | DistrictReport)[]) {
@@ -55,12 +35,9 @@ function buildSummary(items: (RegionReport | DistrictReport)[]) {
       totalStreets: acc.totalStreets + d.totalStreets,
       filledCount: acc.filledCount + d.filledCount,
       emptyCount: acc.emptyCount + d.emptyCount,
-      dailyFilled: acc.dailyFilled + d.dailyFilled,
-      weeklyFilled: acc.weeklyFilled + d.weeklyFilled,
-      monthlyFilled: acc.monthlyFilled + d.monthlyFilled,
       filledPercent: 0,
     }),
-    { totalStreets: 0, filledCount: 0, emptyCount: 0, dailyFilled: 0, weeklyFilled: 0, monthlyFilled: 0, filledPercent: 0 },
+    { totalStreets: 0, filledCount: 0, emptyCount: 0, filledPercent: 0 },
   );
   s.filledPercent = s.totalStreets > 0 ? Math.round((s.filledCount / s.totalStreets) * 100) : 0;
   return s;
@@ -80,9 +57,6 @@ function toDistrictReports(rows: RawDistrictRow[]): DistrictReport[] {
       totalStreets: total,
       filledCount: filled,
       emptyCount: empty,
-      dailyFilled: toNumber(row.dailyFilled),
-      weeklyFilled: toNumber(row.weeklyFilled),
-      monthlyFilled: toNumber(row.monthlyFilled),
       filledPercent: total > 0 ? Math.round((filled / total) * 100) : 0,
       remainingPercent: total > 0 ? Math.round((empty / total) * 100) : 0,
     };
@@ -100,9 +74,6 @@ function toRegionReports(rows: RawRegionRow[]): RegionReport[] {
       totalStreets: total,
       filledCount: filled,
       emptyCount: empty,
-      dailyFilled: toNumber(row.dailyFilled),
-      weeklyFilled: toNumber(row.weeklyFilled),
-      monthlyFilled: toNumber(row.monthlyFilled),
       filledPercent: total > 0 ? Math.round((filled / total) * 100) : 0,
       remainingPercent: total > 0 ? Math.round((empty / total) * 100) : 0,
     };
@@ -110,8 +81,6 @@ function toRegionReports(rows: RawRegionRow[]): RegionReport[] {
 }
 
 export async function getStreetsReport({ regionId, districtId }: ReportParams = {}): Promise<StreetsReportData> {
-  const { todayStart, weekStart, monthStart } = getDateBounds();
-
   if (districtId) {
     const rows = await prisma.$queryRaw<RawDistrictRow[]>`
       SELECT
@@ -119,10 +88,7 @@ export async function getStreetsReport({ regionId, districtId }: ReportParams = 
         r.id AS "regionId",   r.name AS "regionName",
         COUNT(s.id)::bigint AS "totalStreets",
         COUNT(CASE WHEN s."uzKadCode" IS NOT NULL THEN 1 END)::bigint AS "filledCount",
-        COUNT(CASE WHEN s."uzKadCode" IS NULL     THEN 1 END)::bigint AS "emptyCount",
-        COUNT(CASE WHEN s."uzKadUpdatedAt" >= ${todayStart}  THEN 1 END)::bigint AS "dailyFilled",
-        COUNT(CASE WHEN s."uzKadUpdatedAt" >= ${weekStart}   THEN 1 END)::bigint AS "weeklyFilled",
-        COUNT(CASE WHEN s."uzKadUpdatedAt" >= ${monthStart}  THEN 1 END)::bigint AS "monthlyFilled"
+        COUNT(CASE WHEN s."uzKadCode" IS NULL     THEN 1 END)::bigint AS "emptyCount"
       FROM districts d
       JOIN regions r ON d."regionId" = r.id
       LEFT JOIN streets s ON s."districtId" = d.id AND s."isActive" = true
@@ -140,10 +106,7 @@ export async function getStreetsReport({ regionId, districtId }: ReportParams = 
         r.id AS "regionId",   r.name AS "regionName",
         COUNT(s.id)::bigint AS "totalStreets",
         COUNT(CASE WHEN s."uzKadCode" IS NOT NULL THEN 1 END)::bigint AS "filledCount",
-        COUNT(CASE WHEN s."uzKadCode" IS NULL     THEN 1 END)::bigint AS "emptyCount",
-        COUNT(CASE WHEN s."uzKadUpdatedAt" >= ${todayStart}  THEN 1 END)::bigint AS "dailyFilled",
-        COUNT(CASE WHEN s."uzKadUpdatedAt" >= ${weekStart}   THEN 1 END)::bigint AS "weeklyFilled",
-        COUNT(CASE WHEN s."uzKadUpdatedAt" >= ${monthStart}  THEN 1 END)::bigint AS "monthlyFilled"
+        COUNT(CASE WHEN s."uzKadCode" IS NULL     THEN 1 END)::bigint AS "emptyCount"
       FROM districts d
       JOIN regions r ON d."regionId" = r.id
       LEFT JOIN streets s ON s."districtId" = d.id AND s."isActive" = true
@@ -160,10 +123,7 @@ export async function getStreetsReport({ regionId, districtId }: ReportParams = 
       r.id AS "regionId", r.name AS "regionName",
       COUNT(s.id)::bigint AS "totalStreets",
       COUNT(CASE WHEN s."uzKadCode" IS NOT NULL THEN 1 END)::bigint AS "filledCount",
-      COUNT(CASE WHEN s."uzKadCode" IS NULL     THEN 1 END)::bigint AS "emptyCount",
-      COUNT(CASE WHEN s."uzKadUpdatedAt" >= ${todayStart}  THEN 1 END)::bigint AS "dailyFilled",
-      COUNT(CASE WHEN s."uzKadUpdatedAt" >= ${weekStart}   THEN 1 END)::bigint AS "weeklyFilled",
-      COUNT(CASE WHEN s."uzKadUpdatedAt" >= ${monthStart}  THEN 1 END)::bigint AS "monthlyFilled"
+      COUNT(CASE WHEN s."uzKadCode" IS NULL     THEN 1 END)::bigint AS "emptyCount"
     FROM regions r
     LEFT JOIN districts d ON d."regionId" = r.id AND d."isActive" = true
     LEFT JOIN streets s ON s."districtId" = d.id AND s."isActive" = true

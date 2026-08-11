@@ -42,7 +42,7 @@ export function ReportsTable({ isAdmin, lockedRegionId, lockedDistrictId }: Prop
   const startIndex = (safePage - 1) * limit;
   const pageItems = allItems.slice(startIndex, startIndex + limit);
 
-  const statHeaders = ["Jami ko'chalar", 'UzKad qoʻyilgan', 'UzKad qoʻyilmagan', 'Kunlik', 'Haftalik', 'Oylik'];
+  const statHeaders = ["Jami ko'chalar", 'UzKad qoʻyilgan', 'UzKad qoʻyilmagan'];
   const regionHeaders = ['T/R', 'Viloyat', ...statHeaders];
   const districtHeaders = ['T/R', ...(isAdmin ? ['Viloyat'] : []), 'Tuman', ...statHeaders];
   const headers = mode === 'regions' ? regionHeaders : districtHeaders;

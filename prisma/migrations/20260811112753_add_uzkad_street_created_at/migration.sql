@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE "uzkad_streets" ADD COLUMN "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP;

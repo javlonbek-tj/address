@@ -4,9 +4,6 @@ export type RegionReport = {
   totalStreets: number;
   filledCount: number;
   emptyCount: number;
-  dailyFilled: number;
-  weeklyFilled: number;
-  monthlyFilled: number;
   filledPercent: number;
   remainingPercent: number;
 };
@@ -20,9 +17,6 @@ export type DistrictReport = {
   totalStreets: number;
   filledCount: number;
   emptyCount: number;
-  dailyFilled: number;
-  weeklyFilled: number;
-  monthlyFilled: number;
   filledPercent: number;
   remainingPercent: number;
 };
@@ -31,9 +25,6 @@ export type ReportSummary = {
   totalStreets: number;
   filledCount: number;
   emptyCount: number;
-  dailyFilled: number;
-  weeklyFilled: number;
-  monthlyFilled: number;
   filledPercent: number;
 };
 

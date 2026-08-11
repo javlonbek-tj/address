@@ -107,6 +107,7 @@ model Street {
 
 model UzKadStreet {
   id         String   @id @default(cuid())
+  createdAt  DateTime @default(now())
   code       String   @unique
   name       String
   type       String?
