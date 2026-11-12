@@ -231,8 +231,10 @@ export function useMapHandlers({
     };
     const restingStyle = getPropertyStyle(props);
 
-    if (props.assignedNumber !== null) {
-      layer.bindTooltip(String(props.assignedNumber), {
+    // Session numbers take precedence over saved ones; both are shown permanently on the polygon.
+    const label = props.assignedNumber ?? props.houseNumber;
+    if (label !== null) {
+      layer.bindTooltip(label, {
         permanent: true,
         direction: 'center',
         className: 'map-label property-number-label',
@@ -256,8 +258,10 @@ export function useMapHandlers({
         const session = useNumberingSessionStore.getState();
         if (session.isPanelOpen) {
           if (!session.isActive || props.assignedNumber !== null) return;
-          if (!props.candidate) {
-            toast.error("Bu bino tanlangan ko'cha yaqinida emas");
+          // Candidates (near the street) are only a guide: far-away properties can be numbered too.
+          // Already numbered ones are protected; change them in the manual panel.
+          if (props.done) {
+            toast.error(`Bu binoga allaqachon ${props.houseNumber} raqami berilgan`);
             return;
           }
           const problem = session.assignNext(props.id);
