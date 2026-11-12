@@ -10,6 +10,8 @@ import { formatMapStatistics } from '@/lib/utils';
 import { useMapFilters } from '@/hooks/useMapFilters';
 import { useMapFeatures } from '@/hooks/useMapFeatures';
 import { useProperties } from '@/hooks/useProperties';
+import { usePropertySheetStore } from '@/store/usePropertySheetStore';
+import { PropertyPanel } from './PropertyPanel';
 import { useStats } from '@/hooks/useStats';
 import { useMapHighlighting } from '@/hooks/useMapHighlighting';
 import { MapAutoCenter } from './MapAutoCenter';
@@ -62,11 +64,14 @@ export default function UzbekistanMap({ regions }: UzbekistanMapProps) {
   const baseMap = useMapFilterStore((state) => state.baseMap);
   const resetFilters = useMapFilterStore((state) => state.resetFilters);
 
+  const closePropertySheet = usePropertySheetStore((state) => state.closeSheet);
+
   useEffect(() => {
     return () => {
       resetFilters();
+      closePropertySheet();
     };
-  }, [resetFilters]);
+  }, [resetFilters, closePropertySheet]);
 
   const [mapBounds, setMapBounds] = useState<LatLngBounds | null>(null);
 
@@ -157,6 +162,7 @@ export default function UzbekistanMap({ regions }: UzbekistanMapProps) {
         setMapBounds={setMapBounds}
       />
       <MapStatistics stats={displayStats} />
+      <PropertyPanel />
       <MapLayersControl />
       <MapControls />
 
