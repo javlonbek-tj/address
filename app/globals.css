@@ -208,6 +208,10 @@
   display: block !important;
 }
 
+.leaflet-container:not(.zoom-properties) .leaflet-propertiesPane-pane {
+  display: none;
+}
+
 .leaflet-tooltip-top.map-label:before,
 .leaflet-tooltip-bottom.map-label:before,
 .leaflet-tooltip-left.map-label:before,

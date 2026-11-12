@@ -11,6 +11,7 @@ interface MapFilterState {
   showDistricts: boolean;
   showMahallas: boolean;
   showStreets: boolean;
+  showProperties: boolean;
 
   baseMap: BaseMapKey;
 
@@ -23,6 +24,7 @@ interface MapFilterState {
   setShowDistricts: (show: boolean) => void;
   setShowMahallas: (show: boolean) => void;
   setShowStreets: (show: boolean) => void;
+  setShowProperties: (show: boolean) => void;
 
   setBaseMap: (baseMap: BaseMapKey) => void;
 
@@ -38,6 +40,7 @@ const initialState = {
   showDistricts: true,
   showMahallas: true,
   showStreets: true,
+  showProperties: true,
   baseMap: 'osm' as BaseMapKey,
 };
 
@@ -71,6 +74,7 @@ export const useMapFilterStore = create<MapFilterState>((set) => ({
   setShowDistricts: (show) => set({ showDistricts: show }),
   setShowMahallas: (show) => set({ showMahallas: show }),
   setShowStreets: (show) => set({ showStreets: show }),
+  setShowProperties: (show) => set({ showProperties: show }),
 
   setBaseMap: (baseMap) => set({ baseMap }),
 

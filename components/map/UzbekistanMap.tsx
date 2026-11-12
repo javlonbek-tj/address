@@ -9,6 +9,7 @@ import { MAP_LEVEL_STYLES } from '@/lib/constants/map';
 import { formatMapStatistics } from '@/lib/utils';
 import { useMapFilters } from '@/hooks/useMapFilters';
 import { useMapFeatures } from '@/hooks/useMapFeatures';
+import { useProperties } from '@/hooks/useProperties';
 import { useStats } from '@/hooks/useStats';
 import { useMapHighlighting } from '@/hooks/useMapHighlighting';
 import { MapAutoCenter } from './MapAutoCenter';
@@ -57,6 +58,7 @@ export default function UzbekistanMap({ regions }: UzbekistanMapProps) {
   const showDistricts = useMapFilterStore((state) => state.showDistricts);
   const showMahallas = useMapFilterStore((state) => state.showMahallas);
   const showStreets = useMapFilterStore((state) => state.showStreets);
+  const showProperties = useMapFilterStore((state) => state.showProperties);
   const baseMap = useMapFilterStore((state) => state.baseMap);
   const resetFilters = useMapFilterStore((state) => state.resetFilters);
 
@@ -67,6 +69,11 @@ export default function UzbekistanMap({ regions }: UzbekistanMapProps) {
   }, [resetFilters]);
 
   const [mapBounds, setMapBounds] = useState<LatLngBounds | null>(null);
+
+  const { properties, dataUpdatedAt: propertiesUpdatedAt } = useProperties(
+    selectedDistrict,
+    selectedMahalla || undefined,
+  );
 
   // Synchronization with session (Authorization & Auto-initialization)
   useMapAuthSync({
@@ -81,6 +88,7 @@ export default function UzbekistanMap({ regions }: UzbekistanMapProps) {
     onEachDistrict,
     onEachMahalla,
     onEachStreet,
+    onEachProperty,
   } = useMapHandlers({
     regions,
     selectedRegion,
@@ -100,11 +108,13 @@ export default function UzbekistanMap({ regions }: UzbekistanMapProps) {
     districtFeatures,
     mahallaFeatures,
     streetFeatures,
+    propertyFeatures,
   } = useMapFeatures({
     regions,
     districts,
     mahallas,
     streets,
+    properties,
     selectedRegion,
     selectedDistrict,
     selectedMahalla,
@@ -226,6 +236,27 @@ export default function UzbekistanMap({ regions }: UzbekistanMapProps) {
             }}
             onEachFeature={onEachMahalla}
             ref={mahallaLayerRef}
+          />
+        )}
+
+        {/* Properties Layer — hidden below ZOOM_THRESHOLDS.PROPERTY via the zoom-properties class */}
+        {showProperties && selectedDistrict && propertyFeatures.length > 0 && (
+          <GeoJSON
+            key={`properties-${selectedDistrict}-${selectedMahalla}-${propertiesUpdatedAt}`}
+            data={
+              {
+                type: 'FeatureCollection',
+                features: propertyFeatures,
+              } as FeatureCollection
+            }
+            pane='propertiesPane'
+            style={(feature?: Feature) => {
+              const props = feature?.properties as { done: boolean } | undefined;
+              return props?.done
+                ? MAP_LEVEL_STYLES.propertyDone
+                : MAP_LEVEL_STYLES.property;
+            }}
+            onEachFeature={onEachProperty}
           />
         )}
 

@@ -86,6 +86,11 @@ export function MapZoomManager() {
       } else {
         container.classList.remove('zoom-high');
       }
+
+      container.classList.toggle(
+        'zoom-properties',
+        zoom >= ZOOM_THRESHOLDS.PROPERTY,
+      );
     },
     [map],
   );

@@ -215,10 +215,46 @@ export function useMapHandlers({
     [setSelectedStreet],
   );
 
+  const onEachProperty = useCallback((feature: Feature, layer: Layer) => {
+    const props = feature.properties as {
+      id: string;
+      houseNumber: string | null;
+      cadNumber: string | null;
+      done: boolean;
+    };
+    const restingStyle = props.done
+      ? MAP_LEVEL_STYLES.propertyDone
+      : MAP_LEVEL_STYLES.property;
+
+    layer.bindTooltip(props.houseNumber ?? props.cadNumber ?? '', {
+      direction: 'top',
+      className: 'map-label',
+    });
+
+    layer.on({
+      click: (e: { originalEvent: MouseEvent }) => {
+        L.DomEvent.stop(e.originalEvent);
+      },
+      mouseover: (e: { target: Layer }) => {
+        const l = e.target as Path;
+        if (typeof l.setStyle === 'function') {
+          l.setStyle(MAP_LEVEL_STYLES.highlight.property);
+        }
+      },
+      mouseout: (e: { target: Layer }) => {
+        const l = e.target as Path;
+        if (typeof l.setStyle === 'function') {
+          l.setStyle(restingStyle);
+        }
+      },
+    });
+  }, []);
+
   return {
     onEachRegion,
     onEachDistrict,
     onEachMahalla,
     onEachStreet,
+    onEachProperty,
   };
 }
