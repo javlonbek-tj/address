@@ -14,3 +14,4 @@ export * from './regions';
 export * from './users';
 export * from './sessions';
 export * from './reports';
+export * from './properties';

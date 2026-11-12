@@ -8,6 +8,7 @@
     "build": "prisma migrate deploy && next build",
     "start": "next start",
     "lint": "eslint",
+    "test": "tsx --test \"scripts/**/*.test.ts\" \"lib/**/*.test.ts\" \"server/**/*.test.ts\"",
     "migrate:dev": "prisma migrate dev"
   },
   "dependencies": {
@@ -52,8 +53,8 @@
     "@types/pg": "^8.16.0",
     "@types/react": "^19",
     "@types/react-dom": "^19",
-    "eslint": "^10.0.0",
-    "eslint-config-next": "^0.2.4",
+    "eslint": "^9.39.5",
+    "eslint-config-next": "16.1.6",
     "prisma": "^7.3.0",
     "tailwindcss": "^4",
     "tsx": "^4.21.0",

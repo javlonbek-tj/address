@@ -307,6 +307,25 @@ ALTER TABLE "properties" ADD CONSTRAINT "properties_streetId_fkey" FOREIGN KEY (
 
 ## Increment 3 — Server Data Layer, Schemas and Types (F-07, F-08, F-11, Q5, A3)
 
+> **Status: DONE (2026-11-12).**
+> - Files: `types/property.ts`, `lib/schemas/property-schema.ts`, `server/data/properties.ts` (plus barrel exports).
+> - Tests: `lib/schemas/property-schema.test.ts`, `server/data/properties.test.ts`, run with `npm test` (`tsx --test`, no database; the data-layer tests use an in-memory fake Prisma client that enforces the partial unique index and rolls back on errors).
+>
+> **Testing policy (user decision, 2026-11-12):** automated E2E tests are **not** required and won't be written. A missing development database no longer blocks any increment. Unit tests and mocked database tests cover the business logic; the **user tests manually**. Production write tests by the agent are still forbidden. This supersedes the "run under gate G3" clauses in this and later increments.
+>
+> **Decisions made during implementation:**
+> - **`MFY` suffix:** every active production mahalla name already ends with " MFY" (9,445) or " mfy" (7). `buildNewAddress` strips a trailing `MFY` (any case) before appending " MFY", so the address reads "Yangiobod MFY", never "Yangiobod MFY MFY".
+> - **Street type (O4, user decision 2026-11-12):** the address uses the possessive form, as in Task.md's example. `buildNewAddress` lowercases the first letter and appends `si` when the type ends with `ko'cha` (any apostrophe variant). Production types `Ko'cha`, `Tor ko'cha`, `Berk ko'cha` and `Shoh ko'cha` become "ko'chasi", "tor ko'chasi", "berk ko'chasi" and "shoh ko'chasi", so the address reads "Shiroq-3 **berk ko'chasi**, 1-uy". A type already ending in `ko'chasi` is left as is.
+> - **Two-phase write:** the partial unique index isn't deferrable, so `assignPropertyAddresses` first clears `houseNumber` on the targeted rows, then writes the new values, all in the same transaction. That allows swapping numbers within a batch, as the plan intended.
+> - **Defensive check:** `INVALID_HOUSE_NUMBER` was added to the result union for the data-layer `HOUSE_NUMBER_REGEX` check (planned in 3.2, missing from the union in 3.3).
+> - **P2002 detection:** `@prisma/adapter-pg` reports violated **columns**, not the index name (`meta.driverAdapterError.cause.constraint.fields = ['"streetId"', '"houseNumber"']`, read from the adapter source). `isHouseNumberConflict` matches on those columns, on `meta.target`, or on the index name.
+> - **Testability:** `assignPropertyAddresses(streetId, items, db = prisma)` takes an optional client so the mocked tests can inject a fake. Production callers use the default.
+> - **ESLint repaired:**
+>   - `eslint-config-next` `^0.2.4` (an old, unrelated Babel-era release) → `16.1.6`, matching `next`.
+>   - `eslint` `^10.0.0` → `^9.39.5`: the bundled `eslint-plugin-react` 7.37.5 supports ESLint only up to `^9.7`, and crashed on ESLint 10's removed `context.getFilename()`.
+>   - Other versions unchanged (Prisma CLI 7.4.2, Client 7.3.0, Next 16.1.6), apart from four transitive patch/minor bumps.
+>   - Baseline findings in existing code: 117 (40 errors, 77 warnings). New files: 0.
+
 ### 3.1 `types/property.ts` + export from `types/index.ts`
 - `PropertyListItem`:
   ```ts
@@ -376,6 +395,22 @@ ALTER TABLE "properties" ADD CONSTRAINT "properties_streetId_fkey" FOREIGN KEY (
 
 ## Increment 4 — Authorization, Server Actions and API Routes (F-02, F-03, Q2)
 
+> **Status: DONE (2026-11-12).**
+> - `canWriteDistrict` in `lib/auth/authorization.ts`.
+> - `assignErrorMessage` / `assignErrorStatus` in `server/data/properties.ts`, the shared error mapping used by both actions and both write routes.
+> - `app/actions/property-action.ts`: `assignHouseNumberAction`, `batchAssignHouseNumbersAction`, both returning `ActionResult<{ count } | { numbers }>`.
+> - Routes: `app/api/properties/route.ts`, `app/api/properties/[id]/route.ts` (GET, PATCH), `app/api/properties/batch-assign/route.ts`.
+> - Order of checks: session → account active → superuser (writes) → Zod → street's district → `canWriteDistrict` → `assignPropertyAddresses`.
+> - Status codes: duplicate number → 409 with `numbers`; street or property not found → 404; mismatch, missing mahalla or invalid number → 400.
+>
+> **Verified:**
+> - `tsc`: no new errors. ESLint: changed files clean, repo total unchanged (117).
+> - Existing tests still pass.
+> - `next build` registers the three routes.
+> - Local `next start`: all four endpoints return 401 without a session.
+>
+> No new tests were written (user decision: keep it simple, manual testing).
+
 ### 4.1 `canWriteDistrict` in `lib/auth/authorization.ts`
 ```ts
 export async function canWriteDistrict(user: SessionUser, districtId: string): Promise<boolean> {
@@ -427,6 +462,16 @@ Error messages:
 ---
 
 ## Increment 5 — Client Data Layer (F-03, F-12)
+
+> **Status: DONE (2026-11-12).**
+> - `ApiRoutes.PROPERTIES`.
+> - `services/properties.ts`: `fetchProperties(districtId, mahallaId?)`, `fetchPropertyById(id)`.
+> - `hooks/useProperties.ts`:
+>   - `useProperties(districtId, mahallaId?)` → `{ properties, isLoadingProperties, dataUpdatedAt }`, key `['properties', districtId, mahallaId ?? '']`, `staleTime: Infinity`;
+>   - `usePropertyById(id)` → `{ property, isLoadingProperty }`, key `['property', id]`.
+> - Barrel exports added.
+> - No write callers: writes go through the Server Actions.
+> - Checks: `tsc` no new errors; ESLint clean on changed files (repo total unchanged at 117); existing tests pass; `next build` passes.
 
 - `ApiRoutes.PROPERTIES = '/properties'`.
 - `services/properties.ts`: `fetchProperties(districtId, mahallaId?)` and `fetchPropertyById(id)`. No write callers.
@@ -640,7 +685,8 @@ Each gate opens only with explicit approval for that gate. Approving a review is
 ### Open items
 - **O1 — G3:** the user first chose a separate development database, then **explicitly authorized the 365-property import into production** (done, see Increment 2). **Write tests** (house-number assignments, batch saves) are still forbidden on production. They need the development database described below, or a new explicit decision, before Increments 3–10 can be exercised end to end.
 - **O2 — House number format:** **resolved.** The user confirmed `^[1-9]\d*(?:[A-Z]|\/\d+)?$` with no silent conversion (§0.4).
-- **O3 — Deploy the legacy-code removal:** see "Production Deployment State" below.
+- **O3 — Deploy the legacy-code removal:** done (`866144d`); see "Production Deployment State" below.
+- **O4 — Street type in the address:** **resolved.** The user chose "berk ko'chasi" (possessive form); see Increment 3 decisions.
 
 ### Production Deployment State (checked 2026-11-12)
 

@@ -5,3 +5,4 @@ export * from './street';
 export * from './action-result';
 export * from './region';
 export * from './report';
+export * from './property';

@@ -51,6 +51,16 @@ export async function canAccessDistrict(
   return user.districtId === districtId;
 }
 
+/** House-number writes: superuser is read-only; others are limited to their district/region scope. */
+export async function canWriteDistrict(
+  user: SessionUser,
+  districtId: string,
+): Promise<boolean> {
+  if (isSuperuser(user)) return false;
+  if (!hasMinRole(user, UserRole.district_user)) return false;
+  return canAccessDistrict(user, districtId);
+}
+
 export function assertActive(user: SessionUser, redirectTo = '/suspended') {
   if (!isAccountActive(user)) redirect(redirectTo);
 }
