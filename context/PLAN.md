@@ -315,7 +315,7 @@ ALTER TABLE "properties" ADD CONSTRAINT "properties_streetId_fkey" FOREIGN KEY (
 >
 > **Decisions made during implementation:**
 > - **`MFY` suffix:** every active production mahalla name already ends with " MFY" (9,445) or " mfy" (7). `buildNewAddress` strips a trailing `MFY` (any case) before appending " MFY", so the address reads "Yangiobod MFY", never "Yangiobod MFY MFY".
-> - **Street type:** follows the agreed formula and lowercases only the first letter. Production types are `Ko'cha`, `Tor ko'cha`, `Berk ko'cha` and `Shoh ko'cha`, so the address reads "Shiroq-3 **berk ko'cha**, 1-uy". Task.md's example shows "berk ko'chasi", which the data can't produce without an inflection rule. That's open item **O4**.
+> - **Street type (O4, user decision 2026-11-12):** the address uses the possessive form, as in Task.md's example. `buildNewAddress` lowercases the first letter and appends `si` when the type ends with `ko'cha` (any apostrophe variant). Production types `Ko'cha`, `Tor ko'cha`, `Berk ko'cha` and `Shoh ko'cha` become "ko'chasi", "tor ko'chasi", "berk ko'chasi" and "shoh ko'chasi", so the address reads "Shiroq-3 **berk ko'chasi**, 1-uy". A type already ending in `ko'chasi` is left as is.
 > - **Two-phase write:** the partial unique index isn't deferrable, so `assignPropertyAddresses` first clears `houseNumber` on the targeted rows, then writes the new values, all in the same transaction. That allows swapping numbers within a batch, as the plan intended.
 > - **Defensive check:** `INVALID_HOUSE_NUMBER` was added to the result union for the data-layer `HOUSE_NUMBER_REGEX` check (planned in 3.2, missing from the union in 3.3).
 > - **P2002 detection:** `@prisma/adapter-pg` reports violated **columns**, not the index name (`meta.driverAdapterError.cause.constraint.fields = ['"streetId"', '"houseNumber"']`, read from the adapter source). `isHouseNumberConflict` matches on those columns, on `meta.target`, or on the index name.
@@ -462,6 +462,16 @@ Error messages:
 ---
 
 ## Increment 5 — Client Data Layer (F-03, F-12)
+
+> **Status: DONE (2026-11-12).**
+> - `ApiRoutes.PROPERTIES`.
+> - `services/properties.ts`: `fetchProperties(districtId, mahallaId?)`, `fetchPropertyById(id)`.
+> - `hooks/useProperties.ts`:
+>   - `useProperties(districtId, mahallaId?)` → `{ properties, isLoadingProperties, dataUpdatedAt }`, key `['properties', districtId, mahallaId ?? '']`, `staleTime: Infinity`;
+>   - `usePropertyById(id)` → `{ property, isLoadingProperty }`, key `['property', id]`.
+> - Barrel exports added.
+> - No write callers: writes go through the Server Actions.
+> - Checks: `tsc` no new errors; ESLint clean on changed files (repo total unchanged at 117); existing tests pass; `next build` passes.
 
 - `ApiRoutes.PROPERTIES = '/properties'`.
 - `services/properties.ts`: `fetchProperties(districtId, mahallaId?)` and `fetchPropertyById(id)`. No write callers.
@@ -676,7 +686,7 @@ Each gate opens only with explicit approval for that gate. Approving a review is
 - **O1 — G3:** the user first chose a separate development database, then **explicitly authorized the 365-property import into production** (done, see Increment 2). **Write tests** (house-number assignments, batch saves) are still forbidden on production. They need the development database described below, or a new explicit decision, before Increments 3–10 can be exercised end to end.
 - **O2 — House number format:** **resolved.** The user confirmed `^[1-9]\d*(?:[A-Z]|\/\d+)?$` with no silent conversion (§0.4).
 - **O3 — Deploy the legacy-code removal:** done (`866144d`); see "Production Deployment State" below.
-- **O4 — Street type in the address:** the formula `{street.type lowercased}` gives "berk ko'cha", while Task.md's example says "berk ko'chasi". Keep the formula (current implementation), or add an inflection rule (`ko'cha` → `ko'chasi`)? That needs the user's decision before addresses are written in production.
+- **O4 — Street type in the address:** **resolved.** The user chose "berk ko'chasi" (possessive form); see Increment 3 decisions.
 
 ### Production Deployment State (checked 2026-11-12)
 

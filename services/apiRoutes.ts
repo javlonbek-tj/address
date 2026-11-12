@@ -15,4 +15,5 @@ export enum ApiRoutes {
   SESSIONS = '/sessions',
   REPORTS_STREETS = '/reports/streets',
   STREET_TYPES = '/streets/types',
+  PROPERTIES = '/properties',
 }
