@@ -6,6 +6,7 @@ import { Layer, LatLngBounds, Path } from 'leaflet';
 import L from 'leaflet';
 import { MAP_LEVEL_STYLES } from '@/lib/constants/map';
 import { Region } from '@/types';
+import { usePropertySheetStore } from '@/store/usePropertySheetStore';
 
 interface Props {
   regions: Region[];
@@ -234,6 +235,7 @@ export function useMapHandlers({
     layer.on({
       click: (e: { originalEvent: MouseEvent }) => {
         L.DomEvent.stop(e.originalEvent);
+        usePropertySheetStore.getState().openSheet(props.id);
       },
       mouseover: (e: { target: Layer }) => {
         const l = e.target as Path;

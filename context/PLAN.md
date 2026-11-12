@@ -517,6 +517,21 @@ Error messages:
 
 ## Increment 7 — Manual Numbering Panel (Task.md §3; F-13, Q5)
 
+> **Status: DONE (2026-11-12).**
+> - `store/usePropertySheetStore.ts`.
+> - Clicking a building calls `openSheet(id)` (in `useMapHandlers.onEachProperty`).
+> - `components/map/PropertyPanel.tsx`:
+>   - read-only cadastral number, mahalla, current street and current address (or "Manzil berilmagan");
+>   - form with `react-hook-form` + `zodResolver(propertyAssignSchema)`, prefilled with `reset` from the saved values;
+>   - submits `assignHouseNumberAction`. On success: toast, invalidate `['properties', districtId]` and `['property', id]`, close. A duplicate or invalid number becomes a field error; other errors become a toast.
+> - `components/map/StreetSearchSelect.tsx`: a searchable street picker.
+>   - Why: Sirdaryo tumani has 1,100 streets (up to 4,505 in a district) and names repeat (941 distinct), so a plain select is unusable.
+>   - Shows "Name (type)", matches regardless of apostrophe variant, lists at most 50 matches. It will be reused by the Increment 8 panel.
+> - Streets come from `useStreets(districtId)`, the same cache as the map's street layer, so no extra request.
+> - **Placement:** top-right, 320 px wide, drawn over the statistics card while open. Height capped at `calc(50% - 6rem)` with internal scrolling, so it never covers the zoom controls at the right-middle.
+> - The sheet closes when the map unmounts.
+> - Checks: `tsc` no new errors; ESLint clean on changed files (repo total unchanged at 117); tests pass; `next build` passes. Functional checks are the user's manual test.
+
 1. **`store/usePropertySheetStore.ts`.**
 2. **`onEachProperty` click:** `openSheet(id)`.
 3. **`PropertyPanel.tsx`:**
