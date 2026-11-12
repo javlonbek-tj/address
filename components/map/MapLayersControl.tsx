@@ -12,6 +12,7 @@ import {
   X,
   Check,
 } from 'lucide-react';
+
 import {
   Tooltip,
   TooltipContent,
@@ -30,8 +31,6 @@ export function MapLayersControl() {
     setShowMahallas,
     showStreets,
     setShowStreets,
-    showProperties,
-    setShowProperties,
   } = useMapFilterStore();
 
   const [isOpen, setIsOpen] = useState(false);
@@ -72,15 +71,6 @@ export function MapLayersControl() {
       setValue: setShowStreets,
       color: 'text-amber-500',
       bgColor: 'bg-amber-50 dark:bg-amber-900/20',
-    },
-    {
-      id: 'properties',
-      label: 'Binolar',
-      icon: Home,
-      value: showProperties,
-      setValue: setShowProperties,
-      color: 'text-purple-500',
-      bgColor: 'bg-purple-50 dark:bg-purple-900/20',
     },
   ];
 

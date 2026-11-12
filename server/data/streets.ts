@@ -255,7 +255,7 @@ export async function getStreetById(id: string) {
         },
         _count: {
           select: {
-            properties: true,
+            mahalla: true,
           },
         },
       },

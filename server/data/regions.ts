@@ -117,10 +117,9 @@ export async function getRegionById(id: string) {
 
     const districtIds = region.districts.map((d) => d.id);
 
-    const [mahallaCount, streetCount, propertyCount] = await Promise.all([
+    const [mahallaCount, streetCount] = await Promise.all([
       prisma.mahalla.count({ where: { districtId: { in: districtIds } } }),
       prisma.street.count({ where: { districtId: { in: districtIds } } }),
-      prisma.property.count({ where: { districtId: { in: districtIds } } }),
     ]);
 
     return {
@@ -129,7 +128,6 @@ export async function getRegionById(id: string) {
         districtCount: region.districts.length,
         mahallaCount,
         streetCount,
-        propertyCount,
       },
     };
   } catch (error) {

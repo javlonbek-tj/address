@@ -1,6 +1,5 @@
 import { create } from 'zustand';
 import type { BaseMapKey } from '@/lib/constants/map';
-import type { Geometry } from 'geojson';
 
 interface MapFilterState {
   selectedRegion: string;
@@ -12,16 +11,9 @@ interface MapFilterState {
   showDistricts: boolean;
   showMahallas: boolean;
   showStreets: boolean;
-  showProperties: boolean;
 
   baseMap: BaseMapKey;
 
-  // Drawing state
-  isDrawing: boolean;
-  drawGeometry: Geometry | null;
-  isCreatePropertyOpen: boolean;
-
-  // Actions
   setSelectedRegion: (id: string) => void;
   setSelectedDistrict: (id: string) => void;
   setSelectedMahalla: (id: string) => void;
@@ -31,14 +23,8 @@ interface MapFilterState {
   setShowDistricts: (show: boolean) => void;
   setShowMahallas: (show: boolean) => void;
   setShowStreets: (show: boolean) => void;
-  setShowProperties: (show: boolean) => void;
 
   setBaseMap: (baseMap: BaseMapKey) => void;
-
-  // Drawing actions
-  setIsDrawing: (isDrawing: boolean) => void;
-  setDrawGeometry: (geometry: Geometry | null) => void;
-  setIsCreatePropertyOpen: (isOpen: boolean) => void;
 
   resetFilters: () => void;
 }
@@ -52,11 +38,7 @@ const initialState = {
   showDistricts: true,
   showMahallas: true,
   showStreets: true,
-  showProperties: true,
   baseMap: 'osm' as BaseMapKey,
-  isDrawing: false,
-  drawGeometry: null,
-  isCreatePropertyOpen: false,
 };
 
 export const useMapFilterStore = create<MapFilterState>((set) => ({
@@ -89,13 +71,8 @@ export const useMapFilterStore = create<MapFilterState>((set) => ({
   setShowDistricts: (show) => set({ showDistricts: show }),
   setShowMahallas: (show) => set({ showMahallas: show }),
   setShowStreets: (show) => set({ showStreets: show }),
-  setShowProperties: (show) => set({ showProperties: show }),
 
   setBaseMap: (baseMap) => set({ baseMap }),
-
-  setIsDrawing: (isDrawing) => set({ isDrawing }),
-  setDrawGeometry: (drawGeometry) => set({ drawGeometry }),
-  setIsCreatePropertyOpen: (isOpen) => set({ isCreatePropertyOpen: isOpen }),
 
   resetFilters: () => set(initialState),
 }));

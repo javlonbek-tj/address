@@ -128,10 +128,9 @@ export async function getDistrictById(id: string) {
 
     if (!district) return null;
 
-    const [mahallaCount, streetCount, propertyCount] = await Promise.all([
+    const [mahallaCount, streetCount] = await Promise.all([
       prisma.mahalla.count({ where: { districtId: id } }),
       prisma.street.count({ where: { districtId: id } }),
-      prisma.property.count({ where: { districtId: id } }),
     ]);
 
     return {
@@ -139,7 +138,6 @@ export async function getDistrictById(id: string) {
       stats: {
         mahallaCount,
         streetCount,
-        propertyCount,
       },
     };
   } catch (error) {

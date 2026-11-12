@@ -109,12 +109,6 @@ export function AppSidebar({ userRole }: { userRole: string | null }) {
                         href: '/streets',
                         minRole: null,
                       },
-                      {
-                        title: "Ko'chmas mulklar",
-                        icon: Building2,
-                        href: '/properties',
-                        minRole: null,
-                      },
                     ]
                       .filter((subItem) => {
                         if (!subItem.minRole) return true;

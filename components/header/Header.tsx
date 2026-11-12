@@ -10,7 +10,6 @@ const PAGE_TITLES: Record<string, string> = {
   '/districts': 'Tumanlar',
   '/mahallas': 'Mahallalar',
   '/streets': "Ko'chalar",
-  '/properties': "Ko'chmas mulklar",
 };
 
 export function Header() {

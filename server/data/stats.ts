@@ -104,7 +104,6 @@ export async function getDashboardAnalytics() {
         districts: totalDistricts,
         mahallas: totalMahallas,
         streets: totalStreets,
-        properties: 148882,
       },
       charts: {
         regions: regionStats,

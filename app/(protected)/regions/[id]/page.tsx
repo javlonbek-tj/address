@@ -94,14 +94,6 @@ async function RegionDetailContent({ id }: { id: string }) {
                 {region.stats?.streetCount || 0}
               </span>
             </div>
-            <div className='grid grid-cols-3 gap-2 border-b border-gray-100 dark:border-gray-800 pb-2'>
-              <span className='font-medium text-muted-foreground col-span-1'>
-                Ko'chmas mulklar soni:
-              </span>
-              <span className='col-span-2'>
-                {region.stats?.propertyCount || 0}
-              </span>
-            </div>
           </CardContent>
         </Card>
 

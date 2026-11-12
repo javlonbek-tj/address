@@ -1,6 +1,7 @@
 generator client {
-  provider = "prisma-client"
-  output   = "../lib/generated/prisma"
+  provider        = "prisma-client"
+  output          = "../lib/generated/prisma"
+  previewFeatures = ["partialIndexes"]
 }
 
 datasource db {
@@ -98,7 +99,6 @@ model Street {
   districtId String
   district   District @relation(fields: [districtId], references: [id])
   mahalla    Mahalla[]
-
   properties Property[]
 
   @@index([name])
@@ -119,29 +119,37 @@ model UzKadStreet {
 }
 
 model Property {
-  id           String   @id @default(cuid())
+  id        String   @id @default(cuid())
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  cadNumber    String?   @unique
-  newCadNumber String?   @unique
-  newHouseNumber String?
-  oldHouseNumber String?
-  oldStreetName  String?
-  oldMahallaName String?
-  type         String   @default("residential")
-  isNew        Boolean  @default(false)
+  cadNumber    String? @unique
+  spId         String? @unique
+  spUid        String?
+  propertyKind String?
+
   geometry Json
   center   Json?
+
+  houseNumber String?
+  newAddress  String?
+
   isActive Boolean @default(true)
 
   districtId String
   district   District @relation(fields: [districtId], references: [id], onDelete: Cascade)
-  mahallaId String?
-  mahalla   Mahalla?  @relation(fields: [mahallaId], references: [code], onDelete: Cascade)
-  streetId String?
-  street   Street?   @relation(fields: [streetId], references: [code], onDelete: Cascade)
 
+  mahallaId String?
+  mahalla   Mahalla? @relation(fields: [mahallaId], references: [id], onDelete: SetNull)
+
+  streetId String?
+  street   Street?  @relation(fields: [streetId], references: [id], onDelete: SetNull)
+
+  // Soft-deleted rows must not reserve a house number on the street
+  @@unique([streetId, houseNumber], map: "properties_streetId_houseNumber_active_key", where: raw("\"isActive\" = true"))
+  @@index([districtId])
+  @@index([mahallaId])
+  @@index([streetId])
   @@map("properties")
 }
 
