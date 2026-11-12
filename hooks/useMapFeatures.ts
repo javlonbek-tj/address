@@ -3,6 +3,7 @@
 import { useMemo } from 'react';
 import { Geometry } from 'geojson';
 import * as turf from '@turf/turf';
+import { NUMBERING_BUFFER_METERS } from '@/lib/constants/map';
 import {
   MahallaWithRelations,
   StreetWithMetadata,
@@ -17,6 +18,8 @@ interface Props {
   mahallas: MahallaWithRelations[];
   streets: StreetWithMetadata[];
   properties: PropertyListItem[];
+  numberingStreetId: string;
+  assignments: { propertyId: string; houseNumber: number }[];
   selectedRegion: string;
   selectedDistrict: string;
   selectedMahalla: string;
@@ -29,6 +32,8 @@ export function useMapFeatures({
   mahallas,
   streets,
   properties,
+  numberingStreetId,
+  assignments,
   selectedRegion,
   selectedDistrict,
   selectedMahalla,
@@ -117,6 +122,39 @@ export function useMapFeatures({
     }));
   }, [streets]);
 
+  // Semi-auto numbering: unaddressed properties within NUMBERING_BUFFER_METERS of the street.
+  const numberingZone = useMemo(() => {
+    const street = streets.find((s) => s.id === numberingStreetId);
+    if (!street?.geometry) return null;
+    try {
+      return (
+        turf.buffer(turf.feature(street.geometry as unknown as Geometry), NUMBERING_BUFFER_METERS, {
+          units: 'meters',
+        }) ?? null
+      );
+    } catch {
+      return null;
+    }
+  }, [streets, numberingStreetId]);
+
+  const nearStreetIds = useMemo(() => {
+    if (!numberingZone) return new Set<string>();
+    return new Set(
+      properties
+        .filter(
+          (p) =>
+            !(p.houseNumber && p.streetId) &&
+            turf.booleanIntersects(turf.feature(p.geometry as Geometry), numberingZone),
+        )
+        .map((p) => p.id),
+    );
+  }, [properties, numberingZone]);
+
+  const assignedNumbers = useMemo(
+    () => new Map(assignments.map((a) => [a.propertyId, a.houseNumber])),
+    [assignments],
+  );
+
   const propertyFeatures = useMemo(() => {
     return properties.map((property) => ({
       type: 'Feature' as const,
@@ -125,10 +163,14 @@ export function useMapFeatures({
         houseNumber: property.houseNumber,
         cadNumber: property.cadNumber,
         done: !!property.houseNumber && !!property.streetId,
+        candidate: nearStreetIds.has(property.id) && !assignedNumbers.has(property.id),
+        assignedNumber: assignedNumbers.get(property.id) ?? null,
       },
       geometry: property.geometry as Geometry,
     }));
-  }, [properties]);
+  }, [properties, nearStreetIds, assignedNumbers]);
+
+  const candidateCount = propertyFeatures.filter((f) => f.properties.candidate).length;
 
   return {
     currentMahalla,
@@ -138,5 +180,6 @@ export function useMapFeatures({
     mahallaFeatures,
     streetFeatures,
     propertyFeatures,
+    candidateCount,
   };
 }

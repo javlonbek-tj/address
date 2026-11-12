@@ -4,9 +4,11 @@ import { useEffect, useRef, useCallback } from 'react';
 import { Feature } from 'geojson';
 import { Layer, LatLngBounds, Path } from 'leaflet';
 import L from 'leaflet';
-import { MAP_LEVEL_STYLES } from '@/lib/constants/map';
+import toast from 'react-hot-toast';
+import { MAP_LEVEL_STYLES, getPropertyStyle } from '@/lib/constants/map';
 import { Region } from '@/types';
 import { usePropertySheetStore } from '@/store/usePropertySheetStore';
+import { useNumberingSessionStore } from '@/store/useNumberingSessionStore';
 
 interface Props {
   regions: Region[];
@@ -196,6 +198,8 @@ export function useMapHandlers({
       layer.on({
         click: (e: { originalEvent: MouseEvent }) => {
           L.DomEvent.stop(e.originalEvent);
+          // The numbering street is fixed for the whole session.
+          if (useNumberingSessionStore.getState().isActive) return;
           setSelectedStreet(props.id);
         },
         mouseover: (e: { target: Layer }) => {
@@ -222,19 +226,40 @@ export function useMapHandlers({
       houseNumber: string | null;
       cadNumber: string | null;
       done: boolean;
+      candidate: boolean;
+      assignedNumber: number | null;
     };
-    const restingStyle = props.done
-      ? MAP_LEVEL_STYLES.propertyDone
-      : MAP_LEVEL_STYLES.property;
+    const restingStyle = getPropertyStyle(props);
 
-    layer.bindTooltip(props.houseNumber ?? props.cadNumber ?? '', {
-      direction: 'top',
-      className: 'map-label',
-    });
+    if (props.assignedNumber !== null) {
+      layer.bindTooltip(String(props.assignedNumber), {
+        permanent: true,
+        direction: 'center',
+        className: 'map-label property-number-label',
+      });
+    } else {
+      layer.bindTooltip(props.houseNumber ?? props.cadNumber ?? '', {
+        direction: 'top',
+        className: 'map-label',
+      });
+    }
+
+    if (props.candidate) {
+      layer.on('add', () => {
+        (layer as Path).getElement()?.classList.add('property-candidate');
+      });
+    }
 
     layer.on({
       click: (e: { originalEvent: MouseEvent }) => {
         L.DomEvent.stop(e.originalEvent);
+        const session = useNumberingSessionStore.getState();
+        if (session.isPanelOpen) {
+          if (!session.isActive || props.assignedNumber !== null) return;
+          if (props.candidate) session.assignNext(props.id);
+          else toast.error("Bu bino tanlangan ko'cha yaqinida emas");
+          return;
+        }
         usePropertySheetStore.getState().openSheet(props.id);
       },
       mouseover: (e: { target: Layer }) => {
