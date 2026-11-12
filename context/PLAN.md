@@ -661,6 +661,25 @@ Error messages:
 
 ## Increment 10 — End-to-End Verification (F-15)
 
+> **Status: DONE (2026-11-12)**: automated and read-only checks done by the agent. Functional UI checks are the user's manual test (testing policy: no E2E tests, no agent writes to production).
+>
+> | Area | Result |
+> |---|---|
+> | Deployed | `ecb550d` (Increments 1–9) live on Railway since 15:05:22Z. The earlier `281c06e` failure was transient: a clean `npm ci` + `next build` of that commit succeeded, and the next deploy of the same code succeeded. |
+> | Build | `tsc`: only the 2 pre-existing `ReportsTable.tsx` errors. ESLint: 117 problems (40 errors, 77 warnings), all pre-existing; none in feature files. `npm test`: 42/42 pass. `prisma validate`: OK. `next build`: OK, with the 3 property routes registered and no `/properties` pages or `/api/map/properties`. |
+> | Migration | `migrate status`: 5 migrations, up to date. Live diff: exactly the 3 known A2 drift items, nothing about `properties`. Partial index present: `… ("streetId", "houseNumber") WHERE ("isActive" = true)`. |
+> | Import | `--dry-run --compare`: 365 unchanged, 0 to create, 0 to update, 0 conflicts (idempotent). Matching unchanged: 120 by code, 245 by name. |
+> | Production data (read-only) | 365 properties, all active. 3 numbered through the live app on 3 streets. **0 problems**: valid format, street and address present, same district, active street, no duplicates, and every `newAddress` equals `buildNewAddress` output (e.g. "… Abdulla Qahhor-1 berk ko'chasi, 1-uy"). |
+> | Auth smoke test (local `next start`) | `/login` 200. All 4 property endpoints 401 without a session. Existing `/api/map/regions` 401 (unchanged). |
+> | Conventions | No `NumberingSession` in `types/`; no client write callers; no `/api/map/properties`; UI text in Uzbek; dependency changes limited to the ESLint fix (`eslint-config-next` 16.1.6, `eslint` ^9.39.5) and the `test` script. Cleanup in this increment: `AssignResult` and `defaultStartNumber` are no longer exported (only used internally), and `assignErrorMessage` reuses `HOUSE_NUMBER_FORMAT_MESSAGE`. |
+> | Manual (user) | Increments 6–9 checklists: map layer and zoom, manual panel, semi-auto session (including zoom resilience and mahalla border), duplicates (including two tabs at once), the permission matrix (district_user / region_user / admin / superuser / suspended), export, performance at zoom 15. |
+>
+> **Known non-blocking items:**
+> - 117 pre-existing ESLint findings in old code.
+> - The 3 A2 drift items (separate task).
+> - `eslint@9` is flagged "no longer supported" by npm; it's the newest line `eslint-plugin-react` supports.
+> - No Node version is pinned for Railway builds.
+
 | Area | Check |
 |---|---|
 | Build | `npx tsc --noEmit`, `npm run lint` and `npx next build` (**not** `npm run build`, which runs `migrate deploy`). |
