@@ -232,10 +232,22 @@
   cursor: crosshair;
 }
 
-.leaflet-tooltip.property-number-label {
-  font-weight: 700;
-  font-size: 13px;
-  padding: 1px 5px;
+/* House numbers drawn on property polygons; .map-label sets !important defaults. */
+.leaflet-tooltip.map-label.property-number-label {
+  color: #111827 !important;
+  font-weight: 700 !important;
+  font-size: 12px !important;
+  padding: 0 2px !important;
+  text-shadow:
+    -1px -1px 0 #fff,
+    1px -1px 0 #fff,
+    -1px 1px 0 #fff,
+    1px 1px 0 #fff !important;
+}
+
+/* Labels live in the tooltip pane, so hide them together with the properties pane. */
+.leaflet-container:not(.zoom-properties) .leaflet-tooltip.property-number-label {
+  display: none !important;
 }
 
 .leaflet-tooltip-top.map-label:before,

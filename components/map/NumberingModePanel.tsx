@@ -203,7 +203,7 @@ export function NumberingModePanel({ candidateCount }: { candidateCount: number 
             )}
             <Button
               onClick={session.startSession}
-              disabled={!streetId || !startValid || candidateCount === 0}
+              disabled={!streetId || !startValid}
               className='flex-1 cursor-pointer'
             >
               Boshlash
@@ -224,7 +224,8 @@ export function NumberingModePanel({ candidateCount }: { candidateCount: number 
           </div>
 
           <p className='text-muted-foreground'>
-            Ko&apos;cha bo&apos;ylab binolarni ketma-ket bosing. Faqat sariq rangdagi binolarni tanlash mumkin.
+            Ko&apos;cha bo&apos;ylab binolarni ketma-ket bosing. Sariq binolar ko&apos;chaga yaqin; uzoqroqdagi
+            raqamsiz binolarni ham bosish mumkin.
           </p>
 
           <div className='flex items-center gap-2'>
