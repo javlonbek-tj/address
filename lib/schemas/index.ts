@@ -5,3 +5,4 @@ export * from './street-schema';
 export * from './user-schema';
 export * from './login-schema';
 export * from './change-password-schema';
+export * from './property-schema';

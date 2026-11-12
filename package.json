@@ -8,6 +8,7 @@
     "build": "prisma migrate deploy && next build",
     "start": "next start",
     "lint": "eslint",
+    "test": "tsx --test \"scripts/**/*.test.ts\" \"lib/**/*.test.ts\" \"server/**/*.test.ts\"",
     "migrate:dev": "prisma migrate dev"
   },
   "dependencies": {
