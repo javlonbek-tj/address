@@ -486,6 +486,17 @@ Error messages:
 
 ## Increment 6 — Map Property Layer (F-11, F-12, F-16)
 
+> **Status: DONE (2026-11-12).**
+> - Store: `showProperties` with its setter.
+> - Constants: `ZOOM_THRESHOLDS.PROPERTY = 15`; styles `property` (grey), `propertyDone` (green), `highlight.property` (blue).
+> - Map: `propertiesPane`; "Binolar" toggle (`Building2`).
+> - `useMapFeatures.propertyFeatures` with `{ id, houseNumber, cadNumber, done }`.
+> - `useMapHandlers.onEachProperty`: tooltip shows the house number, or the cadastral number if none; hover highlight; clicks stopped from reaching the map.
+> - `UzbekistanMap` loads `useProperties(selectedDistrict, selectedMahalla)` and renders the layer, keyed by `dataUpdatedAt` so it repaints after writes.
+> - Zoom gate: `MapZoomManager` toggles `zoom-properties` on the map container; `globals.css` hides `.leaflet-propertiesPane-pane` without it.
+> - **Deferred to Increment 8:** `propertyCandidate` and `NUMBERING_BUFFER_METERS`, which only semi-auto mode uses (avoids unused exports).
+> - Checks: `tsc` no new errors; ESLint repo total unchanged at 117 (the findings in `MapZoomManager.tsx` and `useMapFeatures.ts` are pre-existing); tests pass; `next build` passes. The visual and performance checks are the user's manual test.
+
 1. **`useMapFilterStore`:** `showProperties` (default `true`) and its setter.
 2. **`lib/constants/map.ts`:** `ZOOM_THRESHOLDS.PROPERTY = 15`, `NUMBERING_BUFFER_METERS = 50`, and the styles `property` (grey), `propertyDone` (green), `propertyCandidate` (amber) and `highlight.property` (blue).
 3. **`MapPanes.tsx`:** `propertiesPane`. The CSS variable already exists.

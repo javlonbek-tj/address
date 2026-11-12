@@ -7,6 +7,7 @@ import {
   Navigation,
   Home,
   Waypoints,
+  Building2,
   Eye,
   EyeOff,
   X,
@@ -31,6 +32,8 @@ export function MapLayersControl() {
     setShowMahallas,
     showStreets,
     setShowStreets,
+    showProperties,
+    setShowProperties,
   } = useMapFilterStore();
 
   const [isOpen, setIsOpen] = useState(false);
@@ -71,6 +74,15 @@ export function MapLayersControl() {
       setValue: setShowStreets,
       color: 'text-amber-500',
       bgColor: 'bg-amber-50 dark:bg-amber-900/20',
+    },
+    {
+      id: 'properties',
+      label: 'Binolar',
+      icon: Building2,
+      value: showProperties,
+      setValue: setShowProperties,
+      color: 'text-orange-500',
+      bgColor: 'bg-orange-50 dark:bg-orange-900/20',
     },
   ];
 

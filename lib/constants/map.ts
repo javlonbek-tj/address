@@ -43,9 +43,30 @@ export const MAP_LEVEL_STYLES = {
     lineCap: 'round' as CanvasLineCap,
     lineJoin: 'round' as CanvasLineJoin,
   },
+  property: {
+    fillColor: '#6b7280',
+    fillOpacity: 0.4,
+    color: '#374151',
+    weight: 1,
+    opacity: 0.8,
+  },
+  propertyDone: {
+    fillColor: '#22c55e',
+    fillOpacity: 0.5,
+    color: '#15803d',
+    weight: 1,
+    opacity: 0.9,
+  },
   highlight: {
     adminBoundary: BLUE_HIGHLIGHT_STYLE,
     mahalla: BLUE_HIGHLIGHT_STYLE,
+    property: {
+      fillColor: '#3b82f6',
+      fillOpacity: 0.5,
+      color: '#1d4ed8',
+      weight: 2,
+      opacity: 1,
+    },
     street: {
       color: '#1d4ed8',
       weight: 6,
@@ -101,6 +122,7 @@ export const MAP_LEVEL_STYLES = {
 };
 
 export const ZOOM_THRESHOLDS = {
+  PROPERTY: 15,
   STREET: 14,
   MAHALLA: 12,
   DISTRICT: 9,
