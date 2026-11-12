@@ -852,7 +852,11 @@ CLI `prisma@7.4.2` generates the client (it reports `clientVersion 7.4.2`), whic
 
 ## Follow-up — Reserved House Numbers and Lowercase Letter Suffixes (2026-11-12)
 
-> **Status: CODE DONE on `feature/property-house-numbering`. The migration is NOT applied and the code is NOT merged.** The code reads and writes the new `reserved_house_numbers` table, so it must not reach `main` before the migration (gate G5) has been applied to production.
+> **Status: DONE (2026-11-12).** Gate G5 approved by the user. Migration `20261112162450_add_reserved_house_numbers` was applied to production with `prisma migrate deploy` at 16:25Z, after a verified backup (`prod_before_reserved_numbers_20261112T162327Z.dump`, SHA-256 `773ffd5d5ccae56baa081f9c50663794f65797a09f9c5482416ce370ad1b8950`).
+> - Checks: `migrate status` up to date; live diff shows only the 3 A2 drift items; the new table has 6 columns, a unique index and an FK to `streets`, and 0 rows.
+> - The recorded checksum equals the committed file bytes (LF, pinned by `.gitattributes`).
+> - Every other table has identical columns, constraints and indexes; row counts are unchanged except `_prisma_migrations` (6 → 7).
+> - The code was merged to `main` afterwards.
 
 ### User decisions
 - Empty plots get **reserved numbers**, stored in the database (option B).
