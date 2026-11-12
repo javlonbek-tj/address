@@ -1,11 +1,11 @@
 import { prisma } from '../prisma';
 import { Prisma, type PrismaClient } from '@/lib/generated/prisma/client';
-import { HOUSE_NUMBER_REGEX } from '@/lib/schemas/property-schema';
+import { HOUSE_NUMBER_FORMAT_MESSAGE, HOUSE_NUMBER_REGEX } from '@/lib/schemas/property-schema';
 import type { PropertyDetail, PropertyListItem } from '@/types';
 
 export type AssignItem = { propertyId: string; houseNumber: string };
 
-export type AssignResult =
+type AssignResult =
   | { ok: true; count: number }
   | { ok: false; error: 'STREET_NOT_FOUND' | 'PROPERTY_NOT_FOUND' | 'DISTRICT_MISMATCH' | 'MAHALLA_MISSING' }
   | { ok: false; error: 'DUPLICATE_HOUSE_NUMBER' | 'INVALID_HOUSE_NUMBER'; numbers: string[] };
@@ -23,7 +23,7 @@ export function assignErrorMessage(result: AssignFailure): string {
     case 'MAHALLA_MISSING':
       return 'Binoning mahallasi aniqlanmagan';
     case 'INVALID_HOUSE_NUMBER':
-      return "Uy raqami noto'g'ri formatda (masalan: 1, 2A, 12/1)";
+      return HOUSE_NUMBER_FORMAT_MESSAGE;
     case 'DUPLICATE_HOUSE_NUMBER':
       return result.numbers.length
         ? `Bu ko'chada ${result.numbers.join(', ')} uy raqami allaqachon mavjud`

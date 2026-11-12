@@ -3,7 +3,7 @@ import { usePropertySheetStore } from './usePropertySheetStore';
 
 export type NumberingSide = 'left' | 'right';
 
-export const defaultStartNumber = (side: NumberingSide) => (side === 'left' ? '1' : '2');
+const defaultStartNumber =(side: NumberingSide) => (side === 'left' ? '1' : '2');
 
 // Left side = odd numbers (1, 3, 5…), right side = even numbers (2, 4, 6…).
 export const isValidStartNumber = (side: NumberingSide, value: string) => {
