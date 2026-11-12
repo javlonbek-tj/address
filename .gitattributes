@@ -1,2 +1,3 @@
 # Applied to Production from a CRLF file; its recorded checksum depends on these exact bytes.
 prisma/migrations/20261112130658_rebuild_properties_table/migration.sql -text
+prisma/migrations/20261112162450_add_reserved_house_numbers/migration.sql -text

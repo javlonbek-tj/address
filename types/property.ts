@@ -21,3 +21,11 @@ export type PropertyDetail = {
   mahalla: { id: string; name: string } | null;
   street: { id: string; name: string; type: string } | null;
 };
+
+export type StreetNumbers = { used: string[]; reserved: string[] };
+
+export type ReservedNumberRow = {
+  houseNumber: string;
+  createdAt: string;
+  street: { name: string; type: string };
+};

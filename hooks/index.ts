@@ -34,5 +34,5 @@ export { useUpdateUserForm } from './useUpdateUserForm';
 export { useSessionsTableData } from './useSessions';
 export { useStreetsReport } from './useReport';
 export { useExportStreets } from './useExportStreets';
-export { useProperties, usePropertyById } from './useProperties';
+export { useProperties, usePropertyById, useStreetNumbers } from './useProperties';
 export { useExportProperties } from './useExportProperties';

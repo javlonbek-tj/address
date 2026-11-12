@@ -100,6 +100,7 @@ model Street {
   district   District @relation(fields: [districtId], references: [id])
   mahalla    Mahalla[]
   properties Property[]
+  reservedHouseNumbers ReservedHouseNumber[]
 
   @@index([name])
   @@map("streets")
@@ -151,6 +152,22 @@ model Property {
   @@index([mahallaId])
   @@index([streetId])
   @@map("properties")
+}
+
+// A house number kept free for an empty plot; deleted once a building takes it.
+model ReservedHouseNumber {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  houseNumber String
+  createdById String?
+
+  streetId String
+  street   Street @relation(fields: [streetId], references: [id], onDelete: Cascade)
+
+  @@unique([streetId, houseNumber])
+  @@map("reserved_house_numbers")
 }
 
 model user {

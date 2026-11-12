@@ -19,7 +19,7 @@ interface Props {
   streets: StreetWithMetadata[];
   properties: PropertyListItem[];
   numberingStreetId: string;
-  assignments: { propertyId: string; houseNumber: number }[];
+  assignments: { propertyId: string; houseNumber: string }[];
   selectedRegion: string;
   selectedDistrict: string;
   selectedMahalla: string;

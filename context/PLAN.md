@@ -847,3 +847,92 @@ CLI `prisma@7.4.2` generates the client (it reports `clientVersion 7.4.2`), whic
    This plan recommends **(a)**. Until you decide, Increments 3–9 can be coded and type-checked, but not exercised end to end.
 3. **Preview feature:** the partial index needs `previewFeatures = ["partialIndexes"]` in Prisma 7.4.2. Preview features can change between Prisma releases, so take care when upgrading Prisma. The CLI already offers 8.0.0-rc. If you'd rather not use a preview feature, the alternative is an index that exists only in raw SQL, which would show up as permanent drift and conflicts with A3's "do not silently introduce schema drift". This plan uses the preview flag.
 4. **Optional documentation follow-up (not done):** `docs/PRISMA_MIGRATIONS.md` tells developers to run `npm run migrate:dev`, which is unsafe against the current production database. Updating it is outside "planning documentation", so it's only flagged here.
+
+---
+
+## Follow-up — Reserved House Numbers and Lowercase Letter Suffixes (2026-11-12)
+
+> **Status: DONE (2026-11-12).** Gate G5 approved by the user. Migration `20261112162450_add_reserved_house_numbers` was applied to production with `prisma migrate deploy` at 16:25Z, after a verified backup (`prod_before_reserved_numbers_20261112T162327Z.dump`, SHA-256 `773ffd5d5ccae56baa081f9c50663794f65797a09f9c5482416ce370ad1b8950`).
+> - Checks: `migrate status` up to date; live diff shows only the 3 A2 drift items; the new table has 6 columns, a unique index and an FK to `streets`, and 0 rows.
+> - The recorded checksum equals the committed file bytes (LF, pinned by `.gitattributes`).
+> - Every other table has identical columns, constraints and indexes; row counts are unchanged except `_prisma_migrations` (6 → 7).
+> - The code was merged to `main` afterwards.
+
+### User decisions
+- Empty plots get **reserved numbers**, stored in the database (option B).
+- Letter suffixes are **lowercase**: `15a`, `15b`, … `15z`.
+- A letter after a reserve continues the **last assigned house** (15 assigned, 17 reserved → **15a**).
+- Letter mode is a **toggle button**.
+- Reserved plots are **not** marked on the map.
+
+### What changed
+- **Format:** `HOUSE_NUMBER_REGEX = /^[1-9]\d*(?:[a-z]|\/\d+)?$/` (was `[A-Z]`). `15a` is accepted and `15A` rejected, never converted. Message: "Uy raqami noto'g'ri formatda (masalan: 1, 2a, 12/1)". The 3 numbers already in production (`1`, `2`, `10`) are unaffected.
+- **Schema:** model `ReservedHouseNumber` (`reserved_house_numbers`): `id`, `createdAt`, `updatedAt`, `houseNumber`, `createdById?`, `streetId` → `streets(id)` ON DELETE CASCADE, `@@unique([streetId, houseNumber])`. Back-relation `Street.reservedHouseNumbers`.
+- **Data layer** (`server/data/properties.ts`):
+  - `assignPropertyAddresses(streetId, items, db, { reserve, useReserved, userId })`, all in one transaction:
+    - rejects numbers used by other active properties (including requested reserves) → `DUPLICATE_HOUSE_NUMBER`;
+    - rejects reserving an already-reserved number, and giving a building a reserved number unless `useReserved` → `RESERVED_HOUSE_NUMBER`;
+    - releases reservations used with `useReserved`, then creates the new reservations.
+  - A P2002 while creating reservations is rethrown as `ReservationConflictError`, because both unique indexes span `(streetId, houseNumber)` and the adapter only reports column names.
+  - New: `getStreetNumbers(streetId)` → `{ used, reserved }`, `getReservedNumbersByDistrict(districtId)`, `deleteReservedNumber`.
+- **Schema / actions / routes:**
+  - `batchAssignSchema`: string house numbers, plus `reserved: string[]`; at least one building or reserve; no number twice across both. `BatchAssignSchemaType` is now `z.input`.
+  - `assignHouseNumberAction(propertyId, data, useReserved)`; new `releaseReservedNumberAction(streetId, houseNumber)`, with the same auth (superuser denied, `canWriteDistrict`).
+  - `PATCH /api/properties/:id` accepts `useReserved`; `batch-assign` accepts `reserved`.
+  - New read routes: `GET /api/properties/street-numbers?streetId=` and `GET /api/properties/reserved?districtId=`, both checking session, active account and `canAccessDistrict`.
+- **Session store:**
+  - A step history (`assign` | `reserve`) replaces the assignments list; undo removes the last step, including a multi-number reserve.
+  - `reserve(count)` skips numbers on the current side.
+  - `nextSequenceNumber` skips numbers already reserved in the database.
+  - Letter mode (`toggleLetterMode`) assigns base + first free letter: base = last assigned number in the session, or start − 2; free = not used or reserved on the street and not in the session. It doesn't advance the sequence.
+- **Numbering panel:**
+  - Counter: "Belgilandi | Zaxira | Keyingi raqam" (shows `15a` in letter mode).
+  - "Zaxira qoldirish" with a count (1–50), and the "Harfli raqam" toggle.
+  - Grey reserve chips; existing street reserves shown in setup; save sends assignments and reserves together.
+- **Manual panel:**
+  - The street's reserved numbers as chips: click to use (sets `useReserved`), × to release (confirmation dialog).
+  - "+ harf" adds the next free letter to the typed base number.
+- **Export:** a second sheet, "Zaxira" (street, reserved number, date), covering the selected district.
+- **Checks:** `tsc` no new errors; ESLint repo total unchanged at 117; 42/42 existing tests pass (expectations updated for lowercase, string numbers and the new result shape; no new tests, per the user); `next build` passes and registers the 2 new routes.
+
+### Gate G5 — migration SQL (prepared, NOT applied, NOT in `prisma/migrations/` yet)
+Read-only `migrate diff` against production shows only this table, its index and FK, plus the 3 known A2 drift items, which are excluded.
+```sql
+-- Migration: add_reserved_house_numbers  (additive only: no DROP, no change to existing tables)
+CREATE TABLE "reserved_house_numbers" (
+    "id" TEXT NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+    "houseNumber" TEXT NOT NULL,
+    "createdById" TEXT,
+    "streetId" TEXT NOT NULL,
+
+    CONSTRAINT "reserved_house_numbers_pkey" PRIMARY KEY ("id")
+);
+
+CREATE UNIQUE INDEX "reserved_house_numbers_streetId_houseNumber_key" ON "reserved_house_numbers"("streetId", "houseNumber");
+
+ALTER TABLE "reserved_house_numbers" ADD CONSTRAINT "reserved_house_numbers_streetId_fkey" FOREIGN KEY ("streetId") REFERENCES "streets"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+```
+
+**Execution (after explicit approval):**
+1. Fresh `pg_dump` 18 backup, verified.
+2. Write the migration file (LF endings, or pin its bytes via `.gitattributes` like the first one).
+3. `prisma migrate deploy`.
+4. Checks: `migrate status`, live diff shows only the 3 drift items, the table and index exist, other tables unchanged.
+5. Merge to `main` (deploys).
+
+### Manual testing checklist (after G5 and the merge)
+1. **Reserve one:** numbering, left side from 1: click → 1; "Zaxira qoldirish" with 1 → chip `3 zaxira`; click → 5. Counter "Belgilandi: 2 ta | Zaxira: 1 ta | Keyingi raqam: 7".
+2. **Reserve several:** "Zaxira qoldirish" with 3 → `7 zaxira`, `9 zaxira`, `11 zaxira`; next click → 13.
+3. **Undo:** removes the last step; undoing a 3-number reserve brings "Keyingi raqam" back to 7.
+4. **Letters:** after 5, turn on "Harfli raqam" and click two buildings → `5a`, `5b`; turn it off and click → the sequence continues.
+5. **Letter after a reserve:** 15 assigned, 17 reserved, letter mode → `15a`.
+6. **Save:** toast "N ta binoga uy raqami berildi, M ta raqam zaxiraga olindi". The new session's setup shows "Zaxiradagi raqamlar: 3, 7, 9, 11".
+7. **Auto-skip:** a new session on the same side from 1 skips reserved numbers (1 → 5 when 3 is reserved).
+8. **Protection:** in the manual panel, typing a reserved number (`3`) and saving shows "Bu ko'chada 3 raqami zaxirada. Zaxiradagi raqamni ro'yxatdan tanlang". Clicking chip `3` and saving succeeds, and 3 disappears from the reserve list.
+9. **Release:** × on a chip → dialog → "Zaxira bekor qilindi"; the number is free again.
+10. **Manual "+ harf":** type `15` → `15a` (or `15b` if 15a is taken).
+11. **Format:** `15A` is rejected with the format message; `15a` is accepted. Address: "… 15a-uy".
+12. **Excel:** the "Zaxira" sheet lists the reserved numbers with street and date.
+13. **Permissions:** superuser can't reserve or release; another district's user is refused.

@@ -227,7 +227,7 @@ export function useMapHandlers({
       cadNumber: string | null;
       done: boolean;
       candidate: boolean;
-      assignedNumber: number | null;
+      assignedNumber: string | null;
     };
     const restingStyle = getPropertyStyle(props);
 
@@ -256,8 +256,12 @@ export function useMapHandlers({
         const session = useNumberingSessionStore.getState();
         if (session.isPanelOpen) {
           if (!session.isActive || props.assignedNumber !== null) return;
-          if (props.candidate) session.assignNext(props.id);
-          else toast.error("Bu bino tanlangan ko'cha yaqinida emas");
+          if (!props.candidate) {
+            toast.error("Bu bino tanlangan ko'cha yaqinida emas");
+            return;
+          }
+          const problem = session.assignNext(props.id);
+          if (problem) toast.error(problem);
           return;
         }
         usePropertySheetStore.getState().openSheet(props.id);

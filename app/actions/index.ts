@@ -4,4 +4,5 @@ export { changePassword } from './profile-action';
 export {
   assignHouseNumberAction,
   batchAssignHouseNumbersAction,
+  releaseReservedNumberAction,
 } from './property-action';

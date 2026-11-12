@@ -141,7 +141,7 @@ export const NUMBERING_BUFFER_METERS = 50;
 export function getPropertyStyle(props: {
   done: boolean;
   candidate: boolean;
-  assignedNumber: number | null;
+  assignedNumber: string | null;
 }) {
   if (props.assignedNumber !== null) return MAP_LEVEL_STYLES.propertyAssigned;
   if (props.candidate) return MAP_LEVEL_STYLES.propertyCandidate;
