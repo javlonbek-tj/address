@@ -3,12 +3,13 @@
 import { useEffect, useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import toast from 'react-hot-toast';
-import { ListOrdered, Loader2, X } from 'lucide-react';
+import { Download, ListOrdered, Loader2, X } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { batchAssignHouseNumbersAction } from '@/app/actions';
 import { useStreets } from '@/hooks/useStreets';
+import { useExportProperties } from '@/hooks/useExportProperties';
 import { cn } from '@/lib/utils';
 import { useMapFilterStore } from '@/store/useMapFilterStore';
 import {
@@ -25,10 +26,12 @@ const SIDES: { side: NumberingSide; label: string }[] = [
 
 export function NumberingModePanel({ candidateCount }: { candidateCount: number }) {
   const selectedDistrict = useMapFilterStore((s) => s.selectedDistrict);
+  const selectedMahalla = useMapFilterStore((s) => s.selectedMahalla);
   const selectedStreet = useMapFilterStore((s) => s.selectedStreet);
   const setSelectedStreet = useMapFilterStore((s) => s.setSelectedStreet);
   const session = useNumberingSessionStore();
   const { streets } = useStreets(selectedDistrict);
+  const { exportToExcel, isExporting } = useExportProperties();
   const queryClient = useQueryClient();
 
   const [isSaving, setIsSaving] = useState(false);
@@ -49,16 +52,31 @@ export function NumberingModePanel({ candidateCount }: { candidateCount: number 
 
   if (!isPanelOpen) {
     return (
-      <Button
-        onClick={() => {
-          setHasSaved(false);
-          session.openPanel();
-        }}
-        className='absolute bottom-8 right-3 z-(--z-map-ui) shadow-lg cursor-pointer'
-      >
-        <ListOrdered className='h-4 w-4' />
-        Raqamlash
-      </Button>
+      <div className='absolute bottom-8 right-3 z-(--z-map-ui) flex gap-2'>
+        <Button
+          variant='outline'
+          disabled={isExporting}
+          onClick={() =>
+            exportToExcel(selectedDistrict, selectedMahalla || undefined).catch(() =>
+              toast.error('Excel faylini yuklashda xatolik yuz berdi'),
+            )
+          }
+          className='bg-background shadow-lg cursor-pointer'
+        >
+          {isExporting ? <Loader2 className='h-4 w-4 animate-spin' /> : <Download className='h-4 w-4' />}
+          Excel
+        </Button>
+        <Button
+          onClick={() => {
+            setHasSaved(false);
+            session.openPanel();
+          }}
+          className='shadow-lg cursor-pointer'
+        >
+          <ListOrdered className='h-4 w-4' />
+          Raqamlash
+        </Button>
+      </div>
     );
   }
 
