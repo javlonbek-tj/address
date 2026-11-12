@@ -553,6 +553,35 @@ Error messages:
 
 ## Increment 8 — Semi-Automatic Numbering (Task.md §4, §6, §9; F-05, F-06, Q5)
 
+> **Status: DONE (2026-11-12).**
+>
+> **`store/useNumberingSessionStore.ts`** holds the panel and the session in one place: `isPanelOpen`, `streetId`, `side`, `startInput`, `isActive`, `currentNumber`, `assignments`.
+> - Actions: `openPanel` (closes the sheet), `setStreet` (ignored while active), `setSide`, `startSession` (validates parity, closes the sheet), `assignNext` (does nothing for an already assigned building), `undoLast`, `cancelSession`, `switchSide`, `endSession`.
+> - One store means the map, the click handler, `MapZoomManager` and the panel all read the same session street (R-01).
+>
+> **Candidates** (`useMapFeatures`):
+> - `turf.buffer(street, NUMBERING_BUFFER_METERS = 50 m)` intersected with unaddressed buildings, minus those already assigned.
+> - Computed as soon as the panel has a street (R-08). The buffer is memoized per street and the intersection per data load.
+> - Features carry `candidate` and `assignedNumber`; `getPropertyStyle` in `lib/constants/map.ts` gives grey, green, amber (candidate) or orange (assigned).
+>
+> **Map behaviour:**
+> - Candidates pulse (CSS class added on the SVG path).
+> - Assigned buildings show permanent number labels; the layer key includes the street, `isActive` and the assignment count.
+> - During a session, clicks assign only candidates; other clicks show the toast "Bu bino tanlangan ko'cha yaqinida emas"; the sheet never opens.
+> - Street clicks are locked during a session. `MapZoomManager` skips zoom-based clearing during a session, and empty-map clicks no longer reset the selection (R-01).
+> - Crosshair cursor while numbering.
+> - While the panel has a street, buildings load district-wide (R-03).
+>
+> **`components/map/NumberingModePanel.tsx`:**
+> - **Idle:** "Raqamlash" button at the bottom-right, shown once a district is selected.
+> - **Setup:** "Select street" and "Select side" merged into one view: street picker (`StreetSearchSelect`, synced with map street clicks), candidate count, side buttons, start number with the odd/even check. "Boshlash" stays disabled without a street, with an invalid start number, or with 0 candidates.
+> - **Numbering:** "Belgilandi: N ta | Keyingi raqam: M", assigned number chips, "Orqaga qaytish", "Saqlash", "Bekor qilish" (discards and returns to setup), and X to close.
+> - **Saving:** on success: toast, invalidate, `switchSide()`, and a "Tugatish" button appears. On a duplicate, the session is kept and the conflicting chips turn red (all of them when the database index reported the conflict).
+>
+> **Deferred to Increment 9:** the "Excel" button.
+>
+> Checks: `tsc` no new errors; ESLint repo total unchanged at 117; tests pass; `next build` passes. Functional checks are the user's manual test.
+
 ### 8.1 `store/useNumberingSessionStore.ts`
 - `startSession` also closes the sheet.
 - `assignNext` does nothing if the property is already assigned.

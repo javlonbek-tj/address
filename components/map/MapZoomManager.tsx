@@ -3,6 +3,7 @@
 import { useMapEvents } from 'react-leaflet';
 import { useEffect, useCallback, useRef } from 'react';
 import { useMapFilterStore } from '@/store/useMapFilterStore';
+import { useNumberingSessionStore } from '@/store/useNumberingSessionStore';
 import { ZOOM_THRESHOLDS } from '@/lib/constants/map';
 
 export function MapZoomManager() {
@@ -45,6 +46,9 @@ export function MapZoomManager() {
 
   const handleZoomBasedClearing = useCallback(
     (zoom: number) => {
+      // Zooming out during semi-auto numbering must not drop the district or street.
+      if (useNumberingSessionStore.getState().isActive) return;
+
       const {
         selectedStreet,
         selectedMahalla,

@@ -57,6 +57,20 @@ export const MAP_LEVEL_STYLES = {
     weight: 1,
     opacity: 0.9,
   },
+  propertyCandidate: {
+    fillColor: '#f59e0b',
+    fillOpacity: 0.6,
+    color: '#b45309',
+    weight: 2,
+    opacity: 1,
+  },
+  propertyAssigned: {
+    fillColor: '#ea580c',
+    fillOpacity: 0.75,
+    color: '#9a3412',
+    weight: 2,
+    opacity: 1,
+  },
   highlight: {
     adminBoundary: BLUE_HIGHLIGHT_STYLE,
     mahalla: BLUE_HIGHLIGHT_STYLE,
@@ -120,6 +134,19 @@ export const MAP_LEVEL_STYLES = {
     },
   },
 };
+
+// Properties within this distance of the street are numbering candidates (Task.md §4.2).
+export const NUMBERING_BUFFER_METERS = 50;
+
+export function getPropertyStyle(props: {
+  done: boolean;
+  candidate: boolean;
+  assignedNumber: number | null;
+}) {
+  if (props.assignedNumber !== null) return MAP_LEVEL_STYLES.propertyAssigned;
+  if (props.candidate) return MAP_LEVEL_STYLES.propertyCandidate;
+  return props.done ? MAP_LEVEL_STYLES.propertyDone : MAP_LEVEL_STYLES.property;
+}
 
 export const ZOOM_THRESHOLDS = {
   PROPERTY: 15,

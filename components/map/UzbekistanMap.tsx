@@ -5,13 +5,15 @@ import { GeoJSON, Marker } from 'react-leaflet';
 import L, { LatLngBounds } from 'leaflet';
 import { Feature, FeatureCollection } from 'geojson';
 import { MapContainer } from './MapContainer';
-import { MAP_LEVEL_STYLES } from '@/lib/constants/map';
+import { MAP_LEVEL_STYLES, getPropertyStyle } from '@/lib/constants/map';
 import { formatMapStatistics } from '@/lib/utils';
 import { useMapFilters } from '@/hooks/useMapFilters';
 import { useMapFeatures } from '@/hooks/useMapFeatures';
 import { useProperties } from '@/hooks/useProperties';
 import { usePropertySheetStore } from '@/store/usePropertySheetStore';
+import { useNumberingSessionStore } from '@/store/useNumberingSessionStore';
 import { PropertyPanel } from './PropertyPanel';
+import { NumberingModePanel } from './NumberingModePanel';
 import { useStats } from '@/hooks/useStats';
 import { useMapHighlighting } from '@/hooks/useMapHighlighting';
 import { MapAutoCenter } from './MapAutoCenter';
@@ -65,19 +67,27 @@ export default function UzbekistanMap({ regions }: UzbekistanMapProps) {
   const resetFilters = useMapFilterStore((state) => state.resetFilters);
 
   const closePropertySheet = usePropertySheetStore((state) => state.closeSheet);
+  const isNumberingPanelOpen = useNumberingSessionStore((state) => state.isPanelOpen);
+  const numberingStreetId = useNumberingSessionStore((state) => state.streetId);
+  const isNumbering = useNumberingSessionStore((state) => state.isActive);
+  const numberingAssignments = useNumberingSessionStore((state) => state.assignments);
+  const endNumberingSession = useNumberingSessionStore((state) => state.endSession);
+  const activeNumberingStreetId = isNumberingPanelOpen ? numberingStreetId : '';
 
   useEffect(() => {
     return () => {
       resetFilters();
       closePropertySheet();
+      endNumberingSession();
     };
-  }, [resetFilters, closePropertySheet]);
+  }, [resetFilters, closePropertySheet, endNumberingSession]);
 
   const [mapBounds, setMapBounds] = useState<LatLngBounds | null>(null);
 
+  // While numbering a street, load the whole district: streets can cross mahalla borders.
   const { properties, dataUpdatedAt: propertiesUpdatedAt } = useProperties(
     selectedDistrict,
-    selectedMahalla || undefined,
+    activeNumberingStreetId ? undefined : selectedMahalla || undefined,
   );
 
   // Synchronization with session (Authorization & Auto-initialization)
@@ -114,12 +124,15 @@ export default function UzbekistanMap({ regions }: UzbekistanMapProps) {
     mahallaFeatures,
     streetFeatures,
     propertyFeatures,
+    candidateCount,
   } = useMapFeatures({
     regions,
     districts,
     mahallas,
     streets,
     properties,
+    numberingStreetId: activeNumberingStreetId,
+    assignments: numberingAssignments,
     selectedRegion,
     selectedDistrict,
     selectedMahalla,
@@ -140,6 +153,8 @@ export default function UzbekistanMap({ regions }: UzbekistanMapProps) {
   );
 
   const handleBackToRegions = () => {
+    // Keep the selection during semi-auto numbering; empty-map clicks happen while clicking along a street.
+    if (isNumbering) return;
     if (
       session?.user?.role === UserRole.district_user ||
       session?.user?.role === UserRole.region_user
@@ -155,7 +170,7 @@ export default function UzbekistanMap({ regions }: UzbekistanMapProps) {
   };
 
   return (
-    <div className='flex flex-col flex-1 min-h-0 h-full'>
+    <div className={`flex flex-col flex-1 min-h-0 h-full ${isNumbering ? 'numbering-mode' : ''}`}>
       <MapFilters
         regions={regions}
         filterState={{ districts, mahallas, streets, isLoading }}
@@ -163,6 +178,7 @@ export default function UzbekistanMap({ regions }: UzbekistanMapProps) {
       />
       <MapStatistics stats={displayStats} />
       <PropertyPanel />
+      <NumberingModePanel candidateCount={candidateCount} />
       <MapLayersControl />
       <MapControls />
 
@@ -248,7 +264,7 @@ export default function UzbekistanMap({ regions }: UzbekistanMapProps) {
         {/* Properties Layer — hidden below ZOOM_THRESHOLDS.PROPERTY via the zoom-properties class */}
         {showProperties && selectedDistrict && propertyFeatures.length > 0 && (
           <GeoJSON
-            key={`properties-${selectedDistrict}-${selectedMahalla}-${propertiesUpdatedAt}`}
+            key={`properties-${selectedDistrict}-${selectedMahalla}-${propertiesUpdatedAt}-${activeNumberingStreetId}-${isNumbering}-${numberingAssignments.length}`}
             data={
               {
                 type: 'FeatureCollection',
@@ -257,10 +273,8 @@ export default function UzbekistanMap({ regions }: UzbekistanMapProps) {
             }
             pane='propertiesPane'
             style={(feature?: Feature) => {
-              const props = feature?.properties as { done: boolean } | undefined;
-              return props?.done
-                ? MAP_LEVEL_STYLES.propertyDone
-                : MAP_LEVEL_STYLES.property;
+              const props = feature?.properties as Parameters<typeof getPropertyStyle>[0];
+              return getPropertyStyle(props);
             }}
             onEachFeature={onEachProperty}
           />
