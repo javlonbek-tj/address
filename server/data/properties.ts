@@ -10,6 +10,33 @@ export type AssignResult =
   | { ok: false; error: 'STREET_NOT_FOUND' | 'PROPERTY_NOT_FOUND' | 'DISTRICT_MISMATCH' | 'MAHALLA_MISSING' }
   | { ok: false; error: 'DUPLICATE_HOUSE_NUMBER' | 'INVALID_HOUSE_NUMBER'; numbers: string[] };
 
+type AssignFailure = Extract<AssignResult, { ok: false }>;
+
+export function assignErrorMessage(result: AssignFailure): string {
+  switch (result.error) {
+    case 'STREET_NOT_FOUND':
+      return "Ko'cha topilmadi";
+    case 'PROPERTY_NOT_FOUND':
+      return 'Bino topilmadi';
+    case 'DISTRICT_MISMATCH':
+      return "Bino va ko'cha bir tumanda emas";
+    case 'MAHALLA_MISSING':
+      return 'Binoning mahallasi aniqlanmagan';
+    case 'INVALID_HOUSE_NUMBER':
+      return "Uy raqami noto'g'ri formatda (masalan: 1, 2A, 12/1)";
+    case 'DUPLICATE_HOUSE_NUMBER':
+      return result.numbers.length
+        ? `Bu ko'chada ${result.numbers.join(', ')} uy raqami allaqachon mavjud`
+        : "Bu ko'chada ushbu uy raqami allaqachon mavjud";
+  }
+}
+
+export function assignErrorStatus(result: AssignFailure): number {
+  if (result.error === 'DUPLICATE_HOUSE_NUMBER') return 409;
+  if (result.error === 'STREET_NOT_FOUND' || result.error === 'PROPERTY_NOT_FOUND') return 404;
+  return 400;
+}
+
 export function buildNewAddress({
   regionName,
   districtName,

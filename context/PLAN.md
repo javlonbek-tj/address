@@ -395,6 +395,22 @@ ALTER TABLE "properties" ADD CONSTRAINT "properties_streetId_fkey" FOREIGN KEY (
 
 ## Increment 4 — Authorization, Server Actions and API Routes (F-02, F-03, Q2)
 
+> **Status: DONE (2026-11-12).**
+> - `canWriteDistrict` in `lib/auth/authorization.ts`.
+> - `assignErrorMessage` / `assignErrorStatus` in `server/data/properties.ts`, the shared error mapping used by both actions and both write routes.
+> - `app/actions/property-action.ts`: `assignHouseNumberAction`, `batchAssignHouseNumbersAction`, both returning `ActionResult<{ count } | { numbers }>`.
+> - Routes: `app/api/properties/route.ts`, `app/api/properties/[id]/route.ts` (GET, PATCH), `app/api/properties/batch-assign/route.ts`.
+> - Order of checks: session → account active → superuser (writes) → Zod → street's district → `canWriteDistrict` → `assignPropertyAddresses`.
+> - Status codes: duplicate number → 409 with `numbers`; street or property not found → 404; mismatch, missing mahalla or invalid number → 400.
+>
+> **Verified:**
+> - `tsc`: no new errors. ESLint: changed files clean, repo total unchanged (117).
+> - Existing tests still pass.
+> - `next build` registers the three routes.
+> - Local `next start`: all four endpoints return 401 without a session.
+>
+> No new tests were written (user decision: keep it simple, manual testing).
+
 ### 4.1 `canWriteDistrict` in `lib/auth/authorization.ts`
 ```ts
 export async function canWriteDistrict(user: SessionUser, districtId: string): Promise<boolean> {
