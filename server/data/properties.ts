@@ -54,7 +54,10 @@ export function buildNewAddress({
 }): string {
   // Mahalla names are stored with their "MFY" suffix already ("Yangiobod MFY").
   const mahalla = mahallaName.replace(/\s+mfy$/i, '');
-  const type = streetType.charAt(0).toLowerCase() + streetType.slice(1);
+  // Street types are stored as "Ko'cha", "Berk ko'cha", …; the address uses the possessive form
+  // ("Shiroq-3 berk ko'chasi"). Any apostrophe variant is accepted.
+  const lowered = streetType.charAt(0).toLowerCase() + streetType.slice(1);
+  const type = /ko['ʻʼ‘’`]cha$/i.test(lowered) ? `${lowered}si` : lowered;
   return `${regionName}, ${districtName}, ${mahalla} MFY, ${streetName} ${type}, ${houseNumber}-uy`;
 }
 

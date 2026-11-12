@@ -120,7 +120,7 @@ test('buildNewAddress produces the Task.md format without doubling the MFY suffi
     streetType: "Berk ko'cha",
     houseNumber: '1',
   };
-  const expected = "Sirdaryo viloyati, Sirdaryo tumani, Yangiobod MFY, Shiroq-3 berk ko'cha, 1-uy";
+  const expected = "Sirdaryo viloyati, Sirdaryo tumani, Yangiobod MFY, Shiroq-3 berk ko'chasi, 1-uy";
   assert.equal(buildNewAddress({ ...parts, mahallaName: 'Yangiobod MFY' }), expected);
   assert.equal(buildNewAddress({ ...parts, mahallaName: 'Yangiobod' }), expected);
   assert.equal(buildNewAddress({ ...parts, mahallaName: 'Yangiobod mfy' }), expected);
@@ -157,7 +157,7 @@ test('assigns a house number, links the street and stores the full address', asy
   assert.deepEqual(result, { ok: true, count: 1 });
   assert.equal(rows[0].houseNumber, '1');
   assert.equal(rows[0].streetId, 'st-shiroq');
-  assert.equal(rows[0].newAddress, "Sirdaryo viloyati, Sirdaryo tumani, Yangiobod MFY, Shiroq-3 berk ko'cha, 1-uy");
+  assert.equal(rows[0].newAddress, "Sirdaryo viloyati, Sirdaryo tumani, Yangiobod MFY, Shiroq-3 berk ko'chasi, 1-uy");
 });
 
 test('assigns a batch of odd numbers in one call', async () => {
@@ -251,7 +251,7 @@ test('moving a numbered property to another street updates street and address', 
   const result = await assignPropertyAddresses('st-shiroq', [{ propertyId: 'p1', houseNumber: '2A' }], fakeDb(rows, streets));
   assert.deepEqual(result, { ok: true, count: 1 });
   assert.equal(rows[0].streetId, 'st-shiroq');
-  assert.equal(rows[0].newAddress, "Sirdaryo viloyati, Sirdaryo tumani, Yangiobod MFY, Shiroq-3 berk ko'cha, 2A-uy");
+  assert.equal(rows[0].newAddress, "Sirdaryo viloyati, Sirdaryo tumani, Yangiobod MFY, Shiroq-3 berk ko'chasi, 2A-uy");
 });
 
 test('rejects an unknown or inactive street', async () => {
