@@ -14,6 +14,7 @@ import { SUPERUSER_DENIED_MESSAGE } from '@/lib/constants/user';
 import {
   assignErrorMessage,
   assignPropertyAddresses,
+  deleteReservedNumber,
   getStreetDistrictId,
   type AssignItem,
 } from '@/server/data/properties';
@@ -30,26 +31,39 @@ async function getWriter(): Promise<{ user: SessionUser } | { denied: AssignActi
   return { user: session.user };
 }
 
-async function assign(user: SessionUser, streetId: string, items: AssignItem[]): Promise<AssignActionResult> {
+async function authorizeStreet(user: SessionUser, streetId: string): Promise<AssignActionResult | null> {
   const districtId = await getStreetDistrictId(streetId);
   if (!districtId) return { success: false, error: 'STREET_NOT_FOUND', message: "Ko'cha topilmadi" };
   if (!(await canWriteDistrict(user, districtId))) {
     return { success: false, error: 'FORBIDDEN', message: "Bu tuman uchun ruxsatingiz yo'q" };
   }
+  return null;
+}
 
-  const result = await assignPropertyAddresses(streetId, items);
+async function assign(
+  user: SessionUser,
+  streetId: string,
+  items: AssignItem[],
+  options: { reserve?: string[]; useReserved?: boolean } = {},
+): Promise<AssignActionResult> {
+  const denied = await authorizeStreet(user, streetId);
+  if (denied) return denied;
+
+  const result = await assignPropertyAddresses(streetId, items, undefined, { ...options, userId: user.id });
   if (result.ok) return { success: true, data: { count: result.count } };
   return {
     success: false,
     error: result.error,
     message: assignErrorMessage(result),
-    ...(result.error === 'DUPLICATE_HOUSE_NUMBER' ? { data: { numbers: result.numbers } } : {}),
+    ...('numbers' in result ? { data: { numbers: result.numbers } } : {}),
   };
 }
 
+// `useReserved` is true only when the number was picked from the street's reserve list.
 export async function assignHouseNumberAction(
   propertyId: string,
   data: PropertyAssignSchemaType,
+  useReserved = false,
 ): Promise<AssignActionResult> {
   const writer = await getWriter();
   if ('denied' in writer) return writer.denied;
@@ -58,7 +72,20 @@ export async function assignHouseNumberAction(
   if (!parsed.success) {
     return { success: false, error: 'VALIDATION_ERROR', message: parsed.error.issues[0].message };
   }
-  return assign(writer.user, parsed.data.streetId, [{ propertyId, houseNumber: parsed.data.houseNumber }]);
+  return assign(writer.user, parsed.data.streetId, [{ propertyId, houseNumber: parsed.data.houseNumber }], {
+    useReserved,
+  });
+}
+
+export async function releaseReservedNumberAction(streetId: string, houseNumber: string): Promise<ActionResult> {
+  const writer = await getWriter();
+  if ('denied' in writer) return writer.denied as ActionResult;
+
+  const denied = await authorizeStreet(writer.user, streetId);
+  if (denied) return denied as ActionResult;
+
+  const deleted = await deleteReservedNumber(streetId, houseNumber);
+  return deleted ? { success: true } : { success: false, message: 'Zaxira raqam topilmadi' };
 }
 
 export async function batchAssignHouseNumbersAction(input: BatchAssignSchemaType): Promise<AssignActionResult> {
@@ -69,9 +96,5 @@ export async function batchAssignHouseNumbersAction(input: BatchAssignSchemaType
   if (!parsed.success) {
     return { success: false, error: 'VALIDATION_ERROR', message: parsed.error.issues[0].message };
   }
-  return assign(
-    writer.user,
-    parsed.data.streetId,
-    parsed.data.assignments.map((a) => ({ propertyId: a.propertyId, houseNumber: String(a.houseNumber) })),
-  );
+  return assign(writer.user, parsed.data.streetId, parsed.data.assignments, { reserve: parsed.data.reserved });
 }

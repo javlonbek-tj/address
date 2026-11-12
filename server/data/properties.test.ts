@@ -42,6 +42,11 @@ function fakeDb(rows: Row[], streets: StreetRow[], opts: { hideTakenNumbers?: bo
     }
   };
   const tx = {
+    reservedHouseNumber: {
+      findMany: async () => [],
+      deleteMany: async () => ({ count: 0 }),
+      createMany: async () => ({ count: 0 }),
+    },
     street: {
       findFirst: async ({ where }: { where: { id: string; isActive: boolean } }) => {
         const s = streets.find((x) => x.id === where.id && x.isActive === where.isActive);
@@ -154,7 +159,7 @@ test('isHouseNumberConflict recognizes only the (streetId, houseNumber) unique v
 test('assigns a house number, links the street and stores the full address', async () => {
   const rows = [property('p1')];
   const result = await assignPropertyAddresses('st-shiroq', [{ propertyId: 'p1', houseNumber: '1' }], fakeDb(rows, streets));
-  assert.deepEqual(result, { ok: true, count: 1 });
+  assert.deepEqual(result, { ok: true, count: 1, reserved: 0 });
   assert.equal(rows[0].houseNumber, '1');
   assert.equal(rows[0].streetId, 'st-shiroq');
   assert.equal(rows[0].newAddress, "Sirdaryo viloyati, Sirdaryo tumani, Yangiobod MFY, Shiroq-3 berk ko'chasi, 1-uy");
@@ -171,7 +176,7 @@ test('assigns a batch of odd numbers in one call', async () => {
     ],
     fakeDb(rows, streets),
   );
-  assert.deepEqual(result, { ok: true, count: 3 });
+  assert.deepEqual(result, { ok: true, count: 3, reserved: 0 });
   assert.deepEqual(rows.map((r) => r.houseNumber), ['1', '3', '5']);
   assert.ok(rows.every((r) => r.newAddress?.endsWith(`, ${r.houseNumber}-uy`)));
 });
@@ -214,19 +219,19 @@ test('rejects a number already used by another active property on the street', a
 test('the same number on a different street is allowed', async () => {
   const rows = [property('p1', { streetId: 'st-atlas', houseNumber: '3' }), property('p2')];
   const result = await assignPropertyAddresses('st-shiroq', [{ propertyId: 'p2', houseNumber: '3' }], fakeDb(rows, streets));
-  assert.deepEqual(result, { ok: true, count: 1 });
+  assert.deepEqual(result, { ok: true, count: 1, reserved: 0 });
 });
 
 test('soft-deleted properties do not reserve their old number', async () => {
   const rows = [property('p-old', { isActive: false, streetId: 'st-shiroq', houseNumber: '7' }), property('p1')];
   const result = await assignPropertyAddresses('st-shiroq', [{ propertyId: 'p1', houseNumber: '7' }], fakeDb(rows, streets));
-  assert.deepEqual(result, { ok: true, count: 1 });
+  assert.deepEqual(result, { ok: true, count: 1, reserved: 0 });
 });
 
 test('re-saving a property with its own number succeeds', async () => {
   const rows = [property('p1', { streetId: 'st-shiroq', houseNumber: '9' })];
   const result = await assignPropertyAddresses('st-shiroq', [{ propertyId: 'p1', houseNumber: '9' }], fakeDb(rows, streets));
-  assert.deepEqual(result, { ok: true, count: 1 });
+  assert.deepEqual(result, { ok: true, count: 1, reserved: 0 });
 });
 
 test('swapping two numbers in one batch succeeds despite the unique index', async () => {
@@ -242,16 +247,16 @@ test('swapping two numbers in one batch succeeds despite the unique index', asyn
     ],
     fakeDb(rows, streets),
   );
-  assert.deepEqual(result, { ok: true, count: 2 });
+  assert.deepEqual(result, { ok: true, count: 2, reserved: 0 });
   assert.deepEqual(rows.map((r) => r.houseNumber), ['3', '1']);
 });
 
 test('moving a numbered property to another street updates street and address', async () => {
   const rows = [property('p1', { streetId: 'st-atlas', houseNumber: '4', newAddress: 'old' })];
-  const result = await assignPropertyAddresses('st-shiroq', [{ propertyId: 'p1', houseNumber: '2A' }], fakeDb(rows, streets));
-  assert.deepEqual(result, { ok: true, count: 1 });
+  const result = await assignPropertyAddresses('st-shiroq', [{ propertyId: 'p1', houseNumber: '2a' }], fakeDb(rows, streets));
+  assert.deepEqual(result, { ok: true, count: 1, reserved: 0 });
   assert.equal(rows[0].streetId, 'st-shiroq');
-  assert.equal(rows[0].newAddress, "Sirdaryo viloyati, Sirdaryo tumani, Yangiobod MFY, Shiroq-3 berk ko'chasi, 2A-uy");
+  assert.equal(rows[0].newAddress, "Sirdaryo viloyati, Sirdaryo tumani, Yangiobod MFY, Shiroq-3 berk ko'chasi, 2a-uy");
 });
 
 test('rejects an unknown or inactive street', async () => {

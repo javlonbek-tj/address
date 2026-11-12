@@ -14,6 +14,10 @@ import { cn } from '@/lib/utils';
 import { useMapFilterStore } from '@/store/useMapFilterStore';
 import {
   isValidStartNumber,
+  nextLetterNumber,
+  nextSequenceNumber,
+  sessionAssignments,
+  sessionReserved,
   useNumberingSessionStore,
   type NumberingSide,
 } from '@/store/useNumberingSessionStore';
@@ -36,12 +40,16 @@ export function NumberingModePanel({ candidateCount }: { candidateCount: number 
 
   const [isSaving, setIsSaving] = useState(false);
   const [hasSaved, setHasSaved] = useState(false);
-  // Conflicts from the last failed save; stale once the assignments change.
-  const [failedSave, setFailedSave] = useState<{ key: string; numbers: number[] | 'all' } | null>(null);
+  const [reserveInput, setReserveInput] = useState('1');
+  // Conflicts from the last failed save; stale once the session steps change.
+  const [failedSave, setFailedSave] = useState<{ key: string; numbers: string[] | 'all' } | null>(null);
 
-  const { isPanelOpen, isActive, streetId, setStreet, assignments } = session;
-  const assignmentsKey = assignments.map((a) => a.propertyId).join(',');
-  const conflicts = failedSave?.key === assignmentsKey ? failedSave.numbers : [];
+  const { isPanelOpen, isActive, streetId, setStreet, steps } = session;
+  const assignments = sessionAssignments(steps);
+  const reserved = sessionReserved(steps);
+  const stepsKey = JSON.stringify(steps);
+  const conflicts = failedSave?.key === stepsKey ? failedSave.numbers : [];
+  const isConflict = (n: string) => conflicts === 'all' || conflicts.includes(n);
 
   // A street clicked on the map becomes the numbering street until the session starts.
   useEffect(() => {
@@ -83,23 +91,33 @@ export function NumberingModePanel({ candidateCount }: { candidateCount: number 
   const street = streets.find((s) => s.id === streetId);
   const streetName = street ? `${street.name} ${street.type}` : '';
   const startValid = isValidStartNumber(session.side, session.startInput);
+  const reserveCount = Number(reserveInput);
+  const reserveValid = Number.isInteger(reserveCount) && reserveCount >= 1 && reserveCount <= 50;
+  const nextNumber = session.letterMode ? nextLetterNumber(session) : String(nextSequenceNumber(session));
+  const streetReserved = session.streetNumbers.reserved;
 
   const save = async () => {
     setIsSaving(true);
-    const result = await batchAssignHouseNumbersAction({ streetId, assignments });
+    const result = await batchAssignHouseNumbersAction({ streetId, assignments, reserved });
     setIsSaving(false);
 
     if (result.success) {
-      toast.success(`${assignments.length} ta binoga uy raqami berildi`);
+      const parts = [
+        assignments.length ? `${assignments.length} ta binoga uy raqami berildi` : '',
+        reserved.length ? `${reserved.length} ta raqam zaxiraga olindi` : '',
+      ].filter(Boolean);
+      toast.success(parts.join(', '));
       queryClient.invalidateQueries({ queryKey: ['properties', selectedDistrict] });
       queryClient.invalidateQueries({ queryKey: ['property'] });
+      queryClient.invalidateQueries({ queryKey: ['street-numbers', streetId] });
       setHasSaved(true);
       session.switchSide();
       return;
     }
-    if (result.error === 'DUPLICATE_HOUSE_NUMBER') {
+    if (result.error === 'DUPLICATE_HOUSE_NUMBER' || result.error === 'RESERVED_HOUSE_NUMBER') {
       const numbers = result.data && 'numbers' in result.data ? result.data.numbers : [];
-      setFailedSave({ key: assignmentsKey, numbers: numbers.length ? numbers.map(Number) : 'all' });
+      setFailedSave({ key: stepsKey, numbers: numbers.length ? numbers : 'all' });
+      queryClient.invalidateQueries({ queryKey: ['street-numbers', streetId] });
     }
     toast.error(result.message || 'Saqlashda xatolik yuz berdi');
   };
@@ -134,6 +152,11 @@ export function NumberingModePanel({ candidateCount }: { candidateCount: number 
             {streetId && (
               <span className='text-muted-foreground'>
                 Ko&apos;cha yaqinidagi raqamsiz binolar: <b>{candidateCount} ta</b>
+              </span>
+            )}
+            {streetId && streetReserved.length > 0 && (
+              <span className='text-muted-foreground'>
+                Zaxiradagi raqamlar: <b>{streetReserved.join(', ')}</b>
               </span>
             )}
           </div>
@@ -197,29 +220,71 @@ export function NumberingModePanel({ candidateCount }: { candidateCount: number 
           </div>
 
           <div className='rounded-md bg-muted px-3 py-2 font-medium'>
-            Belgilandi: {assignments.length} ta | Keyingi raqam: {session.currentNumber}
+            Belgilandi: {assignments.length} ta | Zaxira: {reserved.length} ta | Keyingi raqam: {nextNumber ?? '—'}
           </div>
 
           <p className='text-muted-foreground'>
             Ko&apos;cha bo&apos;ylab binolarni ketma-ket bosing. Faqat sariq rangdagi binolarni tanlash mumkin.
           </p>
 
-          {assignments.length > 0 && (
+          <div className='flex items-center gap-2'>
+            <Input
+              type='number'
+              min={1}
+              max={50}
+              value={reserveInput}
+              onChange={(e) => setReserveInput(e.target.value)}
+              aria-label='Zaxira raqamlar soni'
+              aria-invalid={!reserveValid}
+              className='h-9 w-16'
+              disabled={isSaving}
+            />
+            <Button
+              variant='outline'
+              onClick={() => session.reserve(reserveCount)}
+              disabled={!reserveValid || session.letterMode || isSaving}
+              className='flex-1 cursor-pointer'
+            >
+              Zaxira qoldirish
+            </Button>
+          </div>
+
+          <Button
+            variant={session.letterMode ? 'default' : 'outline'}
+            onClick={session.toggleLetterMode}
+            disabled={isSaving}
+            className='cursor-pointer'
+          >
+            {session.letterMode ? 'Harfli raqam: yoqilgan (15a, 15b…)' : 'Harfli raqam (15a, 15b…)'}
+          </Button>
+
+          {steps.length > 0 && (
             <div className='flex flex-wrap gap-1'>
-              {assignments.map((a) => {
-                const conflict = conflicts === 'all' || conflicts.includes(a.houseNumber);
-                return (
-                  <span
-                    key={a.propertyId}
-                    className={cn(
-                      'rounded px-1.5 py-0.5 text-xs font-semibold',
-                      conflict ? 'bg-red-100 text-red-700' : 'bg-orange-100 text-orange-800',
-                    )}
-                  >
-                    {a.houseNumber}
-                  </span>
-                );
-              })}
+              {steps.flatMap((step, index) =>
+                step.kind === 'assign'
+                  ? [
+                      <span
+                        key={`a-${step.propertyId}`}
+                        className={cn(
+                          'rounded px-1.5 py-0.5 text-xs font-semibold',
+                          isConflict(step.houseNumber) ? 'bg-red-100 text-red-700' : 'bg-orange-100 text-orange-800',
+                        )}
+                      >
+                        {step.houseNumber}
+                      </span>,
+                    ]
+                  : step.houseNumbers.map((n) => (
+                      <span
+                        key={`r-${index}-${n}`}
+                        className={cn(
+                          'rounded px-1.5 py-0.5 text-xs font-medium',
+                          isConflict(n) ? 'bg-red-100 text-red-700' : 'bg-gray-200 text-gray-600',
+                        )}
+                      >
+                        {n} zaxira
+                      </span>
+                    )),
+              )}
             </div>
           )}
 
@@ -227,12 +292,12 @@ export function NumberingModePanel({ candidateCount }: { candidateCount: number 
             <Button
               variant='outline'
               onClick={session.undoLast}
-              disabled={!assignments.length || isSaving}
+              disabled={!steps.length || isSaving}
               className='cursor-pointer'
             >
               Orqaga qaytish
             </Button>
-            <Button onClick={save} disabled={!assignments.length || isSaving} className='cursor-pointer'>
+            <Button onClick={save} disabled={!steps.length || isSaving} className='cursor-pointer'>
               {isSaving && <Loader2 className='h-4 w-4 animate-spin' />}
               Saqlash
             </Button>

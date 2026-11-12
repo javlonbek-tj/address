@@ -52,7 +52,8 @@ export async function PATCH(request: Request, { params }: Context) {
     return Response.json({ success: false, error: 'FORBIDDEN' }, { status: 403 });
   }
 
-  const parsed = propertyAssignSchema.safeParse(await request.json().catch(() => null));
+  const body = await request.json().catch(() => null);
+  const parsed = propertyAssignSchema.safeParse(body);
   if (!parsed.success) {
     return Response.json(
       { success: false, error: 'VALIDATION_ERROR', message: parsed.error.issues[0].message },
@@ -74,7 +75,10 @@ export async function PATCH(request: Request, { params }: Context) {
       return Response.json({ success: false, error: 'FORBIDDEN' }, { status: 403 });
     }
 
-    const result = await assignPropertyAddresses(streetId, [{ propertyId: id, houseNumber }]);
+    const result = await assignPropertyAddresses(streetId, [{ propertyId: id, houseNumber }], undefined, {
+      useReserved: body?.useReserved === true,
+      userId: session.user.id,
+    });
     if (!result.ok) {
       return Response.json(
         {

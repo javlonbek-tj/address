@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { fetchProperties } from '@/services';
+import { fetchProperties, fetchReservedNumbers } from '@/services';
 
 export function useExportProperties() {
   const [isExporting, setIsExporting] = useState(false);
@@ -7,7 +7,10 @@ export function useExportProperties() {
   const exportToExcel = async (districtId: string, mahallaId?: string) => {
     setIsExporting(true);
     try {
-      const properties = await fetchProperties(districtId, mahallaId);
+      const [properties, reserved] = await Promise.all([
+        fetchProperties(districtId, mahallaId),
+        fetchReservedNumbers(districtId),
+      ]);
       const XLSX = await import('xlsx');
 
       const rows = properties.map((property) => ({
@@ -24,6 +27,16 @@ export function useExportProperties() {
       const ws = XLSX.utils.json_to_sheet(rows);
       const wb = XLSX.utils.book_new();
       XLSX.utils.book_append_sheet(wb, ws, 'Binolar');
+
+      // Reserved numbers belong to streets, so this sheet always covers the whole district.
+      if (reserved.length) {
+        const reservedRows = reserved.map((r) => ({
+          "Ko'cha": `${r.street.name} ${r.street.type.charAt(0).toLowerCase()}${r.street.type.slice(1)}`,
+          'Zaxira raqam': r.houseNumber,
+          Sana: new Date(r.createdAt).toLocaleDateString('uz-UZ'),
+        }));
+        XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(reservedRows), 'Zaxira');
+      }
       XLSX.writeFile(wb, `binolar_${Date.now()}.xlsx`);
     } finally {
       setIsExporting(false);

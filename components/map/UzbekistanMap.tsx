@@ -9,9 +9,9 @@ import { MAP_LEVEL_STYLES, getPropertyStyle } from '@/lib/constants/map';
 import { formatMapStatistics } from '@/lib/utils';
 import { useMapFilters } from '@/hooks/useMapFilters';
 import { useMapFeatures } from '@/hooks/useMapFeatures';
-import { useProperties } from '@/hooks/useProperties';
+import { useProperties, useStreetNumbers } from '@/hooks/useProperties';
 import { usePropertySheetStore } from '@/store/usePropertySheetStore';
-import { useNumberingSessionStore } from '@/store/useNumberingSessionStore';
+import { sessionAssignments, useNumberingSessionStore } from '@/store/useNumberingSessionStore';
 import { PropertyPanel } from './PropertyPanel';
 import { NumberingModePanel } from './NumberingModePanel';
 import { useStats } from '@/hooks/useStats';
@@ -70,9 +70,17 @@ export default function UzbekistanMap({ regions }: UzbekistanMapProps) {
   const isNumberingPanelOpen = useNumberingSessionStore((state) => state.isPanelOpen);
   const numberingStreetId = useNumberingSessionStore((state) => state.streetId);
   const isNumbering = useNumberingSessionStore((state) => state.isActive);
-  const numberingAssignments = useNumberingSessionStore((state) => state.assignments);
+  const numberingSteps = useNumberingSessionStore((state) => state.steps);
+  const setStreetNumbers = useNumberingSessionStore((state) => state.setStreetNumbers);
   const endNumberingSession = useNumberingSessionStore((state) => state.endSession);
   const activeNumberingStreetId = isNumberingPanelOpen ? numberingStreetId : '';
+  const numberingAssignments = useMemo(() => sessionAssignments(numberingSteps), [numberingSteps]);
+
+  // Used and reserved numbers of the numbering street drive letter suffixes and reserve skipping.
+  const { streetNumbers } = useStreetNumbers(activeNumberingStreetId);
+  useEffect(() => {
+    setStreetNumbers(streetNumbers);
+  }, [streetNumbers, setStreetNumbers]);
 
   useEffect(() => {
     return () => {

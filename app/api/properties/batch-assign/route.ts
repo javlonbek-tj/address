@@ -29,7 +29,7 @@ export async function POST(request: Request) {
   }
 
   try {
-    const { streetId, assignments } = parsed.data;
+    const { streetId, assignments, reserved } = parsed.data;
     const districtId = await getStreetDistrictId(streetId);
     if (!districtId) {
       return Response.json(
@@ -41,10 +41,10 @@ export async function POST(request: Request) {
       return Response.json({ success: false, error: 'FORBIDDEN' }, { status: 403 });
     }
 
-    const result = await assignPropertyAddresses(
-      streetId,
-      assignments.map((a) => ({ propertyId: a.propertyId, houseNumber: String(a.houseNumber) })),
-    );
+    const result = await assignPropertyAddresses(streetId, assignments, undefined, {
+      reserve: reserved,
+      userId: session.user.id,
+    });
     if (!result.ok) {
       return Response.json(
         {
