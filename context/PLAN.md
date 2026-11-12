@@ -256,6 +256,25 @@ ALTER TABLE "properties" ADD CONSTRAINT "properties_streetId_fkey" FOREIGN KEY (
 
 ## Increment 2 — GeoJSON Import Script (F-09, F-10, Q3)
 
+> **Status: DONE (2026-11-12).** The user authorized importing into **production** (no development database exists). This replaces the G3 dev-database precondition for this import only; write tests remain forbidden on production.
+> - Script: `scripts/import-properties.ts`. Unit tests: `scripts/import-properties.test.ts` (17 tests, `npx tsx --test scripts/import-properties.test.ts`, mocked database rows, no database access).
+> - Fresh backup before writing: `C:\Users\j.turdimatov\manzillar-db-backups\prod_before_property_import_20261112T133401Z.dump` (SHA-256 `6be17234dd2249cd774711f32505398d04ab6a415b3390b6e422d481e88a723f`, verified with `pg_restore --list` and per-table row counts).
+> - **Dry run** (`properties` not accessed): processed 365, unmatchedDistrict 0, noKey 0, mahallaByCode 120, mahallaByName 245, mahallaAmbiguous 0, mahallaUnmatched 0.
+> - **Import** at 13:35:18Z UTC (`--confirm-target=sakura.proxy.rlwy.net:45369/railway --expect-create=365`), one transaction: created 365, updated 0, unchanged 0, skippedNumberedRelocation 0, failed 0.
+> - **Verified read-only:**
+>   - `properties` = 365 rows, with 365 distinct `cadNumber` and 365 distinct `spId`;
+>   - all rows in Sirdaryo tumani / Yangiobod MFY;
+>   - `houseNumber`, `streetId` and `newAddress` null everywhere, every row active;
+>   - Polygon geometry in WGS84 degrees, centres at lng 68.656–68.682, lat 40.667–40.679.
+>   - Every other table has identical structure and row counts.
+> - **Idempotency** (`--dry-run --compare`): 365 unchanged, 0 to create, 0 to update, 0 conflicts. The first compare reported 359 rows as changed. The cause: stored JSON coordinates lose the 17th significant digit on the way into PostgreSQL (≤ 7.1e-15°, about a nanometre). The comparison now uses a 1e-9° tolerance (~0.1 mm), covered by tests. The data was not rewritten.
+>
+> **Deviations from the written steps below, all stricter than planned:**
+> - **Production guard:** instead of a hard-coded `--allow-production` host check, every write run must pass `--confirm-target=<host:port/db>` matching the actual `DATABASE_URL` target. `--expect-create=<n>` aborts unless the plan is exactly n creates.
+> - **No partial imports:** any unmatched district, missing key, ambiguous or unmatched mahalla, duplicate identifier in the file, or key conflict with existing rows aborts **before any write**. Rows aren't imported with `mahallaId = null`.
+> - **Unchanged rows are skipped:** they aren't rewritten, so a real re-run writes nothing.
+> - **Comparison mode:** `--dry-run --compare` previews creates and updates by reading `properties`. Plain `--dry-run` never accesses it.
+
 **File:** `scripts/import-properties.ts` (new). No new dependencies. Writing the script is code-only.
 
 **Entry condition (R-06):** the **G3 decision** (a dev database, or controlled production writes with a named test scope and cleanup SQL) must be recorded in this plan **before the real import runs**. The `--dry-run` can run without it (R-07). A real run writes to production, needs gate G3, and can't happen before G2.
@@ -619,7 +638,7 @@ Each gate opens only with explicit approval for that gate. Approving a review is
 | **(Separate task) — Fix the drift** | Anything touching the 1,401 orphans, the missing uzkad FKs or `streets.uzkadupdatedat`. | Its own task and approval | **Out of scope (A2).** |
 
 ### Open items
-- **O1 — G3:** the user chose a **separate development database** (see "G3 — Development Database Setup" below). Increment 2's real import stays blocked until that database exists and has been inspected.
+- **O1 — G3:** the user first chose a separate development database, then **explicitly authorized the 365-property import into production** (done, see Increment 2). **Write tests** (house-number assignments, batch saves) are still forbidden on production. They need the development database described below, or a new explicit decision, before Increments 3–10 can be exercised end to end.
 - **O2 — House number format:** **resolved.** The user confirmed `^[1-9]\d*(?:[A-Z]|\/\d+)?$` with no silent conversion (§0.4).
 - **O3 — Deploy the legacy-code removal:** see "Production Deployment State" below.
 
@@ -640,7 +659,8 @@ Each gate opens only with explicit approval for that gate. Approving a review is
   | District / region detail pages | `prisma.property.count({ where: { districtId } })` | **Still works**: `COUNT(*)` doesn't touch the dropped columns |
 
   No data can be corrupted: every legacy write fails as a whole.
-- **Fix:** the working-tree removal of the legacy feature, committed as `refactor: remove legacy property feature` on the feature branch. It goes live when the user merges the feature branch into `main`, which deploys. **Merge it together with the schema and migration commit.** The migration is already recorded in production's `_prisma_migrations`, so the build's `migrate deploy` will treat it as applied and do nothing, as long as the migration folder is part of the deployed code. No other code change is needed.
+- **Update (2026-11-12, user-authorized):** `feature/property-house-numbering` was merged into `main` as merge commit `866144d` (fast-forward push, no force). Railway deployed `866144d` to "protective-respect / production": `in_progress` at 13:30:26Z, **`success`** at 13:32:14Z, and the previous `432745b` deployment was marked `inactive` at 13:32:18Z. The build's `prisma migrate deploy` left `_prisma_migrations` unchanged (6 rows, none failed), which confirms the pinned migration checksum matched. The deployed tree has no `/properties`, `/api/properties` or `/api/map/properties` routes (verified with a local `next build` of the same tree). Checking the live site over HTTP needs the public URL or Railway access.
+- **Fix (as originally planned):** the working-tree removal of the legacy feature, committed as `refactor: remove legacy property feature` on the feature branch. It goes live when the user merges the feature branch into `main`, which deploys. **Merge it together with the schema and migration commit.** The migration is already recorded in production's `_prisma_migrations`, so the build's `migrate deploy` will treat it as applied and do nothing, as long as the migration folder is part of the deployed code. No other code change is needed.
 
 ### G3 — Development Database Setup (instructions; nothing executed)
 
