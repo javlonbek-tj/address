@@ -638,6 +638,13 @@ Error messages:
 
 ## Increment 9 — Excel Export (Task.md §5, §8 Step 9; F-04, Q4)
 
+> **Status: DONE (2026-11-12).**
+> - `hooks/useExportProperties.ts`, mirroring `useExportStreets`: `exportToExcel(districtId, mahallaId?)` → `fetchProperties` → `xlsx`.
+> - Columns: Kadastr raqami, Mulk turi, Mahalla, Ko'cha (name + type with the first letter lowercased), Uy raqami, Yangi manzil. Sheet "Binolar", file `binolar_<timestamp>.xlsx`.
+> - Button: "Excel" next to "Raqamlash" in the idle numbering panel (Q4). Scope is the selected district, narrowed to the selected mahalla when one is selected. Spinner while exporting; error toast on failure.
+> - Access control comes from `GET /api/properties` (`canAccessDistrict`).
+> - Checks: `tsc` no new errors; ESLint clean on changed files (repo total unchanged at 117); tests pass; `next build` passes.
+
 - **`hooks/useExportProperties.ts`:** mirrors `useExportStreets`.
   - Columns: Kadastr raqami, Mulk turi, Mahalla, Ko'cha (name + type with the first letter lowercased), Uy raqami, Yangi manzil.
   - Sheet "Binolar".
