@@ -10,7 +10,6 @@ export interface AnalyticsCardsProps {
     districts: number;
     mahallas: number;
     streets: number;
-    properties: number;
   };
 }
 

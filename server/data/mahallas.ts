@@ -201,7 +201,6 @@ export async function getMahallaById(id: string) {
         _count: {
           select: {
             streets: true,
-            properties: true,
           },
         },
       },

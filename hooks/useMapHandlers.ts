@@ -5,15 +5,13 @@ import { Feature } from 'geojson';
 import { Layer, LatLngBounds, Path } from 'leaflet';
 import L from 'leaflet';
 import { MAP_LEVEL_STYLES } from '@/lib/constants/map';
-import { PropertyWithRelations, Region } from '@/types';
-import { usePropertySheetStore } from '@/store/usePropertySheetStore';
+import { Region } from '@/types';
 
 interface Props {
   regions: Region[];
   selectedRegion: string;
   selectedDistrict: string;
   selectedMahalla: string;
-  properties: PropertyWithRelations[];
   setSelectedRegion: (id: string) => void;
   setSelectedDistrict: (id: string) => void;
   setSelectedMahalla: (id: string) => void;
@@ -27,7 +25,6 @@ export function useMapHandlers({
   selectedRegion,
   selectedDistrict,
   selectedMahalla,
-  properties,
   setSelectedRegion,
   setSelectedDistrict,
   setSelectedMahalla,
@@ -40,8 +37,6 @@ export function useMapHandlers({
   const selectedDistrictRef = useRef(selectedDistrict);
   const selectedMahallaRef = useRef(selectedMahalla);
   const selectedStreetRef = useRef(selectedStreet);
-
-  const openSheet = usePropertySheetStore((s) => s.open);
 
   useEffect(() => {
     selectedRegionRef.current = selectedRegion;
@@ -220,50 +215,10 @@ export function useMapHandlers({
     [setSelectedStreet],
   );
 
-  const onEachProperty = useCallback(
-    (feature: Feature, layer: Layer) => {
-      const props = feature.properties as {
-        id: string;
-        cadNumber: string;
-        newCadNumber?: string;
-      };
-      const isDone = !!props.newCadNumber;
-
-      layer.on({
-        mouseover: (e) => {
-          const l = e.target as Path;
-          if (typeof l.setStyle === 'function') {
-            l.setStyle(
-              isDone
-                ? MAP_LEVEL_STYLES.highlight.propertyDone
-                : MAP_LEVEL_STYLES.highlight.property,
-            );
-          }
-        },
-        mouseout: (e) => {
-          const l = e.target as Path;
-          if (typeof l.setStyle === 'function') {
-            l.setStyle(
-              isDone
-                ? MAP_LEVEL_STYLES.propertyDone
-                : MAP_LEVEL_STYLES.property,
-            );
-          }
-        },
-        click: (e) => {
-          L.DomEvent.stopPropagation(e);
-          openSheet(props.id);
-        },
-      });
-    },
-    [openSheet],
-  );
-
   return {
     onEachRegion,
     onEachDistrict,
     onEachMahalla,
     onEachStreet,
-    onEachProperty,
   };
 }

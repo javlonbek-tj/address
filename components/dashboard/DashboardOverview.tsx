@@ -12,7 +12,6 @@ interface Props {
       districts: number;
       mahallas: number;
       streets: number;
-      properties: number;
     };
     charts: {
       regions: { name: string; mahallas: number }[];

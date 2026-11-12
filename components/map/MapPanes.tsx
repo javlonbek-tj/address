@@ -12,7 +12,6 @@ export const MapPanes = () => {
       { name: 'regionsPane', zIndex: 'var(--z-map-pane-regions)' },
       { name: 'districtsPane', zIndex: 'var(--z-map-pane-districts)' },
       { name: 'mahallasPane', zIndex: 'var(--z-map-pane-mahallas)' },
-      { name: 'propertiesPane', zIndex: 'var(--z-map-pane-properties)' },
       { name: 'streetsPane', zIndex: 'var(--z-map-pane-streets)' },
     ];
 

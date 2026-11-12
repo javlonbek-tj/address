@@ -158,14 +158,6 @@ async function MahallaDetailContent({ id }: { id: string }) {
                   {mahalla._count.streets}
                 </span>
               </div>
-              <div className='grid grid-cols-3 gap-2 border-b border-gray-100 dark:border-gray-800 pb-2'>
-                <span className='font-medium text-muted-foreground col-span-1'>
-                  Ko'chmas mulklar:
-                </span>
-                <span className='col-span-2 font-bold'>
-                  {mahalla._count.properties}
-                </span>
-              </div>
             </CardContent>
           </Card>
 

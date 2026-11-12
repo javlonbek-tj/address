@@ -1,4 +1,4 @@
-import { Map, Navigation, Home, Waypoints, Building2 } from 'lucide-react';
+import { Map, Navigation, Home, Waypoints } from 'lucide-react';
 import { AnalyticsCardsProps } from './AnalyticsCards';
 
 export const CARDS_DATA = ({ counts }: AnalyticsCardsProps) => [
@@ -29,13 +29,6 @@ export const CARDS_DATA = ({ counts }: AnalyticsCardsProps) => [
     icon: Waypoints,
     color: 'text-amber-600 dark:text-amber-400',
     bg: 'bg-amber-50 dark:bg-amber-900/20',
-  },
-  {
-    title: "Ko'chmas Mulk",
-    value: counts.properties,
-    icon: Building2,
-    color: 'text-violet-600 dark:text-violet-400',
-    bg: 'bg-violet-50 dark:bg-violet-900/20',
   },
 ];
 

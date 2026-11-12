@@ -13,11 +13,6 @@ import { useStats } from '@/hooks/useStats';
 import { useMapHighlighting } from '@/hooks/useMapHighlighting';
 import { MapAutoCenter } from './MapAutoCenter';
 import { MapEvents } from './MapEvents';
-import { MapDrawControl } from './MapDrawControl';
-import { CreatePropertyDialog } from '../addressData/property/CreatePropertyDialog';
-import { UpdatePropertyDialog } from '../addressData/property/UpdatePropertyDialog';
-import { useProperty } from '@/hooks/useProperties';
-import { usePropertySheetStore } from '@/store/usePropertySheetStore';
 import {
   MapZoomManager,
   MapFilters,
@@ -34,14 +29,13 @@ interface UzbekistanMapProps {
   regions: Region[];
 }
 import { useMapFilterStore } from '@/store/useMapFilterStore';
-import { District, Property, Region } from '@/types';
+import { Region } from '@/types';
 import { useSession } from '@/lib/auth/auth-client';
 import { UserRole } from '@/lib/generated/prisma/enums';
 
 export default function UzbekistanMap({ regions }: UzbekistanMapProps) {
   const { data: session } = useSession();
-  const { districts, mahallas, streets, properties, isLoading } =
-    useMapFilters();
+  const { districts, mahallas, streets, isLoading } = useMapFilters();
 
   const selectedRegion = useMapFilterStore((state) => state.selectedRegion);
   const setSelectedRegion = useMapFilterStore(
@@ -63,24 +57,8 @@ export default function UzbekistanMap({ regions }: UzbekistanMapProps) {
   const showDistricts = useMapFilterStore((state) => state.showDistricts);
   const showMahallas = useMapFilterStore((state) => state.showMahallas);
   const showStreets = useMapFilterStore((state) => state.showStreets);
-  const showProperties = useMapFilterStore((state) => state.showProperties);
   const baseMap = useMapFilterStore((state) => state.baseMap);
   const resetFilters = useMapFilterStore((state) => state.resetFilters);
-
-  // Drawing state
-  const isCreatePropertyOpen = useMapFilterStore(
-    (state) => state.isCreatePropertyOpen,
-  );
-  const setIsCreatePropertyOpen = useMapFilterStore(
-    (state) => state.setIsCreatePropertyOpen,
-  );
-  const drawGeometry = useMapFilterStore((state) => state.drawGeometry);
-  const setDrawGeometry = useMapFilterStore((state) => state.setDrawGeometry);
-
-  // Property update state
-  const { selectedPropertyId, close: closePropertyForm } =
-    usePropertySheetStore();
-  const { property: selectedProperty } = useProperty(selectedPropertyId || '');
 
   useEffect(() => {
     return () => {
@@ -103,13 +81,11 @@ export default function UzbekistanMap({ regions }: UzbekistanMapProps) {
     onEachDistrict,
     onEachMahalla,
     onEachStreet,
-    onEachProperty,
   } = useMapHandlers({
     regions,
     selectedRegion,
     selectedDistrict,
     selectedMahalla,
-    properties,
     setSelectedRegion,
     setSelectedDistrict,
     setSelectedMahalla,
@@ -124,13 +100,11 @@ export default function UzbekistanMap({ regions }: UzbekistanMapProps) {
     districtFeatures,
     mahallaFeatures,
     streetFeatures,
-    propertyFeatures,
   } = useMapFeatures({
     regions,
     districts,
     mahallas,
     streets,
-    properties,
     selectedRegion,
     selectedDistrict,
     selectedMahalla,
@@ -182,30 +156,6 @@ export default function UzbekistanMap({ regions }: UzbekistanMapProps) {
         <MapAutoCenter bounds={mapBounds} />
         <MapEvents onMapClick={handleBackToRegions} />
         <MapZoomManager />
-        {showProperties && !!selectedDistrict && <MapDrawControl />}
-
-        {isCreatePropertyOpen && (
-          <CreatePropertyDialog
-            open={isCreatePropertyOpen}
-            onClose={() => {
-              setIsCreatePropertyOpen(false);
-              setDrawGeometry(null);
-            }}
-            geometry={drawGeometry}
-            regions={regions as Region[]}
-            districts={districts as District[]}
-          />
-        )}
-
-        {!!selectedPropertyId && selectedProperty && (
-          <UpdatePropertyDialog
-            open={!!selectedPropertyId}
-            onClose={closePropertyForm}
-            property={selectedProperty as Property}
-            regions={regions as Region[]}
-            districts={districts as District[]}
-          />
-        )}
 
         {currentStreet && showStreets && (
           <StreetPopup
@@ -276,31 +226,6 @@ export default function UzbekistanMap({ regions }: UzbekistanMapProps) {
             }}
             onEachFeature={onEachMahalla}
             ref={mahallaLayerRef}
-          />
-        )}
-
-        {showProperties && selectedMahalla && propertyFeatures.length > 0 && (
-          <GeoJSON
-            key={`properties-${selectedMahalla}-${properties.reduce(
-              (acc, p) => acc + (p.newCadNumber ? '1' : '0'),
-              '',
-            )}`}
-            data={
-              {
-                type: 'FeatureCollection',
-                features: propertyFeatures,
-              } as FeatureCollection
-            }
-            pane='propertiesPane'
-            style={(feature?: Feature) => {
-              const props = feature?.properties as
-                | { newCadNumber?: string }
-                | undefined;
-              return props?.newCadNumber
-                ? MAP_LEVEL_STYLES.propertyDone
-                : MAP_LEVEL_STYLES.property;
-            }}
-            onEachFeature={onEachProperty}
           />
         )}
 
