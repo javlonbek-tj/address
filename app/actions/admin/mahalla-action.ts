@@ -1,5 +1,7 @@
 'use server';
 
+import { centroid } from '@turf/turf';
+
 import { prisma } from '@/server/prisma';
 import type { ActionResult } from '@/types';
 import type { MahallaSchemaType } from '@/lib';
@@ -8,6 +10,114 @@ import { mahallaSchema } from '@/lib';
 import { getServerSession } from '@/lib/auth/session';
 import { assertActive, assertSuperadmin, isSuperuser } from '@/lib/auth/authorization';
 import { SUPERUSER_DENIED_MESSAGE } from '@/lib/constants/user';
+
+// Mahallas created without a boundary file; an empty MultiPolygon keeps the required column valid and renders nothing.
+const EMPTY_GEOMETRY = { type: 'MultiPolygon', coordinates: [] };
+
+function withCenter(geometry: NonNullable<MahallaSchemaType['geometry']>) {
+  return {
+    geometry,
+    center: { type: 'Point', coordinates: centroid(geometry).geometry.coordinates },
+  };
+}
+
+const mahallaSelect = {
+  id: true,
+  name: true,
+  code: true,
+  uzKadName: true,
+  geoCode: true,
+  oneId: true,
+  isOptimized: true,
+  mergedInto: { select: { code: true, name: true } },
+  mergedMahallas: { select: { code: true, name: true } },
+  oldName: true,
+  regulation: true,
+  regulationUrl: true,
+  district: {
+    select: {
+      id: true,
+      name: true,
+      region: { select: { id: true, name: true } },
+    },
+  },
+} as const;
+
+async function findDuplicateMahalla(
+  data: Pick<MahallaSchemaType, 'code' | 'districtId' | 'name' | 'uzKadName'>,
+  excludeId?: string,
+) {
+  return prisma.mahalla.findFirst({
+    where: {
+      ...(excludeId && { NOT: { id: excludeId } }),
+      OR: [
+        { code: data.code },
+        {
+          districtId: data.districtId,
+          OR: [
+            { name: { equals: data.name, mode: 'insensitive' } },
+            { uzKadName: { equals: data.uzKadName, mode: 'insensitive' } },
+          ],
+        },
+      ],
+    },
+    select: { id: true },
+  });
+}
+
+async function resolveMahallaIdsByCode(items: Array<{ mahallaCode: string }>) {
+  const mahallas = await prisma.mahalla.findMany({
+    where: { code: { in: items.map((item) => item.mahallaCode) } },
+    select: { id: true },
+  });
+  return mahallas.map((mahalla) => ({ id: mahalla.id }));
+}
+
+export async function createMahalla(
+  data: MahallaSchemaType,
+): Promise<ActionResult<Mahalla>> {
+  const session = await getServerSession();
+  assertActive(session!.user);
+  if (isSuperuser(session!.user)) return { success: false, message: SUPERUSER_DENIED_MESSAGE };
+  assertSuperadmin(session!.user);
+
+  const validationResult = mahallaSchema.safeParse(data);
+
+  if (!validationResult.success) {
+    return {
+      success: false,
+      error: 'VALIDATION_ERROR',
+    };
+  }
+
+  const { regionId, mergingMahallas, mergedInto, geometry, ...fields } = validationResult.data;
+
+  try {
+    if (await findDuplicateMahalla(fields)) {
+      return {
+        success: false,
+        message: 'Mahalla allaqachon mavjud',
+      };
+    }
+
+    const targets = await resolveMahallaIdsByCode(mergedInto);
+    const sources = await resolveMahallaIdsByCode(mergingMahallas);
+
+    const mahalla = await prisma.mahalla.create({
+      data: {
+        ...fields,
+        ...(geometry ? withCenter(geometry) : { geometry: EMPTY_GEOMETRY }),
+        mergedInto: { connect: targets },
+        mergedMahallas: { connect: sources },
+      },
+      select: mahallaSelect,
+    });
+
+    return { success: true, data: mahalla };
+  } catch (error) {
+    return { success: false, error: 'INTERNAL_SERVER_ERROR' };
+  }
+}
 
 export async function updateMahalla(
   id: string,
@@ -27,125 +137,31 @@ export async function updateMahalla(
     };
   }
 
-  const {
-    name,
-    code,
-    districtId,
-    uzKadName,
-    geoCode,
-    oneId,
-    oldName,
-    regulation,
-    regulationUrl,
-    isOptimized,
-    mergingMahallas,
-    mergedInto,
-  } = validationResult.data;
+  const { regionId, mergingMahallas, mergedInto, geometry, ...fields } = validationResult.data;
 
   try {
-    const existingMahalla = await prisma.mahalla.findFirst({
-      where: {
-        NOT: { id: id || undefined },
-        OR: [
-          { code },
-          {
-            districtId,
-            OR: [
-              { name: { equals: name, mode: 'insensitive' } },
-              { uzKadName: { equals: uzKadName, mode: 'insensitive' } },
-            ],
-          },
-        ],
-      },
-      select: { id: true },
-    });
-
-    if (existingMahalla) {
+    if (await findDuplicateMahalla(fields, id)) {
       return {
         success: false,
         message: 'Mahalla allaqachon mavjud',
       };
     }
 
-    const targetCodes = (mergedInto || []).map(
-      (mahalla) => mahalla.mahallaCode,
-    );
-    const targets = await prisma.mahalla.findMany({
-      where: { code: { in: targetCodes } },
-      select: { id: true },
+    const targets = await resolveMahallaIdsByCode(mergedInto);
+    const sources = await resolveMahallaIdsByCode(mergingMahallas);
+
+    const mahalla = await prisma.mahalla.update({
+      where: { id },
+      data: {
+        ...fields,
+        ...(geometry && withCenter(geometry)),
+        mergedInto: { set: targets },
+        mergedMahallas: { set: sources },
+      },
+      select: mahallaSelect,
     });
 
-    const sourceCodes = (mergingMahallas || []).map(
-      (mahalla) => mahalla.mahallaCode,
-    );
-    const sources = await prisma.mahalla.findMany({
-      where: { code: { in: sourceCodes } },
-      select: { id: true },
-    });
-
-    const updatedMahalla = await prisma.$transaction(async (tx) => {
-      const mahalla = await tx.mahalla.update({
-        where: { id },
-        data: {
-          name,
-          code,
-          districtId,
-          uzKadName,
-          geoCode,
-          oneId,
-          oldName,
-          regulation,
-          regulationUrl,
-          isOptimized,
-          mergedInto: {
-            set: targets.map((mahalla) => ({ id: mahalla.id })),
-          },
-          mergedMahallas: {
-            set: sources.map((mahalla) => ({ id: mahalla.id })),
-          },
-        },
-        select: {
-          id: true,
-          name: true,
-          code: true,
-          uzKadName: true,
-          geoCode: true,
-          oneId: true,
-          isOptimized: true,
-          mergedInto: {
-            select: {
-              code: true,
-              name: true,
-            },
-          },
-          mergedMahallas: {
-            select: {
-              code: true,
-              name: true,
-            },
-          },
-          oldName: true,
-          regulation: true,
-          regulationUrl: true,
-          district: {
-            select: {
-              id: true,
-              name: true,
-              region: {
-                select: {
-                  id: true,
-                  name: true,
-                },
-              },
-            },
-          },
-        },
-      });
-
-      return mahalla;
-    });
-
-    return { success: true, data: updatedMahalla };
+    return { success: true, data: mahalla };
   } catch (error) {
     return { success: false, error: 'INTERNAL_SERVER_ERROR' };
   }

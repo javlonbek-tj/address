@@ -1,7 +1,8 @@
 'use client';
 
-import { Loader2Icon } from 'lucide-react';
+import { Loader2Icon, Plus } from 'lucide-react';
 
+import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
   Select,
@@ -26,6 +27,7 @@ interface Props {
   isOptimized: string;
   isRegionLocked?: boolean;
   isDistrictLocked?: boolean;
+  onAddClick?: () => void;
 }
 
 export function MahallaTableFilters({
@@ -41,6 +43,7 @@ export function MahallaTableFilters({
   isOptimized,
   isRegionLocked = false,
   isDistrictLocked = false,
+  onAddClick,
 }: Props) {
   return (
     <div className='flex flex-wrap items-center gap-3 p-4 border-gray-100 dark:border-gray-700 border-b'>
@@ -144,6 +147,17 @@ export function MahallaTableFilters({
           ))}
         </SelectContent>
       </Select>
+
+      {onAddClick && (
+        <Button
+          onClick={onAddClick}
+          size='sm'
+          className='bg-blue-600 hover:bg-blue-700 ml-auto cursor-pointer text-white gap-2'
+        >
+          <Plus className='w-4 h-4' />
+          <span>Qo&apos;shish</span>
+        </Button>
+      )}
     </div>
   );
 }

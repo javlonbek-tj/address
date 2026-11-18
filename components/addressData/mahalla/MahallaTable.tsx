@@ -73,6 +73,7 @@ export function MahallaTable({
     handleCloseForm,
     editingItem,
     handleEdit,
+    handleCreate,
     deleteId,
     setDeleteId,
     handleCloseDelete,
@@ -81,10 +82,9 @@ export function MahallaTable({
   const { handleDelete, isDeleting } = useDelete(deleteMahalla, {
     onSuccess: () => {
       handleCloseDelete();
-      queryClient.invalidateQueries({
-        queryKey: ['mahallas-map', districtId],
-      });
+      queryClient.invalidateQueries({ queryKey: ['mahallas-map'] });
       queryClient.invalidateQueries({ queryKey: ['mahallas-table'] });
+      queryClient.invalidateQueries({ queryKey: ['mahallas-list'] });
     },
     successMessage: "Mahalla muvaffaqiyatli o'chirildi",
     errorMessage: "Mahallani o'chirishda xatolik yuz berdi",
@@ -124,6 +124,7 @@ export function MahallaTable({
           isOptimized={isOptimized}
           isRegionLocked={isRegionLocked}
           isDistrictLocked={isDistrictLocked}
+          onAddClick={isSuperadmin ? handleCreate : undefined}
         />
 
         <div className='p-4 overflow-hidden'>
@@ -271,9 +272,10 @@ export function MahallaTable({
       <MahallaFormDialog
         open={isFormOpen}
         onClose={handleCloseForm}
-        mahalla={editingItem as Mahalla}
+        mahalla={editingItem}
         regions={regions}
-        districts={districts}
+        defaultRegionId={regionId === 'all' ? '' : regionId}
+        defaultDistrictId={districtId === 'all' ? '' : districtId}
       />
 
       <DeleteDialog

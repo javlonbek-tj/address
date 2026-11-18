@@ -27,17 +27,19 @@ import {
 import { Field, FieldError, FieldLabel } from '@/components/ui/field';
 import { Checkbox } from '@/components/ui/checkbox';
 import { useDistrictsList, useFileUpload, useMahallaForm } from '@/hooks';
-import type { District, Mahalla, Region } from '@/types';
+import type { Mahalla, Region } from '@/types';
 import { Button } from '@/components/ui/button';
 import { ACCEPTED_DOCUMENT_TYPES } from '@/lib';
 import { fetchMahallaByCode } from '@/services';
+import { MahallaBoundaryInput } from './MahallaBoundaryInput';
 
 interface Props {
   open: boolean;
   onClose: () => void;
-  mahalla: Mahalla;
+  mahalla: Mahalla | null;
   regions: Region[];
-  districts: District[];
+  defaultRegionId?: string;
+  defaultDistrictId?: string;
 }
 
 export function MahallaFormDialog({
@@ -45,9 +47,23 @@ export function MahallaFormDialog({
   onClose,
   mahalla,
   regions,
-  districts,
+  defaultRegionId,
+  defaultDistrictId,
 }: Props) {
   const [showExistingFiles, setShowExistingFiles] = useState(false);
+
+  // useFileUpload needs the region chosen in the form, so it is declared after; this closure only runs on submit.
+  const { form, regionName, isSubmitting, onSubmit, existingFiles } =
+    useMahallaForm({
+      mahalla,
+      regions,
+      defaultRegionId,
+      defaultDistrictId,
+      open,
+      onClose,
+      markAsSubmitted: () => markAsSubmitted(),
+    });
+
   const {
     removeImage,
     cleanupOrphanedImage,
@@ -55,20 +71,13 @@ export function MahallaFormDialog({
     uploadFile,
     isUploading: isFileUploading,
   } = useFileUpload(
-    mahalla?.regulationUrl,
-    mahalla?.regulationUrl,
-    `optimization/${mahalla?.district?.region?.name}`,
+    mahalla?.regulationUrl ?? null,
+    mahalla?.regulationUrl ?? null,
+    `optimization/${regionName}`,
     ACCEPTED_DOCUMENT_TYPES,
     true,
     open,
   );
-
-  const { form, isSubmitting, onSubmit, existingFiles } = useMahallaForm({
-    mahalla,
-    open,
-    onClose,
-    markAsSubmitted,
-  });
 
   const { districts: formDistricts } = useDistrictsList(
     form.watch('regionId') || '',
@@ -165,7 +174,7 @@ export function MahallaFormDialog({
                 name='regionId'
                 label='Hudud'
                 options={regions}
-                disabled
+                disabled={!!mahalla}
                 placeholder='Hududni tanlang'
               />
 
@@ -227,6 +236,8 @@ export function MahallaFormDialog({
                 />
               </div>
             </div>
+
+            <MahallaBoundaryInput />
 
             {/* Ushbu mahallaga qo'shib yuborilgan mahallalar (Manbalar) - ALWAYS VISIBLE */}
             <div className='space-y-4 border rounded-xl overflow-hidden bg-blue-50/20 dark:bg-blue-900/10 border-blue-100 dark:border-blue-900/30 mt-4'>
@@ -353,7 +364,7 @@ export function MahallaFormDialog({
                   existingFiles.length > 0 && (
                     <div className='bg-blue-50/50 dark:bg-blue-900/10 border border-blue-100 dark:border-blue-900/30 rounded-lg p-3 space-y-2 animate-in slide-in-from-top-1 duration-200'>
                       <p className='text-[10px] font-semibold text-blue-700 dark:text-blue-300 uppercase tracking-wider mb-2'>
-                        {mahalla?.district?.region?.name} hududi uchun yuklangan
+                        {regionName} hududi uchun yuklangan
                         hujjatlar:
                       </p>
                       <div className='grid grid-cols-1 gap-1.5 max-h-36 overflow-y-auto pr-1'>
