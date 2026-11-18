@@ -1,6 +1,6 @@
 'use client';
 
-import { Loader2Icon, Plus } from 'lucide-react';
+import { Download, Loader2Icon, Plus } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -13,6 +13,7 @@ import {
 } from '@/components/ui/select';
 import type { District, Region } from '@/types';
 import { MAHALLA_OPTIMIZATION_OPTIONS } from '@/lib';
+import { useExportMahallas } from '@/hooks';
 
 interface Props {
   search: string;
@@ -45,6 +46,8 @@ export function MahallaTableFilters({
   isDistrictLocked = false,
   onAddClick,
 }: Props) {
+  const { exportToExcel, isExporting } = useExportMahallas();
+
   return (
     <div className='flex flex-wrap items-center gap-3 p-4 border-gray-100 dark:border-gray-700 border-b'>
       <Input
@@ -147,6 +150,26 @@ export function MahallaTableFilters({
           ))}
         </SelectContent>
       </Select>
+
+      <Button
+        size='sm'
+        variant='outline'
+        disabled={isExporting}
+        onClick={() =>
+          exportToExcel(
+            { search, regionId, districtId, isOptimized },
+            isRegionLocked,
+            isDistrictLocked,
+          )
+        }
+      >
+        {isExporting ? (
+          <Loader2Icon className='animate-spin size-4' />
+        ) : (
+          <Download className='size-4' />
+        )}
+        Excel
+      </Button>
 
       {onAddClick && (
         <Button
