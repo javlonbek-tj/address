@@ -8,11 +8,14 @@ import toast from 'react-hot-toast';
 
 import type { MahallaSchemaType } from '@/lib';
 import { mahallaSchema } from '@/lib';
-import { getFiles, updateMahalla } from '@/app/actions';
-import type { Mahalla } from '@/types';
+import { createMahalla, getFiles, updateMahalla } from '@/app/actions';
+import type { Mahalla, Region } from '@/types';
 
 interface Props {
-  mahalla: Mahalla;
+  mahalla: Mahalla | null;
+  regions: Region[];
+  defaultRegionId?: string;
+  defaultDistrictId?: string;
   open: boolean;
   onClose: () => void;
   markAsSubmitted: () => void;
@@ -20,6 +23,9 @@ interface Props {
 
 export function useMahallaForm({
   mahalla,
+  regions,
+  defaultRegionId = '',
+  defaultDistrictId = '',
   open,
   onClose,
   markAsSubmitted,
@@ -30,14 +36,14 @@ export function useMahallaForm({
     Array<{ name: string; url: string }>
   >([]);
 
-  const getFormattedValues = (mahalla: Mahalla): MahallaSchemaType => ({
-    name: mahalla?.name,
-    code: mahalla?.code,
-    uzKadName: mahalla?.uzKadName,
-    geoCode: mahalla?.geoCode,
-    oneId: mahalla?.oneId,
-    regionId: mahalla?.district?.region?.id,
-    districtId: mahalla?.district?.id,
+  const getFormattedValues = (mahalla: Mahalla | null): MahallaSchemaType => ({
+    name: mahalla?.name ?? '',
+    code: mahalla?.code ?? '',
+    uzKadName: mahalla?.uzKadName ?? '',
+    geoCode: mahalla?.geoCode ?? '',
+    oneId: mahalla?.oneId ?? '',
+    regionId: mahalla?.district?.region?.id ?? defaultRegionId,
+    districtId: mahalla?.district?.id ?? defaultDistrictId,
     oldName: mahalla?.oldName,
     regulation: mahalla?.regulation,
     regulationUrl: mahalla?.regulationUrl,
@@ -46,7 +52,8 @@ export function useMahallaForm({
         mahallaCode: m.code,
         name: m.name,
       })) || [],
-    isOptimized: mahalla?.isOptimized,
+    isOptimized: mahalla?.isOptimized ?? false,
+    geometry: undefined,
     mergingMahallas:
       mahalla?.mergedMahallas.map((m) => ({
         mahallaCode: m.code,
@@ -59,25 +66,33 @@ export function useMahallaForm({
     defaultValues: getFormattedValues(mahalla),
   });
 
-  useEffect(() => {
-    if (open) {
-      form.reset(getFormattedValues(mahalla));
+  const regionId = form.watch('regionId');
+  const regionName = regions.find((region) => region.id === regionId)?.name;
 
-      const getExistingFiles = async () => {
-        const files = await getFiles(
-          `optimization/${mahalla?.district?.region?.name}`,
-        );
-        setExistingFiles(files);
-      };
-      if (mahalla?.district?.region?.id) {
-        getExistingFiles();
-      }
-    }
+  useEffect(() => {
+    if (open) form.reset(getFormattedValues(mahalla));
   }, [mahalla, form, open]);
+
+  useEffect(() => {
+    const subscription = form.watch((_, { name }) => {
+      if (name === 'regionId') form.setValue('districtId', '');
+    });
+    return () => subscription.unsubscribe();
+  }, [form]);
+
+  useEffect(() => {
+    if (!open || !regionName) {
+      setExistingFiles([]);
+      return;
+    }
+    getFiles(`optimization/${regionName}`).then(setExistingFiles);
+  }, [open, regionName]);
 
   const onSubmit = async (data: MahallaSchemaType) => {
     setIsSubmitting(true);
-    const result = await updateMahalla(mahalla.id, data);
+    const result = mahalla
+      ? await updateMahalla(mahalla.id, data)
+      : await createMahalla(data);
 
     if (!result.success) {
       toast.error(result.message || 'Mahallani saqlashda xatolik yuz berdi');
@@ -86,19 +101,21 @@ export function useMahallaForm({
     }
 
     markAsSubmitted();
-    toast.success('Mahalla muvaffaqiyatli tahrirlandi');
-    queryClient.invalidateQueries({
-      queryKey: ['mahallas-map', mahalla.district?.id],
-    });
-    queryClient.invalidateQueries({
-      queryKey: ['mahallas-table', mahalla.district?.id],
-    });
+    toast.success(
+      mahalla
+        ? 'Mahalla muvaffaqiyatli tahrirlandi'
+        : "Mahalla muvaffaqiyatli qo'shildi",
+    );
+    queryClient.invalidateQueries({ queryKey: ['mahallas-map'] });
+    queryClient.invalidateQueries({ queryKey: ['mahallas-table'] });
+    queryClient.invalidateQueries({ queryKey: ['mahallas-list'] });
     onClose();
     setIsSubmitting(false);
   };
 
   return {
     form,
+    regionName,
     isSubmitting,
     onSubmit,
     existingFiles,

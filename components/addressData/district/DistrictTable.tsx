@@ -59,13 +59,9 @@ export function DistrictTable({ isRegionLocked = false, userRegionId = null, isS
   const { isDeleting, handleDelete } = useDelete(deleteDistrict, {
     onSuccess: () => {
       handleCloseDelete();
-      queryClient.invalidateQueries({ queryKey: ['districts-map', regionId] });
-      queryClient.invalidateQueries({
-        queryKey: ['districts-table', regionId],
-      });
-      queryClient.invalidateQueries({
-        queryKey: ['districts-list', regionId],
-      });
+      queryClient.invalidateQueries({ queryKey: ['districts-map'] });
+      queryClient.invalidateQueries({ queryKey: ['districts-table'] });
+      queryClient.invalidateQueries({ queryKey: ['districts-list'] });
     },
     successMessage: "Tuman muvaffaqiyatli o'chirildi",
     errorMessage: "Tumanni o'chirishda xatolik yuz berdi",
