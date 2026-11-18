@@ -93,10 +93,9 @@ export function StreetTable({
   const { handleDelete, isDeleting } = useDelete(deleteStreet, {
     onSuccess: () => {
       handleCloseDelete();
-      queryClient.invalidateQueries({
-        queryKey: ['streets-map', districtId],
-      });
+      queryClient.invalidateQueries({ queryKey: ['streets-map'] });
       queryClient.invalidateQueries({ queryKey: ['streets-table'] });
+      queryClient.invalidateQueries({ queryKey: ['streets-list'] });
     },
     successMessage: "Ko'cha muvaffaqiyatli o'chirildi",
     errorMessage: "Ko'chani o'chirishda xatolik yuz berdi",

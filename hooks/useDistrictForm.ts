@@ -49,15 +49,9 @@ export function useDistrictForm({ district, open, onClose }: Props) {
       return;
     }
 
-    queryClient.invalidateQueries({
-      queryKey: ['districts-map', district.regionId],
-    });
-    queryClient.invalidateQueries({
-      queryKey: ['districts-table', district.regionId],
-    });
-    queryClient.invalidateQueries({
-      queryKey: ['districts-list', district.regionId],
-    });
+    queryClient.invalidateQueries({ queryKey: ['districts-map'] });
+    queryClient.invalidateQueries({ queryKey: ['districts-table'] });
+    queryClient.invalidateQueries({ queryKey: ['districts-list'] });
     toast.success('Tuman muvaffaqiyatli tahrirlandi');
     onClose();
     setIsSubmitting(false);
